@@ -6,6 +6,7 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import snake.actor.EnhancedMessage;
 import snake.base.*;
 import snake.distributed.DistributedCoordinator;
 import snake.gateway.auth.GatewayAuthClient;
@@ -13,6 +14,7 @@ import snake.gateway.dispatcher.MessageDispatcher;
 import snake.gateway.heartbeat.HeartbeatService;
 import snake.gateway.session.ClientSession;
 import snake.gateway.session.SessionManager;
+import snake.mq.MessageBus;
 import snake.network.ISession;
 import snake.network.NioServer;
 
@@ -25,6 +27,7 @@ public class ReactorGateway extends NioServer {
   private final DistributedCoordinator coordinator;
   private final String gatewayId;
   private final ExecutorService workerPool;
+  private final MessageBus messageBus;
 
   public ReactorGateway(
       int port,
@@ -33,6 +36,7 @@ public class ReactorGateway extends NioServer {
       MessageDispatcher dispatcher,
       GatewayAuthClient authClient,
       DistributedCoordinator coordinator,
+      MessageBus messageBus,
       String gatewayId) {
     super(port);
     this.sessionManager = sessionManager;
@@ -40,6 +44,7 @@ public class ReactorGateway extends NioServer {
     this.dispatcher = dispatcher;
     this.authClient = authClient;
     this.coordinator = coordinator;
+    this.messageBus = messageBus;
     this.gatewayId = gatewayId;
 
     final java.util.concurrent.atomic.AtomicLong counter =
@@ -285,16 +290,19 @@ public class ReactorGateway extends NioServer {
     client.closed = true;
     heartbeatService.remove(client);
     if (client.username != null) {
-      if (client.roomId != -1 && coordinator != null) {
-        var location = coordinator.getPlayerLocation(client.username);
-        if (location != null && location.roomId() != -1) {
-          String workerId = coordinator.getRoomWorker(location.roomId());
-          if (workerId != null) {
-            var msg =
-                new snake.actor.EnhancedMessage(
-                    "LEAVE", client.username, location.roomId(), gatewayId, "{}");
-            coordinator.publishToWorker(workerId, msg.toJson());
-          }
+      if (client.roomId != -1 && coordinator != null && messageBus != null) {
+        // 获取该房间所在的 Worker
+        String workerId = coordinator.getRoomWorker(client.roomId);
+        if (workerId != null) {
+          // 构造 LEAVE 消息，通过 RabbitMQ 发送给 Worker
+          EnhancedMessage leaveMsg =
+              new EnhancedMessage("LEAVE", client.username, client.roomId, gatewayId, "{}");
+          messageBus.sendToWorker(workerId, leaveMsg.toJson());
+          logger.info(
+              "Sent LEAVE for "
+                  + client.username
+                  + "from disconnected session to worker "
+                  + workerId);
         }
       }
       sessionManager.unbindUsername(client.username);

@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import snake.base.*;
 import snake.distributed.DistributedCoordinator;
+import snake.event.KafkaEventProducer;
 import snake.game.event.*;
 import snake.game.state.GameState;
 import snake.network.Serializer;
@@ -39,14 +40,14 @@ public class GameActor {
       int roomId,
       DistributedCoordinator coordinator,
       String workerId,
-      ILeaderboardRepository leaderboardRepo,
+      KafkaEventProducer eventProducer,
       Runnable onStatusChange) {
     this.roomId = roomId;
     this.coordinator = coordinator;
     this.workerId = workerId;
     this.onStatusChange = onStatusChange;
     this.state = new GameState(roomId);
-    this.notifier = new ActorNotifier(coordinator, leaderboardRepo);
+    this.notifier = new ActorNotifier(coordinator, eventProducer);
     this.lastActiveTime = System.currentTimeMillis();
 
     // Disruptor 设置
@@ -208,12 +209,24 @@ public class GameActor {
       lastActiveTime = System.currentTimeMillis();
     }
 
+    Map<String, Integer> oldScores = new HashMap<>();
+    for (GameState.Player p : state.getPlayers()) {
+      oldScores.put(p.username, p.score);
+    }
+
     Map<String, Boolean> wasAlive = new HashMap<>();
     for (GameState.Player p : state.getPlayers()) {
       wasAlive.put(p.username, !p.isDead);
     }
 
     state.update();
+
+    for (GameState.Player p : state.getPlayers()) {
+      int oldScore = oldScores.getOrDefault(p.username, 0);
+      if (p.score > oldScore) {
+        notifier.publishScoreChanged(p.username, roomId, p.score, p.score - oldScore);
+      }
+    }
 
     List<String> diedPlayers = new ArrayList<>();
     for (GameState.Player p : state.getPlayers()) {
@@ -230,7 +243,7 @@ public class GameActor {
               .findFirst()
               .orElse(null);
       if (player != null) {
-        notifier.updateHighScore(username, player.score);
+        notifier.publishPlayerDied(username, roomId, player.score, player.length, "COLLISION");
       }
       state.removePlayer(username);
       notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");

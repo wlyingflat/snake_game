@@ -5,24 +5,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import snake.actor.GameActor;
 import snake.base.Config;
-import snake.base.ILeaderboardRepository;
 import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
+import snake.event.KafkaEventProducer;
 
 public class ActorManager {
   private final Map<Integer, GameActor> actors = new ConcurrentHashMap<>();
   private final DistributedCoordinator coordinator;
   private final String workerId;
-  private final ILeaderboardRepository leaderboardRepo;
+  private final KafkaEventProducer eventProducer;
   private final ILogger logger = Logger.getInstance();
   private Runnable onActorStatusChange;
 
   public ActorManager(
-      DistributedCoordinator coordinator, String workerId, ILeaderboardRepository leaderboardRepo) {
+      DistributedCoordinator coordinator, String workerId, KafkaEventProducer eventProducer) {
     this.coordinator = coordinator;
     this.workerId = workerId;
-    this.leaderboardRepo = leaderboardRepo;
+    this.eventProducer = eventProducer;
   }
 
   public void setOnActorStatusChange(Runnable callback) {
@@ -57,7 +57,7 @@ public class ActorManager {
             roomId,
             coordinator,
             workerId,
-            leaderboardRepo,
+            eventProducer,
             () -> {
               GameActor a = actorRef.get();
               if (a != null && a.isRunning()) {

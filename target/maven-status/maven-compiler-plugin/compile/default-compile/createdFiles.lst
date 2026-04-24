@@ -5,6 +5,7 @@ snake/actor/EnhancedMessage.class
 snake/mq/MessageBus.class
 snake/worker/GameWorker.class
 snake/client/GatewayClient.class
+snake/consumer/LeaderboardConsumer.class
 snake/auth/AuthHttpServer.class
 snake/persistence/user/MySQLUserRepository.class
 snake/game/event/JoinRoomMsg.class
@@ -22,6 +23,7 @@ snake/base/RoomListEntry.class
 snake/distributed/DistributedCoordinator$UserRank.class
 snake/auth/MainServer.class
 snake/client/swing/GameFrame$1.class
+snake/event/PlayerDiedEvent.class
 snake/persistence/leaderboard/RedissonLeaderboardRepository.class
 snake/gateway/dispatcher/MessageDispatcher.class
 snake/network/IServer.class
@@ -32,6 +34,7 @@ snake/base/Config.class
 snake/auth/IAuthenticationService.class
 snake/game/event/TickMessage.class
 snake/client/GatewayClient$RoomListListener.class
+snake/event/PlayerInputEvent.class
 snake/base/Position.class
 snake/game/state/GameState$Player.class
 snake/client/swing/RoomListFrame$1.class
@@ -46,6 +49,8 @@ snake/network/Serializer.class
 snake/persistence/leaderboard/MySQLLeaderboardRepository.class
 snake/persistence/PropertiesConfigProvider.class
 snake/game/event/MessageEvent.class
+snake/event/KafkaEventProducer.class
+snake/event/ScoreChangedEvent.class
 snake/gateway/auth/GatewayAuthClient.class
 snake/gateway/heartbeat/DefaultHeartbeatService.class
 snake/client/swing/LoginFrame.class
@@ -54,6 +59,7 @@ snake/client/Config.class
 snake/base/ISerializer.class
 snake/persistence/user/IUserRepository.class
 snake/network/NioSession.class
+snake/event/GameEvent.class
 snake/auth/AuthHttpServer$AuthServlet.class
 snake/distributed/DistributedCoordinator$RoomEntry.class
 snake/client/swing/GameApp.class

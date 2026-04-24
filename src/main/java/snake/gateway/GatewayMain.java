@@ -67,7 +67,14 @@ public class GatewayMain {
 
     ReactorGateway gateway =
         new ReactorGateway(
-            port, sessionManager, heartbeatService, dispatcher, authClient, coordinator, gatewayId);
+            port,
+            sessionManager,
+            heartbeatService,
+            dispatcher,
+            authClient,
+            coordinator,
+            messageBus,
+            gatewayId);
 
     if (coordinator != null) {
       coordinator.subscribeRoomListUpdates((channel, msg) -> gateway.sendRoomListToLobby());

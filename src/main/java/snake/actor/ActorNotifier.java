@@ -1,21 +1,22 @@
 package snake.actor;
 
-import java.util.concurrent.CompletableFuture;
 import snake.base.Config;
-import snake.base.ILeaderboardRepository;
 import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
+import snake.event.KafkaEventProducer;
+import snake.event.PlayerDiedEvent;
+import snake.event.ScoreChangedEvent;
 
 /** Actor 的通知器 负责将消息发送到正确的 Gateway，再由 Gateway 转发给客户端 */
 public class ActorNotifier {
   private final DistributedCoordinator coordinator;
-  private final ILeaderboardRepository leaderboardRepo;
+  private final KafkaEventProducer eventProducer;
   private final ILogger logger = Logger.getInstance();
 
-  public ActorNotifier(DistributedCoordinator coordinator, ILeaderboardRepository leaderboardRepo) {
+  public ActorNotifier(DistributedCoordinator coordinator, KafkaEventProducer eventProducer) {
     this.coordinator = coordinator;
-    this.leaderboardRepo = leaderboardRepo;
+    this.eventProducer = eventProducer;
   }
 
   /**
@@ -46,16 +47,26 @@ public class ActorNotifier {
     }
   }
 
-  /** 更新最高分 */
-  public void updateHighScore(String username, int score) {
-    CompletableFuture.runAsync(
-            () -> {
-              leaderboardRepo.updateHighScore(username, score);
-            })
-        .exceptionally(
-            ex -> {
-              logger.error("High score update failed: " + ex.getMessage());
-              return null;
-            });
+  public void publishPlayerDied(
+      String username, int roomId, int finalScore, int finalLength, String cause) {
+    if (eventProducer != null) {
+      eventProducer.send(
+          "game.player.died",
+          new PlayerDiedEvent(username, roomId, finalScore, finalLength, cause));
+    }
+  }
+
+  public void publishScoreChanged(String username, int roomId, int newScore, int delta) {
+    if (eventProducer != null) {
+      eventProducer.send(
+          "game.player.score", new ScoreChangedEvent(username, roomId, newScore, delta));
+    }
+  }
+
+  public void publishPlayerInput(String username, int roomId, snake.base.Direction direction) {
+    if (eventProducer != null) {
+      eventProducer.send(
+          "game.player.input", new snake.event.PlayerInputEvent(username, roomId, direction));
+    }
   }
 }

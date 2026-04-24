@@ -30,10 +30,9 @@ public class PropertiesConfigProvider implements IConfigProvider {
                   || key.startsWith("redis.")
                   || key.startsWith("gateway.")
                   || key.startsWith("room.")
-                  || // 新增
-                  key.startsWith("auth.")
-                  || // 新增
-                  key.startsWith("heartbeat.")) { // 新增
+                  || key.startsWith("auth.")
+                  || key.startsWith("heartbeat.")
+                  || key.startsWith("kafka.")) {
                 props.setProperty(key, v.toString());
               }
             });
@@ -46,7 +45,6 @@ public class PropertiesConfigProvider implements IConfigProvider {
       try {
         return Integer.parseInt(val);
       } catch (NumberFormatException e) {
-        // ignore
       }
     }
     return defaultValue;
@@ -55,5 +53,14 @@ public class PropertiesConfigProvider implements IConfigProvider {
   @Override
   public String getString(String key, String defaultValue) {
     return props.getProperty(key, defaultValue);
+  }
+
+  @Override
+  public boolean getBoolean(String key, boolean defaultValue) {
+    String val = props.getProperty(key);
+    if (val != null) {
+      return Boolean.parseBoolean(val);
+    }
+    return defaultValue;
   }
 }

@@ -5,10 +5,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import snake.actor.EnhancedMessage;
 import snake.actor.GameActor;
-import snake.base.ILeaderboardRepository;
 import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
+import snake.event.KafkaEventProducer;
 import snake.mq.MessageBus; // 新增
 
 public class GameWorker {
@@ -17,20 +17,20 @@ public class GameWorker {
   private final DistributedCoordinator coordinator;
   private final ILogger logger = Logger.getInstance();
   private final ExecutorService dispatchPool;
-  private final ILeaderboardRepository leaderboardRepo;
   private final MessageBus messageBus; // 新增
+  private final KafkaEventProducer eventProducer;
   private volatile boolean running = false;
 
   public GameWorker(
       String workerId,
       DistributedCoordinator coordinator,
-      ILeaderboardRepository leaderboardRepo,
-      MessageBus messageBus) {
+      MessageBus messageBus,
+      KafkaEventProducer eventProducer) {
     this.workerId = workerId;
     this.coordinator = coordinator;
-    this.leaderboardRepo = leaderboardRepo;
+    this.eventProducer = eventProducer;
     this.messageBus = messageBus;
-    this.actorManager = new ActorManager(coordinator, workerId, leaderboardRepo);
+    this.actorManager = new ActorManager(coordinator, workerId, eventProducer);
     this.dispatchPool =
         Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
@@ -71,9 +71,20 @@ public class GameWorker {
       dispatchPool.awaitTermination(5, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       dispatchPool.shutdownNow();
+      Thread.currentThread().interrupt();
     }
 
     coordinator.unregisterWorker(workerId);
+
+    // 关闭 Kafka 生产者，确保所有待发送事件被刷新
+    if (eventProducer != null) {
+      try {
+        eventProducer.close(); // close() 内部会调用 flush() 并关闭连接
+      } catch (Exception e) {
+        logger.error("Failed to close Kafka producer: " + e.getMessage());
+      }
+    }
+
     logger.info("Worker " + workerId + " stopped");
   }
 

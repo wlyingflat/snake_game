@@ -51,4 +51,9 @@ public class Config {
 
   // ==================== 客户端 ====================
   public static final int MAX_RETRY_ATTEMPTS = provider.getInt("max.retry.attempts", 5);
+
+  // ==================== Kafka ====================
+  public static final String KAFKA_BOOTSTRAP_SERVERS =
+      provider.getString("kafka.bootstrap.servers", "localhost:9092");
+  public static final boolean KAFKA_ENABLED = provider.getBoolean("kafka.enabled", true);
 }
