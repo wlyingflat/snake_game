@@ -1,20 +1,256 @@
-2026-04-10 14:28:05.630 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:28:05.641 [snake.server.MainServer.main()] INFO  snake.util.Logger - Gateway process started on port 19000
-2026-04-10 14:28:06.148 [snake.server.MainServer.main()] INFO  snake.util.Logger - MainServer listening on port 12345
-2026-04-10 14:28:06.770 [Thread-2] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:28:06.773 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - HeartbeatService started
-2026-04-10 14:28:06.774 [Thread-2] INFO  snake.util.Logger - Gateway admin server listening on port 19004
-2026-04-10 14:28:06.774 [Thread-3] INFO  snake.util.Logger - Gateway query server listening on port 19003
-2026-04-10 14:28:06.776 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Gateway listening on port 19000
-2026-04-10 14:28:14.511 [gateway-worker-100] INFO  snake.util.Logger - Client identified: wmh
-2026-04-10 14:28:17.415 [gateway-worker-100] INFO  snake.util.Logger - Room 1 started with Disruptor.
-2026-04-10 14:28:17.415 [gateway-worker-100] INFO  snake.util.Logger - Room 1 created.
-2026-04-10 14:28:17.420 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-10 14:28:17.656 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:28:19.495 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-10 14:29:00.513 [gateway-worker-100] INFO  snake.util.Logger - Client identified: hwc
-2026-04-10 14:29:04.998 [room-1-disruptor] INFO  snake.util.Logger - Room 1 idle timeout, stopping.
-2026-04-10 14:36:14.643 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:38:31.489 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:39:00.725 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 15:19:18.785 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:26:46.600 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:26:46.710 [snake.server.MainServer.main()] INFO  snake.util.Logger - Users table ensured.
+2026-04-21 13:26:46.716 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:26:46.721 [snake.server.MainServer.main()] INFO  snake.util.Logger - Gateway process started on port 19000
+2026-04-21 13:26:47.235 [snake.server.MainServer.main()] INFO  snake.util.Logger - MainServer listening on port 12345
+2026-04-21 13:26:47.908 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:26:47.999 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Users table ensured.
+2026-04-21 13:26:48.007 [Thread-2] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:26:48.008 [Thread-2] INFO  snake.util.Logger - Gateway admin server listening on port 19004
+2026-04-21 13:26:48.008 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - HeartbeatService started
+2026-04-21 13:26:48.008 [Thread-3] INFO  snake.util.Logger - Gateway query server listening on port 19003
+2026-04-21 13:26:48.011 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Gateway listening on port 19000
+2026-04-21 13:30:48.224 [gateway-worker-103] INFO  snake.util.Logger - Client identified: test_leaderboard_user
+2026-04-21 13:34:59.520 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
+2026-04-21 13:34:59.545 [gateway-worker-104] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:35:02.860 [gateway-worker-104] INFO  snake.util.Logger - Room 2 created, destroyCallback is set
+2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room 2 started with Disruptor and independent idle checker.
+2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room 2 created.
+2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:02.884 [gateway-worker-104] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:35:02.885 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
+2026-04-21 13:35:02.886 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:02.886 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:35:03.115 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:35:04.069 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
+2026-04-21 13:35:04.070 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:04.070 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:35:05.853 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
+2026-04-21 13:35:05.854 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:05.854 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
+2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
+2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
+2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
+2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
+2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:35:55.281 [ForkJoinPool.commonPool-worker-32] INFO  snake.util.Logger - High score updated for wmh: 4
+2026-04-21 13:36:01.689 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
+2026-04-21 13:36:32.868 [room-2-idle-check] INFO  snake.util.Logger - Room 2 idle timeout, stopping from idle check thread.
+2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room 2 is stopping...
+2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 2
+2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 13:36:37.870 [room-2-idle-check] INFO  snake.util.Logger - Room 2 destroyed.
+2026-04-21 13:36:37.870 [room-2-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 2
+2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 2
+2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - removeRoom called for room 2
+2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room 2 removed from manager. Remaining rooms: 0
+2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 13:37:50.301 [gateway-worker-109] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:49:04.989 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
+2026-04-21 13:49:05.008 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:49:07.535 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created, destroyCallback is set
+2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room 1 started with Disruptor and independent idle checker.
+2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created.
+2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:49:07.543 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-21 13:49:07.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:49:07.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:49:07.768 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
+2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:49:17.581 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
+2026-04-21 13:49:32.791 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:50:01.980 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
+2026-04-21 13:50:02.002 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Room 1 idle timeout, stopping from idle check thread.
+2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Room 1 is stopping...
+2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 1
+2026-04-21 13:50:07.544 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:07.544 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:50:12.544 [room-1-idle-check] INFO  snake.util.Logger - Room 1 destroyed.
+2026-04-21 13:50:12.544 [room-1-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 1
+2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 1
+2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - removeRoom called for room 1
+2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room 1 removed from manager. Remaining rooms: 0
+2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:50:13.731 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created, destroyCallback is set
+2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room 1 started with Disruptor and independent idle checker.
+2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created.
+2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:13.733 [gateway-worker-110] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:50:13.962 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-21 13:50:16.532 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
+2026-04-21 13:50:16.533 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:16.533 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
+2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 13:51:38.332 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
+2026-04-21 13:51:38.333 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:51:38.333 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 13:51:38.337 [ForkJoinPool.commonPool-worker-35] INFO  snake.util.Logger - High score updated for wmh: 9
+2026-04-21 13:51:42.069 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
+2026-04-21 13:51:47.731 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
+2026-04-21 13:52:13.732 [room-1-idle-check] INFO  snake.util.Logger - Room 1 idle timeout, stopping from idle check thread.
+2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room 1 is stopping...
+2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 1
+2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room 1 destroyed.
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 1
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 1
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - removeRoom called for room 1
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room 1 removed from manager. Remaining rooms: 0
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
+2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 16:27:17.308 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 16:27:17.418 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 16:27:17.432 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 16:27:17.437 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 16:27:17.441 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Gateway process started on port 19000
+2026-04-21 16:27:17.945 [snake.auth.MainServer.main()] INFO  snake.base.Logger - MainServer listening on port 12345
+2026-04-21 16:27:18.692 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 16:27:18.780 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 16:27:18.793 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 16:27:18.801 [Thread-2] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 16:27:18.802 [Thread-2] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 16:27:18.802 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 16:27:18.802 [Thread-3] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 16:27:18.804 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Gateway listening on port 19000
+2026-04-21 16:27:30.610 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged in: wmh
+2026-04-21 16:27:30.682 [gateway-worker-103] INFO  snake.base.Logger - Client identified: wmh
+2026-04-21 16:27:34.293 [gateway-worker-104] INFO  snake.base.Logger - Room 1 created, destroyCallback is set
+2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room 1 started with Disruptor and independent idle checker.
+2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room 1 created.
+2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:27:34.316 [gateway-worker-104] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Player wmh joined room 1
+2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 16:27:34.544 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - User wmh left room, roomId changed from 1 to -1
+2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 16:28:18.779 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged out: wmh
+2026-04-21 16:28:24.279 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged in: yhl
+2026-04-21 16:28:24.282 [gateway-worker-104] INFO  snake.base.Logger - Client identified: yhl
+2026-04-21 16:28:27.321 [room-1-disruptor] INFO  snake.base.Logger - Player yhl joined room 1
+2026-04-21 16:28:27.322 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:28:27.322 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
+2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - User yhl left room, roomId changed from 1 to -1
+2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
+2026-04-21 16:28:37.312 [ForkJoinPool.commonPool-worker-31] INFO  snake.base.Logger - High score updated for yhl: 1
+2026-04-21 16:28:40.832 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged out: yhl
+2026-04-21 16:28:53.880 [gateway-worker-104] INFO  snake.base.Logger - Client identified: yhl
+2026-04-21 16:29:34.299 [room-1-idle-check] INFO  snake.base.Logger - Room 1 idle timeout, stopping from idle check thread.
+2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room 1 is stopping...
+2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Triggering room list update via onStatusChange for room 1
+2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 16:29:39.301 [room-1-idle-check] INFO  snake.base.Logger - Room 1 destroyed.
+2026-04-21 16:29:39.301 [room-1-idle-check] INFO  snake.base.Logger - Calling destroyCallback.onRoomDestroyed for room 1
+2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - onRoomDestroyed called for room 1
+2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - removeRoom called for room 1
+2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room 1 removed from manager. Remaining rooms: 0
+2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room list update callback invoked
+2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
+2026-04-21 18:44:14.305 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:44:14.413 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 18:44:14.420 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 18:44:14.432 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:44:14.433 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 18:44:14.433 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 18:44:14.433 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 18:44:14.436 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 18:45:55.380 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:45:55.489 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 18:45:55.503 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 18:45:55.515 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:45:55.516 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 18:45:55.516 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 18:45:55.516 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 18:46:06.177 [Thread-3] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-21 18:46:08.819 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:46:08.923 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 18:46:08.936 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 18:46:08.946 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:46:08.947 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 18:46:08.947 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 18:46:08.947 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 18:46:08.949 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 18:47:55.331 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-21 18:54:11.473 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:54:11.578 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 18:54:11.591 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 18:54:11.601 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:54:11.602 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 18:54:11.602 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 18:54:11.602 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 18:54:11.604 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 18:55:34.946 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-21 18:58:43.286 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:58:43.397 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 18:58:43.439 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 18:58:43.450 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 18:58:43.451 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 18:58:43.451 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 18:58:43.451 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 18:58:43.453 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 18:59:13.959 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-21 19:01:01.605 [main] ERROR snake.base.Logger - Error parsing message: Invalid message length: 2065851245
+2026-04-21 19:01:20.615 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:01:20.724 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 19:01:20.738 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 19:01:20.748 [Thread-1] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:01:20.749 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 19:01:20.749 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 19:01:20.749 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 19:01:20.752 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 19:01:29.464 [main] ERROR snake.base.Logger - Error parsing message: Invalid message length: 2065851245
+2026-04-21 19:02:38.977 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
+2026-04-21 19:02:38.978 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-21 19:05:03.636 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:05:03.738 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 19:05:03.752 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 19:05:03.761 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:05:03.762 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 19:05:03.762 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 19:05:03.763 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 19:05:03.764 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 19:05:07.482 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-21 19:06:03.114 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
+2026-04-21 19:11:09.693 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:11:09.798 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-21 19:11:09.811 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-21 19:11:09.821 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-21 19:11:09.822 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
+2026-04-21 19:11:09.822 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
+2026-04-21 19:11:09.822 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-21 19:11:09.824 [main] INFO  snake.base.Logger - Gateway listening on port 8080
+2026-04-21 19:11:22.978 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
+2026-04-21 19:11:22.980 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN

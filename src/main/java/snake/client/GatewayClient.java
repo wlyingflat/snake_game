@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import snake.common.GameStateData;
-import snake.common.Serializer;
+import snake.base.GameStateData;
+import snake.network.Serializer;
 
 public class GatewayClient {
   private Socket socket;
