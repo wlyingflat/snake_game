@@ -42,7 +42,6 @@ public class GatewayMain {
       coordinator = null;
     }
 
-    // 创建 MessageBus 并连接 RabbitMQ
     MessageBus messageBus = null;
     try {
       messageBus = new MessageBus();
@@ -75,29 +74,17 @@ public class GatewayMain {
             messageBus,
             gatewayId);
 
-    // ========== 房间列表更新广播（RabbitMQ）==========
+    // 房间列表更新广播（RabbitMQ）
     if (messageBus != null) {
       try {
-        messageBus.subscribeRoomListUpdates(
-            gatewayId,
-            () -> {
-              // 接收到广播后，刷新并推送给大厅内所有玩家
-              gateway.sendRoomListToLobby();
-            });
+        messageBus.subscribeRoomListUpdates(gatewayId, () -> gateway.sendRoomListToLobby());
         logger.info("Gateway subscribed to room list updates via RabbitMQ");
       } catch (Exception e) {
         logger.error("Failed to subscribe to room list updates: " + e.getMessage());
       }
-    } else {
-      logger.warn("MessageBus not available, room list updates will not be received");
     }
 
-    // 可选：如果还需要兼容 Redis 广播，可保留以下代码并添加开关
-    // if (coordinator != null && Config.USE_REDIS_ROOM_LIST) {
-    //     coordinator.subscribeRoomListUpdates((channel, msg) -> gateway.sendRoomListToLobby());
-    // }
-
-    // ========== 定向消息订阅（RabbitMQ）==========
+    // 定向消息订阅（RabbitMQ）
     if (messageBus != null) {
       try {
         messageBus.subscribeGateway(

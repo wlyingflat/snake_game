@@ -71,13 +71,6 @@ public class GameActor {
             doGameTick();
           } else if (msg instanceof EnhancedMessage) {
             handleEnhancedMessage((EnhancedMessage) msg);
-          } else if (msg instanceof JoinRoomMsg) {
-            handleJoin(((JoinRoomMsg) msg).username(), null);
-          } else if (msg instanceof InputMsg) {
-            InputMsg input = (InputMsg) msg;
-            state.updateDirection(input.username(), input.direction());
-          } else if (msg instanceof LeaveRoomMsg) {
-            handleLeave(((LeaveRoomMsg) msg).username(), null);
           }
           event.clear();
         });
@@ -125,10 +118,10 @@ public class GameActor {
     publishEvent(msg);
   }
 
-  public void post(Message msg) {
-    if (!running.get()) return;
-    publishEvent(msg);
-  }
+  // public void post(Message msg) {
+  //   if (!running.get()) return;
+  //   publishEvent(msg);
+  // }
 
   public int getRoomId() {
     return roomId;

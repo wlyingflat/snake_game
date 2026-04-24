@@ -19,7 +19,6 @@ public class GameState {
   // ---------- 差分计算需要的历史状态 ----------
   private Position previousFood;
   private final Map<String, List<Position>> previousPlayerBodies = new HashMap<>();
-  private int previousActivePlayers;
   private Set<String> previousPlayerNames = new HashSet<>();
   // 记录本 tick 新加入的玩家，用于发送全量快照
   private final Set<String> newPlayersThisTick = new HashSet<>();
@@ -29,7 +28,6 @@ public class GameState {
     initWorld();
     // 初始化 previous 状态为空，确保第一个 tick 能正确处理
     previousFood = new Position(food.x, food.y);
-    previousActivePlayers = 0;
     previousPlayerNames = new HashSet<>();
   }
 
@@ -197,7 +195,6 @@ public class GameState {
     for (Map.Entry<String, Player> entry : players.entrySet()) {
       previousPlayerBodies.put(entry.getKey(), new ArrayList<>(entry.getValue().body));
     }
-    previousActivePlayers = activePlayers;
     previousPlayerNames = new HashSet<>(players.keySet());
 
     List<Player> playerList = new ArrayList<>(players.values());

@@ -9,7 +9,7 @@ import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
-import snake.mq.MessageBus; // 新增
+import snake.mq.MessageBus;
 
 public class GameWorker {
   private final String workerId;
@@ -17,7 +17,7 @@ public class GameWorker {
   private final DistributedCoordinator coordinator;
   private final ILogger logger = Logger.getInstance();
   private final ExecutorService dispatchPool;
-  private final MessageBus messageBus; // 新增
+  private final MessageBus messageBus;
   private final KafkaEventProducer eventProducer;
   private volatile boolean running = false;
 
@@ -47,11 +47,6 @@ public class GameWorker {
 
     coordinator.registerWorker(workerId);
 
-    actorManager.setOnActorStatusChange(
-        () -> {
-          coordinator.publishRoomListUpdate();
-        });
-
     // 通过 RabbitMQ 接收指令
     messageBus.startWorkerConsumer(
         workerId,
@@ -76,10 +71,9 @@ public class GameWorker {
 
     coordinator.unregisterWorker(workerId);
 
-    // 关闭 Kafka 生产者，确保所有待发送事件被刷新
     if (eventProducer != null) {
       try {
-        eventProducer.close(); // close() 内部会调用 flush() 并关闭连接
+        eventProducer.close();
       } catch (Exception e) {
         logger.error("Failed to close Kafka producer: " + e.getMessage());
       }
@@ -104,7 +98,9 @@ public class GameWorker {
       GameActor actor = actorManager.getActor(roomId);
       if (actor == null || !actor.isRunning()) {
         String error = "{\"cmd\":\"ERROR\",\"message\":\"Room not found\"}";
-        coordinator.publishToGateway(msg.getGatewayId(), msg.getUsername(), error);
+        if (messageBus != null) {
+          messageBus.publishToPlayer(msg.getGatewayId(), msg.getUsername(), error);
+        }
         return;
       }
 
@@ -128,7 +124,9 @@ public class GameWorker {
     GameActor actor = actorManager.getOrCreateActor(roomId);
     if (actor == null) {
       String error = "{\"cmd\":\"ERROR\",\"message\":\"Cannot create room\"}";
-      coordinator.publishToGateway(msg.getGatewayId(), msg.getUsername(), error);
+      if (messageBus != null) {
+        messageBus.publishToPlayer(msg.getGatewayId(), msg.getUsername(), error);
+      }
       return;
     }
 

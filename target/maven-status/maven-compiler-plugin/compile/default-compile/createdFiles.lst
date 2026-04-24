@@ -10,7 +10,6 @@ snake/game/event/PlayerDiff.class
 snake/consumer/LeaderboardConsumer.class
 snake/auth/AuthHttpServer.class
 snake/persistence/user/MySQLUserRepository.class
-snake/game/event/JoinRoomMsg.class
 snake/distributed/DistributedCoordinator$PlayerLocation.class
 snake/client/swing/RoomListFrame$RoomEntry.class
 snake/mq/MessageBus$1.class
@@ -22,7 +21,6 @@ snake/gateway/reactor/ReactorGateway.class
 snake/base/ILeaderboardRepository.class
 snake/persistence/DatabaseManager.class
 snake/gateway/session/SessionManager.class
-snake/base/RoomListEntry.class
 snake/distributed/DistributedCoordinator$UserRank.class
 snake/auth/MainServer.class
 snake/client/swing/GameFrame$1.class
@@ -37,7 +35,6 @@ snake/base/Config.class
 snake/auth/IAuthenticationService.class
 snake/game/event/TickMessage.class
 snake/client/GatewayClient$RoomListListener.class
-snake/event/PlayerInputEvent.class
 snake/base/Position.class
 snake/game/state/GameState$Player.class
 snake/client/swing/RoomListFrame$1.class
@@ -69,14 +66,11 @@ snake/distributed/DistributedCoordinator$RoomEntry.class
 snake/client/swing/GameApp.class
 snake/persistence/redis/RedissonManager.class
 snake/base/Logger.class
-snake/game/state/RoomStatus.class
 snake/worker/ActorManager.class
 snake/persistence/BaseMySQLRepository.class
 snake/base/ILogger.class
 snake/base/JsonUtils.class
 snake/base/ILeaderboardRepository$UserRank.class
-snake/game/event/LeaveRoomMsg.class
-snake/game/event/InputMsg.class
 snake/client/swing/GameFrame$2.class
 snake/client/swing/LeaderboardDialog$1.class
 snake/client/swing/GameFrame.class

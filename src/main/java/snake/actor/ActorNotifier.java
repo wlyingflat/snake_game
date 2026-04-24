@@ -7,12 +7,12 @@ import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
 import snake.event.PlayerDiedEvent;
 import snake.event.ScoreChangedEvent;
-import snake.mq.MessageBus; // 新增
+import snake.mq.MessageBus;
 
 public class ActorNotifier {
   private final DistributedCoordinator coordinator;
   private final KafkaEventProducer eventProducer;
-  private final MessageBus messageBus; // 新增
+  private final MessageBus messageBus;
   private final ILogger logger = Logger.getInstance();
 
   public ActorNotifier(
@@ -34,11 +34,10 @@ public class ActorNotifier {
       gatewayId = loc.gatewayId();
     }
 
-    // 优先使用 RabbitMQ（如果可用），否则降级到 Redis
     if (messageBus != null) {
       messageBus.publishToPlayer(gatewayId, username, message);
     } else {
-      coordinator.publishToGateway(gatewayId, username, message);
+      logger.warn("MessageBus not available, cannot send message to " + username);
     }
 
     if (Config.DEBUG_MESSAGE_LOGGING) {
@@ -59,13 +58,6 @@ public class ActorNotifier {
     if (eventProducer != null) {
       eventProducer.send(
           "game.player.score", new ScoreChangedEvent(username, roomId, newScore, delta));
-    }
-  }
-
-  public void publishPlayerInput(String username, int roomId, snake.base.Direction direction) {
-    if (eventProducer != null) {
-      eventProducer.send(
-          "game.player.input", new snake.event.PlayerInputEvent(username, roomId, direction));
     }
   }
 }

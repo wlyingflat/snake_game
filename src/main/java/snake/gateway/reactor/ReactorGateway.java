@@ -18,7 +18,6 @@ import snake.mq.MessageBus;
 import snake.network.ISession;
 import snake.network.NioServer;
 
-/** Reactor 层 - 纯网络网关 只负责连接管理、认证、路由 不包含任何游戏逻辑 */
 public class ReactorGateway extends NioServer {
   private final SessionManager sessionManager;
   private final HeartbeatService heartbeatService;
@@ -291,17 +290,15 @@ public class ReactorGateway extends NioServer {
     heartbeatService.remove(client);
     if (client.username != null) {
       if (client.roomId != -1 && coordinator != null && messageBus != null) {
-        // 获取该房间所在的 Worker
         String workerId = coordinator.getRoomWorker(client.roomId);
         if (workerId != null) {
-          // 构造 LEAVE 消息，通过 RabbitMQ 发送给 Worker
           EnhancedMessage leaveMsg =
               new EnhancedMessage("LEAVE", client.username, client.roomId, gatewayId, "{}");
           messageBus.sendToWorker(workerId, leaveMsg.toJson());
           logger.info(
               "Sent LEAVE for "
                   + client.username
-                  + "from disconnected session to worker "
+                  + " from disconnected session to worker "
                   + workerId);
         }
       }

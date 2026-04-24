@@ -128,7 +128,7 @@ public class LocalGameState {
         }
 
         pd.length = pdNode.get("length").asInt();
-        // 分数可能在 ScoreChanged 事件中更新，这里差分未提供，保持原值
+        pd.score = pd.length - 1; // ← 新增：根据长度实时推算分数
       }
     }
 

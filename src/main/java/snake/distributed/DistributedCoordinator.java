@@ -3,8 +3,6 @@ package snake.distributed;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.redisson.api.*;
-import org.redisson.api.listener.MessageListener;
-import org.redisson.api.listener.PatternMessageListener;
 import snake.base.*;
 
 public class DistributedCoordinator {
@@ -170,7 +168,6 @@ public class DistributedCoordinator {
     RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
     onlineMap.fastPut(username, System.currentTimeMillis());
     onlineMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
-    redisson.getSet(RedisKeys.ONLINE_USERS).add(username);
   }
 
   public void refreshOnline(String username) {
@@ -187,7 +184,6 @@ public class DistributedCoordinator {
     if (username == null) return;
     RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
     onlineMap.remove(username);
-    redisson.getSet(RedisKeys.ONLINE_USERS).remove(username);
   }
 
   public boolean isOnline(String username) {
@@ -195,12 +191,6 @@ public class DistributedCoordinator {
     RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
     Long lastSeen = onlineMap.get(username);
     if (lastSeen == null) {
-      boolean inOldSet = redisson.getSet(RedisKeys.ONLINE_USERS).contains(username);
-      if (inOldSet) {
-        onlineMap.fastPut(username, System.currentTimeMillis());
-        onlineMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
-        return true;
-      }
       return false;
     }
     long elapsed = System.currentTimeMillis() - lastSeen;
@@ -212,67 +202,7 @@ public class DistributedCoordinator {
     return true;
   }
 
-  // ==================== 消息发布/订阅 ====================
-
-  public void publishToWorker(String workerId, String message) {
-    redisson.getTopic(RedisKeys.WORKER_CHANNEL_PREFIX + workerId).publish(message);
-  }
-
-  public int subscribeWorkerMessages(String workerId, MessageListener<String> listener) {
-    return redisson
-        .getTopic(RedisKeys.WORKER_CHANNEL_PREFIX + workerId)
-        .addListener(String.class, listener);
-  }
-
-  public void unsubscribeWorkerMessages(String workerId, int listenerId) {
-    redisson.getTopic(RedisKeys.WORKER_CHANNEL_PREFIX + workerId).removeListener(listenerId);
-  }
-
-  public void publishToGateway(String gatewayId, String username, String message) {
-    String channel = String.format(RedisKeys.GATEWAY_PLAYER_CHANNEL, gatewayId, username);
-    redisson.getTopic(channel).publish(message);
-  }
-
-  public int subscribeGatewayMessages(String gatewayId, PatternMessageListener<String> listener) {
-    String pattern = String.format(RedisKeys.GATEWAY_PLAYER_CHANNEL, gatewayId, "*");
-    return redisson.getPatternTopic(pattern).addListener(String.class, listener);
-  }
-
-  public void publishRoomListUpdate() {
-    redisson.getTopic(RedisKeys.ROOM_LIST_UPDATE_CHANNEL).publish("update");
-  }
-
-  public int subscribeRoomListUpdates(MessageListener<String> listener) {
-    return redisson
-        .getTopic(RedisKeys.ROOM_LIST_UPDATE_CHANNEL)
-        .addListener(String.class, listener);
-  }
-
-  public void publishToRoom(int roomId, String message) {
-    redisson.getTopic(String.format(RedisKeys.ROOM_BROADCAST_CHANNEL, roomId)).publish(message);
-  }
-
-  public void publishToPlayer(String username, String message) {
-    redisson.getTopic(String.format(RedisKeys.PLAYER_DIRECT_CHANNEL, username)).publish(message);
-  }
-
-  public int subscribeDirectMessages(PatternMessageListener<String> listener) {
-    return redisson
-        .getPatternTopic(RedisKeys.PLAYER_DIRECT_CHANNEL.replace("%s", "*"))
-        .addListener(String.class, listener);
-  }
-
   // ==================== 排行榜 ====================
-
-  public void updateHighScore(String username, int score) {
-    RScoredSortedSet<String> leaderboard =
-        redisson.getScoredSortedSet(
-            RedisKeys.LEADERBOARD_KEY, org.redisson.client.codec.StringCodec.INSTANCE);
-    Double current = leaderboard.getScore(username);
-    if (current == null || current < score) {
-      leaderboard.add(score, username);
-    }
-  }
 
   public List<UserRank> getLeaderboard(int limit) {
     RScoredSortedSet<String> leaderboard =
@@ -290,19 +220,6 @@ public class DistributedCoordinator {
       }
     }
     return ranks;
-  }
-
-  // 兼容旧代码
-  public void registerNode() {
-    registerGateway(nodeId);
-  }
-
-  public void unregisterNode() {
-    unregisterGateway(nodeId);
-  }
-
-  public void refreshNode() {
-    // no-op for now
   }
 
   public static class UserRank {

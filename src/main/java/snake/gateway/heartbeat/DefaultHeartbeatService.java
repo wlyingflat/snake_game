@@ -19,7 +19,7 @@ public class DefaultHeartbeatService implements HeartbeatService {
       new ConcurrentHashMap<>();
   private final ILogger logger = Logger.getInstance();
   private final Consumer<ClientSession> onTimeoutCallback;
-  private final DistributedCoordinator coordinator; // 新增
+  private final DistributedCoordinator coordinator;
   private ScheduledExecutorService pingSender;
   private volatile boolean running = true;
 
@@ -27,11 +27,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
       Consumer<ClientSession> onTimeoutCallback, DistributedCoordinator coordinator) {
     this.onTimeoutCallback = onTimeoutCallback;
     this.coordinator = coordinator;
-  }
-
-  // 兼容旧构造
-  public DefaultHeartbeatService(Consumer<ClientSession> onTimeoutCallback) {
-    this(onTimeoutCallback, null);
   }
 
   @Override
@@ -53,7 +48,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
   public void stop() {
     running = false;
     if (pingSender != null) pingSender.shutdownNow();
-    // 清理所有待处理的 Timeout，防止内存残留
     for (Timeout timeout : sessionTimeouts.values()) {
       if (timeout != null && !timeout.isCancelled()) {
         timeout.cancel();
@@ -66,7 +60,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
 
   @Override
   public void refresh(ClientSession session) {
-    // 如果会话已经标记为关闭，不再添加心跳跟踪
     if (session == null || session.closed) return;
 
     Timeout old = sessionTimeouts.remove(session);
@@ -76,7 +69,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
         timer.newTimeout(
             timeout -> {
               logger.warn("Client " + session.username + " heartbeat timeout, closing session");
-              // 心跳超时，清理 Redis 在线状态
               if (coordinator != null && session.username != null) {
                 coordinator.markOffline(session.username);
                 coordinator.removePlayerLocation(session.username);
@@ -89,7 +81,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
             TimeUnit.SECONDS);
     sessionTimeouts.put(session, newTimeout);
 
-    // 续约 Redis 在线状态
     if (coordinator != null && session.username != null) {
       coordinator.refreshOnline(session.username);
       coordinator.refreshPlayerLocation(session.username);
@@ -112,7 +103,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
     }
     logger.debug("Removed heartbeat tracking for session: " + session.getSessionId());
 
-    // 清理 Redis 在线状态
     if (coordinator != null && session.username != null) {
       coordinator.markOffline(session.username);
       coordinator.removePlayerLocation(session.username);
@@ -122,7 +112,6 @@ public class DefaultHeartbeatService implements HeartbeatService {
   private void sendPings() {
     if (!running) return;
     long nowSec = System.currentTimeMillis() / 1000;
-    // 遍历快照，避免在迭代过程中修改 map 导致 ConcurrentModificationException
     for (ClientSession session : sessionTimeouts.keySet()) {
       if (session == null || session.closed || session.username == null) continue;
 
@@ -130,11 +119,9 @@ public class DefaultHeartbeatService implements HeartbeatService {
         session.sendMessage("{\"cmd\":\"PING\"}");
         session.pendingPong = true;
         session.lastPingSent = nowSec;
-        // 刷新超时计时器（延长下次超时时间）
         refresh(session);
       }
 
-      // 即使不发送 PING，也续约 Redis 状态
       if (coordinator != null && session.username != null) {
         coordinator.refreshOnline(session.username);
         coordinator.refreshPlayerLocation(session.username);
