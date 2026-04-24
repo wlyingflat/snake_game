@@ -1,25 +1,26 @@
-// snake/core/Room.java
 package snake.core;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
-import snake.common.Config;
-import snake.common.GameStateData;
-import snake.common.Protocol;
-import snake.common.Serializer;
+import snake.common.*;
 import snake.util.Logger;
 
 public class Room implements Runnable {
   private final int roomId;
-  private final ConcurrentLinkedQueue<Message> mailbox = new ConcurrentLinkedQueue<>();
+  private final BlockingQueue<Message> mailbox;
   private final GameState state;
   private volatile boolean running = true;
   private final BiConsumer<String, String> messageSender;
   private final BiConsumer<Integer, Room> onDestroy;
   private final Runnable onStatusChange;
   private long lastActiveTime;
+  private final ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   public Room(
       int roomId,
@@ -27,6 +28,7 @@ public class Room implements Runnable {
       BiConsumer<Integer, Room> onDestroy,
       Runnable onStatusChange) {
     this.roomId = roomId;
+    this.mailbox = new ArrayBlockingQueue<>(1024);
     this.state = new GameState(roomId);
     this.messageSender = messageSender;
     this.onDestroy = onDestroy;
@@ -34,54 +36,102 @@ public class Room implements Runnable {
   }
 
   public void post(Message msg) {
-    mailbox.offer(msg);
+    if (msg instanceof InputMsg) {
+      InputMsg input = (InputMsg) msg;
+      mailbox.removeIf(
+          m -> m instanceof InputMsg && ((InputMsg) m).username().equals(input.username()));
+      boolean offered = mailbox.offer(msg);
+      if (!offered) {
+        Logger.warn("Room " + roomId + " mailbox full, dropping INPUT from " + input.username());
+      }
+    } else {
+      boolean offered = mailbox.offer(msg);
+      if (!offered) {
+        Logger.warn("Room " + roomId + " mailbox full, dropping message: " + msg.type());
+      }
+    }
   }
 
   public GameStateData getSnapshot(String username) {
-    return state.snapshot(username);
+    if (!running) return null;
+    stateLock.readLock().lock();
+    try {
+      return state.snapshot(username);
+    } finally {
+      stateLock.readLock().unlock();
+    }
   }
 
   @Override
   public void run() {
+    Logger.info("[Room " + roomId + "] Thread started");
     lastActiveTime = System.currentTimeMillis();
     Logger.info("Room " + roomId + " started.");
     while (running) {
       long start = System.currentTimeMillis();
 
       try {
-        // 处理消息队列
         Message msg;
         while ((msg = mailbox.poll()) != null) {
           handle(msg);
         }
 
-        // 记录当前所有玩家的存活状态，用于死亡检测
+        // 记录玩家存活状态（更新前）
         Map<String, Boolean> wasAlive = new HashMap<>();
-        for (GameState.Player p : state.getPlayers()) {
-          wasAlive.put(p.username, !p.isDead);
+        stateLock.readLock().lock();
+        try {
+          for (GameState.Player p : state.getPlayers()) {
+            wasAlive.put(p.username, !p.isDead);
+          }
+        } finally {
+          stateLock.readLock().unlock();
         }
 
         // 更新游戏逻辑
-        state.update();
+        stateLock.writeLock().lock();
+        try {
+          state.update();
+        } finally {
+          stateLock.writeLock().unlock();
+        }
 
-        // 检测死亡玩家并发送 YOU DIED 消息
-        for (GameState.Player p : state.getPlayers()) {
-          Boolean aliveBefore = wasAlive.get(p.username);
-          if (aliveBefore != null && aliveBefore && p.isDead) {
-            messageSender.accept(p.username, Protocol.YOU_DIED);
-            Logger.debug("Player " + p.username + " died, sent YOU DIED");
+        // 收集死亡玩家
+        List<String> diedPlayers = new ArrayList<>();
+        stateLock.readLock().lock();
+        try {
+          for (GameState.Player p : state.getPlayers()) {
+            Boolean aliveBefore = wasAlive.get(p.username);
+            if (aliveBefore != null && aliveBefore && p.isDead) {
+              diedPlayers.add(p.username);
+            }
           }
+        } finally {
+          stateLock.readLock().unlock();
+        }
+
+        // 移除死亡玩家并发送通知
+        if (!diedPlayers.isEmpty()) {
+          stateLock.writeLock().lock();
+          try {
+            for (String username : diedPlayers) {
+              state.removePlayer(username);
+              messageSender.accept(username, "{\"cmd\":\"YOU_DIED\"}");
+              Logger.debug("Player " + username + " died, removed from room");
+            }
+          } finally {
+            stateLock.writeLock().unlock();
+          }
+          if (onStatusChange != null) onStatusChange.run();
         }
 
         // 广播快照
         broadcastSnapshot();
 
-        // 更新活跃时间
         if (!state.isEmpty()) {
           lastActiveTime = System.currentTimeMillis();
         }
 
-        // 空闲超时检查
+        // 空闲超时检测
         if (state.isEmpty()
             && System.currentTimeMillis() - lastActiveTime > Config.ROOM_IDLE_TIMEOUT * 1000L) {
           Logger.info("Room " + roomId + " idle timeout, stopping.");
@@ -107,46 +157,70 @@ public class Room implements Runnable {
   }
 
   private void handle(Message msg) {
-    switch (msg.type()) {
-      case "JOIN":
-        JoinRoomMsg join = (JoinRoomMsg) msg;
-        if (state.addPlayer(join.username())) {
-          messageSender.accept(join.username(), "JOIN_OK " + roomId);
-          Logger.info("Player " + join.username() + " joined room " + roomId);
-          if (onStatusChange != null) {
-            onStatusChange.run();
+    stateLock.writeLock().lock();
+    try {
+      switch (msg.type()) {
+        case "JOIN":
+          JoinRoomMsg join = (JoinRoomMsg) msg;
+          if (state.addPlayer(join.username())) {
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "JOIN_OK");
+            resp.put("roomId", roomId);
+            messageSender.accept(join.username(), resp.toString());
+            Logger.info("Player " + join.username() + " joined room " + roomId);
+            if (onStatusChange != null) onStatusChange.run();
+          } else {
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "JOIN_FAIL");
+            resp.put("message", "Room is full or join failed");
+            messageSender.accept(join.username(), resp.toString());
           }
-        } else {
-          messageSender.accept(join.username(), "JOIN_FAIL");
-        }
-        break;
-      case "INPUT":
-        InputMsg input = (InputMsg) msg;
-        state.updateDirection(input.username(), input.direction());
-        break;
-      case "LEAVE":
-        LeaveRoomMsg leave = (LeaveRoomMsg) msg;
-        state.removePlayer(leave.username());
-        Logger.info("Player " + leave.username() + " left room " + roomId);
-        if (onStatusChange != null) {
-          onStatusChange.run();
-        }
-        break;
+          break;
+        case "INPUT":
+          InputMsg input = (InputMsg) msg;
+          state.updateDirection(input.username(), input.direction());
+          break;
+        case "LEAVE":
+          LeaveRoomMsg leave = (LeaveRoomMsg) msg;
+          state.removePlayer(leave.username());
+          Logger.info("Player " + leave.username() + " left room " + roomId);
+          if (onStatusChange != null) onStatusChange.run();
+          break;
+      }
+    } finally {
+      stateLock.writeLock().unlock();
     }
   }
 
   private void broadcastSnapshot() {
-    for (GameState.Player p : state.getPlayers()) {
-      if (p.isDead) continue; // 死亡玩家不再接收 STATE 消息
-      GameStateData data = state.snapshot(p.username);
-      String json = Serializer.serializeGameState(data);
-      if (json != null) {
-        messageSender.accept(p.username, json);
-      }
+    GameStateData snapshot;
+    stateLock.readLock().lock();
+    try {
+      snapshot = state.snapshot(null);
+    } finally {
+      stateLock.readLock().unlock();
+    }
+    if (snapshot == null) return;
+
+    String json = Serializer.serializeGameState(snapshot);
+    if (json == null) return;
+
+    List<GameState.Player> players;
+    stateLock.readLock().lock();
+    try {
+      players = state.getPlayers();
+    } finally {
+      stateLock.readLock().unlock();
+    }
+
+    for (GameState.Player p : players) {
+      if (p.isDead) continue;
+      messageSender.accept(p.username, json);
     }
   }
 
   private void cleanup() {
+    running = false;
     Logger.info("Room " + roomId + " destroyed.");
     if (onDestroy != null) {
       onDestroy.accept(roomId, this);

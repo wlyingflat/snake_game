@@ -19,6 +19,13 @@ public class GameState {
   public GameState(int roomId) {
     this.roomId = roomId;
     initWorld();
+    Logger.info(
+        "[GameState] Room "
+            + roomId
+            + " initialized, obstacles="
+            + Config.OBSTACLE_COUNT
+            + ", food="
+            + food);
   }
 
   private void initWorld() {
@@ -289,7 +296,7 @@ public class GameState {
       info.direction = p.direction;
       info.score = p.score;
       info.isDead = p.isDead;
-      info.isYou = p.username.equals(clientUsername);
+      // isYou 字段已删除，不再根据 clientUsername 设置
       data.players[i] = info;
     }
     data.activePlayers = activePlayers;

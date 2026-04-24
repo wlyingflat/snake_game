@@ -1,17 +1,19 @@
-// snake/server/MainServer.java
 package snake.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import snake.common.*;
-import snake.util.*;
+import snake.util.Logger;
 
 public class MainServer extends NioServer {
   private UserManager userManager;
-  private Map<SocketChannel, MainSession> sessions = new ConcurrentHashMap<>();
+  private final Map<SocketChannel, MainSession> sessions = new ConcurrentHashMap<>();
+  private final ObjectMapper mapper = new ObjectMapper();
 
   public MainServer(int port, int gatewayPort) {
     super(port);
@@ -32,123 +34,72 @@ public class MainServer extends NioServer {
   }
 
   @Override
-  protected void processMessage(NioSession session, String msg) {
+  protected void processMessage(NioSession session, String jsonMsg) {
     MainSession mainSession = (MainSession) session;
-    String[] parts = msg.split(" ");
-    String cmd = parts[0];
     try {
+      ObjectNode root = (ObjectNode) mapper.readTree(jsonMsg);
+      String cmd = root.get("cmd").asText();
+
       switch (cmd) {
-        case Protocol.CMD_REGISTER:
-          if (parts.length >= 3) {
-            String username = parts[1];
-            String password = parts[2];
-            if (userManager.register(username, password)) {
-              mainSession.enqueueResponse(
-                  Protocol.RESP_OK
-                      + " Registration successful\nGATEWAY 127.0.0.1 "
-                      + Config.GATEWAY_DEFAULT_PORT);
-            } else {
-              mainSession.enqueueResponse(Protocol.RESP_ERROR + " Registration failed");
-            }
+        case "REGISTER":
+          String username = root.get("username").asText();
+          String password = root.get("password").asText();
+          if (userManager.register(username, password)) {
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "REGISTER_OK");
+            mainSession.enqueueResponse(resp.toString());
           } else {
-            mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid REG command");
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "ERROR");
+            resp.put("message", "Registration failed");
+            mainSession.enqueueResponse(resp.toString());
           }
           break;
-        case Protocol.CMD_LOGIN:
-          if (parts.length >= 3) {
-            String username = parts[1];
-            String password = parts[2];
-            if (userManager.login(username, password)) {
-              mainSession.enqueueResponse(
-                  Protocol.RESP_OK
-                      + " Login successful\nGATEWAY 127.0.0.1 "
-                      + Config.GATEWAY_DEFAULT_PORT);
-            } else {
-              mainSession.enqueueResponse(Protocol.RESP_ERROR + " Login failed");
-            }
+        case "LOGIN":
+          String loginUser = root.get("username").asText();
+          String loginPass = root.get("password").asText();
+          if (userManager.login(loginUser, loginPass)) {
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "LOGIN_OK");
+            resp.put("gatewayHost", "127.0.0.1");
+            resp.put("gatewayPort", Config.GATEWAY_DEFAULT_PORT);
+            mainSession.enqueueResponse(resp.toString());
           } else {
-            mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid LOGIN command");
+            ObjectNode resp = mapper.createObjectNode();
+            resp.put("cmd", "ERROR");
+            resp.put("message", "Login failed");
+            mainSession.enqueueResponse(resp.toString());
           }
           break;
-        case Protocol.CMD_CREATE:
-          if (parts.length >= 3) {
-            int roomId = Integer.parseInt(parts[1]);
-            String creator = parts[2];
-            if (sendCreateRoomToGateway(roomId)) {
-              // 返回房间ID（端口不再需要）
-              mainSession.enqueueResponse(Protocol.RESP_REDIRECT + " " + roomId + " " + roomId);
-            } else {
-              mainSession.enqueueResponse(Protocol.RESP_ERROR + " Cannot create room");
-            }
-          } else {
-            mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid CREATE command");
-          }
-          break;
-        case Protocol.CMD_JOIN:
-          if (parts.length >= 3) {
-            int roomId = Integer.parseInt(parts[1]);
-            String username = parts[2];
-            // 直接返回网关地址，房间ID用于后续加入
-            mainSession.enqueueResponse(
-                Protocol.RESP_REDIRECT + " " + Config.GATEWAY_DEFAULT_PORT + " " + roomId);
-          } else {
-            mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid JOIN command");
-          }
-          break;
-        case Protocol.CMD_LOGOUT:
-          if (parts.length >= 2) {
-            String username = parts[1];
-            userManager.logout(username);
-            mainSession.enqueueResponse(Protocol.RESP_OK + " Logout successful");
-          } else {
-            mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid LOGOUT command");
-          }
-          break;
-        case Protocol.CMD_ROOM_LIST:
-          mainSession.enqueueResponse(fetchRoomListFromGateway());
+        case "LOGOUT":
+          String logoutUser = root.get("username").asText();
+          userManager.logout(logoutUser);
+          ObjectNode resp = mapper.createObjectNode();
+          resp.put("cmd", "LOGOUT_OK");
+          mainSession.enqueueResponse(resp.toString());
           break;
         default:
-          mainSession.enqueueResponse(Protocol.RESP_ERROR + " Unknown command");
+          ObjectNode error = mapper.createObjectNode();
+          error.put("cmd", "ERROR");
+          error.put("message", "Unknown command");
+          mainSession.enqueueResponse(error.toString());
       }
     } catch (Exception e) {
-      Logger.error("Error handling request: " + e.getMessage());
-      mainSession.enqueueResponse(Protocol.RESP_ERROR + " Internal error");
+      Logger.error("Error processing message: " + e.getMessage());
+      try {
+        ObjectNode error = mapper.createObjectNode();
+        error.put("cmd", "ERROR");
+        error.put("message", "Internal error");
+        mainSession.enqueueResponse(error.toString());
+      } catch (Exception ignored) {
+      }
+      closeSession(mainSession);
     }
   }
 
   @Override
   protected void onSessionClosed(NioSession session) {
     sessions.remove(session.channel);
-  }
-
-  private boolean sendCreateRoomToGateway(int roomId) {
-    try (Socket socket = new Socket("localhost", 19004);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-      out.println("CREATE_ROOM " + roomId);
-      String resp = in.readLine();
-      return "OK".equals(resp);
-    } catch (IOException e) {
-      Logger.error("Failed to contact Gateway: " + e.getMessage());
-      return false;
-    }
-  }
-
-  private String fetchRoomListFromGateway() {
-    try (Socket socket = new Socket("localhost", Config.ROOM_LIST_QUERY_PORT);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-      out.println("LIST");
-      StringBuilder sb = new StringBuilder();
-      String line;
-      while ((line = in.readLine()) != null) {
-        sb.append(line).append("\n");
-      }
-      return sb.toString();
-    } catch (IOException e) {
-      Logger.error("Failed to fetch room list from Gateway: " + e.getMessage());
-      return "No active rooms.\n";
-    }
   }
 
   private void startGatewayProcess(int gatewayPort) {
@@ -159,12 +110,12 @@ public class MainServer extends NioServer {
               "mvn",
               "exec:java",
               "-Dexec.mainClass=snake.gateway.Gateway",
-              "-Dexec.args=" + gatewayPort);
+              "-Dexec.args=" + Config.GATEWAY_DEFAULT_PORT);
       pb.directory(new File(projectDir));
       pb.inheritIO();
       pb.start();
       Logger.info("Gateway process started on port " + gatewayPort);
-      Thread.sleep(500); // 等待网关初始化
+      Thread.sleep(500);
     } catch (IOException | InterruptedException e) {
       Logger.error("Failed to start gateway: " + e.getMessage());
     }

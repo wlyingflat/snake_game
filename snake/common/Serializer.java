@@ -10,14 +10,13 @@ import snake.util.Logger;
 public class Serializer {
   private static final ObjectMapper mapper =
       new ObjectMapper()
-          .disable(SerializationFeature.INDENT_OUTPUT) // 便于调试，可关闭
+          .disable(SerializationFeature.INDENT_OUTPUT)
           .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
-  /** 将游戏状态序列化为 JSON 字符串，并包装为统一格式： {"type":"STATE","data":{...}} */
   public static String serializeGameState(GameStateData state) {
     try {
       Map<String, Object> wrapper = new LinkedHashMap<>();
-      wrapper.put("type", Protocol.STATE);
+      wrapper.put("cmd", "STATE");
       wrapper.put("data", state);
       return mapper.writeValueAsString(wrapper);
     } catch (JsonProcessingException e) {
@@ -26,12 +25,6 @@ public class Serializer {
     }
   }
 
-  /**
-   * 从 JSON 字符串反序列化 GameStateData
-   *
-   * @param json 完整消息（含 type 字段）
-   * @return GameStateData 对象，若解析失败返回 null
-   */
   public static GameStateData deserializeGameState(String json) {
     try {
       Map<?, ?> root = mapper.readValue(json, Map.class);

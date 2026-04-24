@@ -6,13 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import snake.util.Logger;
 
-/**
- * NIO 服务器抽象基类，统一处理： - Selector 事件循环 - accept / read / write 半包处理 - 会话创建与销毁的钩子方法 子类只需实现
- * createSession 和 processMessage，并可选覆盖 onSessionClosed。
- */
 public abstract class NioServer {
   protected int port;
   protected ServerSocketChannel serverChannel;
@@ -23,7 +20,6 @@ public abstract class NioServer {
     this.port = port;
   }
 
-  /** 启动服务器，进入事件循环。 */
   public void start() throws IOException {
     serverChannel = ServerSocketChannel.open();
     serverChannel.bind(new InetSocketAddress(port));
@@ -52,24 +48,19 @@ public abstract class NioServer {
     cleanup();
   }
 
-  /** 停止服务器。 */
   public void stop() {
     running = false;
     if (selector != null) selector.wakeup();
   }
 
-  // ---------- 抽象方法，由子类实现 ----------
   protected abstract String getServerName();
 
   protected abstract NioSession createSession(SocketChannel channel);
 
-  protected abstract void processMessage(NioSession session, String message);
+  protected abstract void processMessage(NioSession session, String jsonMessage);
 
-  // ---------- 可选钩子 ----------
   protected void onSessionClosed(NioSession session) {}
 
-  // ---------- 公共方法 ----------
-  /** 由 NioSession.enqueueResponse 调用，为指定会话注册 OP_WRITE 事件。 */
   public void scheduleWrite(NioSession session) {
     SelectionKey key = session.channel.keyFor(selector);
     if (key != null && key.isValid()) {
@@ -90,7 +81,6 @@ public abstract class NioServer {
     onSessionClosed(session);
   }
 
-  // ---------- 私有 NIO 方法 ----------
   private void acceptClient() throws IOException {
     SocketChannel client = serverChannel.accept();
     client.configureBlocking(false);
@@ -104,33 +94,23 @@ public abstract class NioServer {
     SocketChannel client = session.channel;
     ByteBuffer buf = session.readBuffer;
     try {
-      // NioServer.java - handleRead 方法内
       int bytesRead = client.read(buf);
       if (bytesRead == -1) {
         closeSession(session);
         return;
       }
       buf.flip();
-      byte[] data = new byte[buf.remaining()];
-      buf.get(data);
+      List<String> messages = session.parseReadData(buf);
       buf.clear();
-      String chunk = new String(data, StandardCharsets.UTF_8);
-      // 添加调试：打印接收到的原始数据块，转义不可见字符以便观察
-      String printable = chunk.replace("\n", "\\n").replace("\r", "\\r");
-      Logger.debug("[" + getServerName() + "] Raw received: " + printable);
-      session.pendingMessage.append(chunk);
 
-      String fullMsg;
-      int idx;
-      while ((idx = session.pendingMessage.indexOf("\n")) != -1) {
-        fullMsg = session.pendingMessage.substring(0, idx).trim();
-        session.pendingMessage.delete(0, idx + 1);
-        if (!fullMsg.isEmpty()) {
-          processMessage(session, fullMsg);
-        }
+      for (String msg : messages) {
+        processMessage(session, msg);
       }
     } catch (IOException e) {
-      Logger.warn("IOException in handleRead for " + client + ": " + e.getMessage());
+      Logger.warn("IOException in handleRead: " + e.getMessage());
+      closeSession(session);
+    } catch (Exception e) {
+      Logger.error("Error parsing message: " + e.getMessage());
       closeSession(session);
     }
   }
@@ -139,23 +119,37 @@ public abstract class NioServer {
     NioSession session = (NioSession) key.attachment();
     SocketChannel client = session.channel;
     Queue<String> queue = session.writeQueue;
-    ByteBuffer buf = ByteBuffer.allocate(Config.BUFFER_SIZE);
+    ByteBuffer buf = session.writeBuffer;
+
     while (!queue.isEmpty()) {
       String msg = queue.peek();
-      byte[] bytes = (msg + "\n").getBytes(StandardCharsets.UTF_8);
-      if (bytes.length > Config.BUFFER_SIZE) {
-        ByteBuffer largeBuf = ByteBuffer.wrap(bytes);
+      byte[] body = msg.getBytes(StandardCharsets.UTF_8);
+      int totalLen = 4 + body.length;
+
+      if (totalLen > Config.BUFFER_SIZE) {
+        // 超大消息单独分配
+        ByteBuffer largeBuf = ByteBuffer.allocateDirect(totalLen);
+        largeBuf.putInt(body.length);
+        largeBuf.put(body);
+        largeBuf.flip();
         client.write(largeBuf);
-        if (largeBuf.hasRemaining()) break;
+        if (largeBuf.hasRemaining()) {
+          break;
+        }
+        queue.poll();
       } else {
         buf.clear();
-        buf.put(bytes);
+        buf.putInt(body.length);
+        buf.put(body);
         buf.flip();
         client.write(buf);
-        if (buf.hasRemaining()) break;
+        if (buf.hasRemaining()) {
+          break;
+        }
+        queue.poll();
       }
-      queue.poll();
     }
+
     if (queue.isEmpty()) {
       key.interestOps(SelectionKey.OP_READ);
     }

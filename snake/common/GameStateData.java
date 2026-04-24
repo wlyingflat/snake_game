@@ -22,6 +22,5 @@ public class GameStateData {
     public Direction direction;
     public int score;
     public boolean isDead;
-    public boolean isYou;
   }
 }

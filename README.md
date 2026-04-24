@@ -1,1 +1,5 @@
-房间架构从多进程到多进程+多线程（线程安全）
+Config.java 硬编码配置改用 .properties
+ByteBuffer改用健康DirectByteBuffer
+使用更标准的协议通信
+广播机制优化
+java客户端
