@@ -4,13 +4,13 @@ import java.util.UUID;
 import org.redisson.api.RedissonClient;
 import snake.base.*;
 import snake.distributed.DistributedCoordinator;
+import snake.mq.MessageBus; // 新增
 import snake.persistence.DatabaseManager;
 import snake.persistence.PropertiesConfigProvider;
 import snake.persistence.leaderboard.MySQLLeaderboardRepository;
 import snake.persistence.leaderboard.RedissonLeaderboardRepository;
 import snake.persistence.redis.RedissonManager;
 
-/** Game Worker 启动入口 */
 public class WorkerMain {
   public static void main(String[] args) {
     boolean distributedMode = Boolean.parseBoolean(System.getProperty("distributed.mode", "false"));
@@ -33,28 +33,45 @@ public class WorkerMain {
       coordinator = null;
     }
 
-    // 构建排行榜仓库（同时包含 Redis 和 MySQL 双写能力）
+    // 排行榜仓库
     ILeaderboardRepository leaderboardRepo = null;
     if (distributedMode && coordinator != null) {
       MySQLLeaderboardRepository mysqlRepo =
           new MySQLLeaderboardRepository(dbManager.getDataSource());
-      RedissonLeaderboardRepository redissonLeaderboardRepo =
+      RedissonLeaderboardRepository redissonRepo =
           new RedissonLeaderboardRepository(redisson, mysqlRepo);
-      redissonLeaderboardRepo.loadFromMySQL(); // 初始化 Redis 缓存
-      leaderboardRepo = redissonLeaderboardRepo;
+      redissonRepo.loadFromMySQL();
+      leaderboardRepo = redissonRepo;
     }
 
-    GameWorker worker = new GameWorker(workerId, coordinator, leaderboardRepo);
-    worker.start();
+    // 创建 MessageBus 连接 RabbitMQ
+    MessageBus messageBus = null;
+    try {
+      messageBus = new MessageBus();
+    } catch (Exception e) {
+      logger.error("Failed to connect to RabbitMQ: " + e.getMessage());
+      System.exit(1);
+    }
+
+    GameWorker worker = new GameWorker(workerId, coordinator, leaderboardRepo, messageBus);
+    try {
+      worker.start();
+    } catch (Exception e) {
+      logger.error("Failed to start worker: " + e.getMessage());
+      System.exit(1);
+    }
     logger.info("Worker " + workerId + " started");
 
+    final MessageBus finalMessageBus = messageBus;
+    final RedissonClient finalRedisson = redisson;
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
                 () -> {
                   logger.info("Shutting down worker " + workerId + "...");
                   worker.stop();
-                  if (redisson != null) redisson.shutdown();
+                  if (finalMessageBus != null) finalMessageBus.close();
+                  if (finalRedisson != null) finalRedisson.shutdown();
                   dbManager.shutdown();
                 }));
 

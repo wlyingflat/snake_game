@@ -315,6 +315,48 @@ public class GameState {
     return new ArrayList<>(players.values());
   }
 
+  /** 从快照恢复游戏状态（跳过随机生成） */
+  public GameState(int roomId, GameStateData snapshot) {
+    this.roomId = roomId;
+    this.food = snapshot.food;
+    this.activePlayers = snapshot.activePlayers;
+    this.totalPlayers = snapshot.totalPlayers;
+    // 初始化空地图边框
+    for (int y = 0; y < Config.MAP_HEIGHT; y++) {
+      for (int x = 0; x < Config.MAP_WIDTH; x++) {
+        map[y][x] = ' ';
+      }
+    }
+    for (int x = 0; x < Config.MAP_WIDTH; x++) {
+      map[0][x] = '#';
+      map[Config.MAP_HEIGHT - 1][x] = '#';
+    }
+    for (int y = 0; y < Config.MAP_HEIGHT; y++) {
+      map[y][0] = '#';
+      map[y][Config.MAP_WIDTH - 1] = '#';
+    }
+    // 恢复障碍物
+    for (int i = 0; i < snapshot.obstacleCount; i++) {
+      obstacles[i] = snapshot.obstacles[i];
+      map[obstacles[i].y][obstacles[i].x] = 'X';
+    }
+    // 标记食物
+    map[food.y][food.x] = 'F';
+    // 恢复玩家
+    for (int i = 0; i < snapshot.playerCount; i++) {
+      GameStateData.PlayerInfo pi = snapshot.players[i];
+      Player p = new Player();
+      p.username = pi.name;
+      p.body = new ArrayList<>(Arrays.asList(pi.body).subList(0, pi.length));
+      p.length = pi.length;
+      p.direction = pi.direction;
+      p.score = pi.score;
+      p.isDead = pi.isDead;
+      players.put(p.username, p);
+    }
+    this.initialDelayDone = true; // 恢复后直接开始正常Tick
+  }
+
   public static class Player {
     public String username;
     public List<Position> body;

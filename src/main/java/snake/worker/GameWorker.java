@@ -9,12 +9,8 @@ import snake.base.ILeaderboardRepository;
 import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
+import snake.mq.MessageBus; // 新增
 
-/**
- * Worker 层 - Actor 调度器
- *
- * <p>职责： 1. 管理本节点的所有 Actor 2. 接收来自 Gateway 的消息并分发到正确的 Actor 3. 管理 Actor 的生命周期
- */
 public class GameWorker {
   private final String workerId;
   private final ActorManager actorManager;
@@ -22,14 +18,18 @@ public class GameWorker {
   private final ILogger logger = Logger.getInstance();
   private final ExecutorService dispatchPool;
   private final ILeaderboardRepository leaderboardRepo;
+  private final MessageBus messageBus; // 新增
   private volatile boolean running = false;
-  private int messageListenerId;
 
   public GameWorker(
-      String workerId, DistributedCoordinator coordinator, ILeaderboardRepository leaderboardRepo) {
+      String workerId,
+      DistributedCoordinator coordinator,
+      ILeaderboardRepository leaderboardRepo,
+      MessageBus messageBus) {
     this.workerId = workerId;
     this.coordinator = coordinator;
     this.leaderboardRepo = leaderboardRepo;
+    this.messageBus = messageBus;
     this.actorManager = new ActorManager(coordinator, workerId, leaderboardRepo);
     this.dispatchPool =
         Executors.newFixedThreadPool(
@@ -41,7 +41,7 @@ public class GameWorker {
             });
   }
 
-  public void start() {
+  public void start() throws Exception {
     if (running) return;
     running = true;
 
@@ -52,22 +52,18 @@ public class GameWorker {
           coordinator.publishRoomListUpdate();
         });
 
-    messageListenerId =
-        coordinator.subscribeWorkerMessages(
-            workerId,
-            (channel, rawMsg) -> {
-              dispatchPool.submit(() -> dispatchToActor(rawMsg));
-            });
+    // 通过 RabbitMQ 接收指令
+    messageBus.startWorkerConsumer(
+        workerId,
+        rawMsg -> {
+          dispatchPool.submit(() -> dispatchToActor(rawMsg));
+        });
 
-    logger.info("Worker " + workerId + " started, listening for messages");
+    logger.info("Worker " + workerId + " started, listening for messages via RabbitMQ");
   }
 
   public void stop() {
     running = false;
-
-    if (messageListenerId > 0) {
-      coordinator.unsubscribeWorkerMessages(workerId, messageListenerId);
-    }
 
     actorManager.stopAllActors();
     dispatchPool.shutdown();
@@ -102,7 +98,6 @@ public class GameWorker {
       }
 
       actor.postMessage(msg);
-
     } catch (Exception e) {
       logger.error("Failed to dispatch message: " + e.getMessage());
     }

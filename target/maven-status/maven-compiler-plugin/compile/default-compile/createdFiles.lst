@@ -2,6 +2,7 @@ snake/base/IConfigProvider.class
 snake/game/state/GameState$1.class
 snake/worker/WorkerMain.class
 snake/actor/EnhancedMessage.class
+snake/mq/MessageBus.class
 snake/worker/GameWorker.class
 snake/client/GatewayClient.class
 snake/auth/AuthHttpServer.class
@@ -9,6 +10,7 @@ snake/persistence/user/MySQLUserRepository.class
 snake/game/event/JoinRoomMsg.class
 snake/distributed/DistributedCoordinator$PlayerLocation.class
 snake/client/swing/RoomListFrame$RoomEntry.class
+snake/mq/MessageBus$1.class
 snake/client/swing/GameCanvas.class
 snake/distributed/DistributedCoordinator.class
 snake/actor/ActorNotifier.class

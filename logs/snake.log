@@ -639,95 +639,669 @@ java.util.concurrent.RejectedExecutionException: event executor terminated
 2026-04-24 14:31:06.562 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
 2026-04-24 14:31:11.565 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
 2026-04-24 14:48:31.994 [qtp2082351661-94] INFO  snake.base.Logger - User logged out: yhl
-2026-04-24 15:00:28.301 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.305 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.454 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
-2026-04-24 15:00:28.457 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.465 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-24 15:00:28.481 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-24 15:00:28.525 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.537 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
-2026-04-24 15:00:28.537 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.572 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.578 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
-2026-04-24 15:00:28.579 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.593 [main] ERROR snake.base.Logger - Failed to start auth service: Failed to bind to 0.0.0.0/0.0.0.0:19001
-2026-04-24 15:00:28.598 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
-2026-04-24 15:00:28.602 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 15:00:28.634 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-24 15:00:28.675 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-24 15:00:28.752 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-24 15:00:28.768 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-24 15:00:28.981 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-24 15:00:29.017 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
-2026-04-24 15:00:29.036 [main] INFO  snake.base.Logger - Worker registered: worker-2
-2026-04-24 15:00:29.049 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
-2026-04-24 15:00:29.050 [main] INFO  snake.base.Logger - Worker worker-2 started
-2026-04-24 15:00:29.061 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-24 15:00:29.087 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
-2026-04-24 15:00:29.107 [main] INFO  snake.base.Logger - Worker registered: worker-1
-2026-04-24 15:00:29.122 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
-2026-04-24 15:00:29.122 [main] INFO  snake.base.Logger - Worker worker-1 started
-2026-04-24 15:00:29.266 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
-2026-04-24 15:00:29.267 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-24 15:00:29.267 [main] ERROR snake.base.Logger - Failed to start gateway: 地址已在使用
-2026-04-24 15:00:29.292 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
-2026-04-24 15:00:29.292 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-24 15:00:29.293 [main] ERROR snake.base.Logger - Failed to start gateway: 地址已在使用
-2026-04-24 15:31:39.933 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
-2026-04-24 15:31:39.941 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
-2026-04-24 15:31:39.942 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
-2026-04-24 15:34:44.553 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
-2026-04-24 15:34:44.560 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
-2026-04-24 15:34:44.560 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
-2026-04-24 15:34:44.564 [redisson-netty-1-9] ERROR io.netty.util.concurrent.DefaultPromise.rejectedExecution - Failed to submit a listener notification task. Event loop shut down?
-java.util.concurrent.RejectedExecutionException: event executor terminated
-	at io.netty.util.concurrent.SingleThreadEventExecutor.reject(SingleThreadEventExecutor.java:934) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.offerTask(SingleThreadEventExecutor.java:351) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.addTask(SingleThreadEventExecutor.java:344) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:836) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.execute0(SingleThreadEventExecutor.java:827) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:817) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.safeExecute(DefaultPromise.java:862) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:500) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.setSuccess(DefaultPromise.java:97) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.channel.group.DefaultChannelGroupFuture.setSuccess0(DefaultChannelGroupFuture.java:200) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.group.DefaultChannelGroupFuture.access$400(DefaultChannelGroupFuture.java:41) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:75) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:48) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:557) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.DefaultPromise.trySuccess(DefaultPromise.java:105) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.channel.DefaultChannelPromise.trySuccess(DefaultChannelPromise.java:84) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannel$AbstractUnsafe.safeSetSuccess(AbstractChannel.java:990) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannel$AbstractUnsafe.doClose0(AbstractChannel.java:756) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:731) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:620) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.DefaultChannelPipeline$HeadContext.close(DefaultChannelPipeline.java:1352) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.invokeClose(AbstractChannelHandlerContext.java:755) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannelHandlerContext.access$1200(AbstractChannelHandlerContext.java:61) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.AbstractChannelHandlerContext$11.run(AbstractChannelHandlerContext.java:738) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) [netty-common-4.1.100.Final.jar:4.1.100.Final]
-	at java.base/java.lang.Thread.run(Thread.java:1516) [?:?]
-2026-04-24 15:34:44.573 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
-2026-04-24 15:35:01.780 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
-2026-04-24 15:35:01.788 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
-2026-04-24 15:35:01.788 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
-2026-04-24 15:35:01.798 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
-2026-04-24 15:35:37.850 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 17:23:12.871 [Thread-5] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 17:29:49.399 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 17:38:36.991 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 17:50:16.574 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-24 19:26:28.970 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:31:51.573 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:31:51.575 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:31:51.682 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:31:51.696 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:31:51.795 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 15:31:51.795 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 15:32:03.592 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:32:03.602 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 15:32:03.603 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:32:03.699 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:32:03.913 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:32:03.923 [main] ERROR snake.base.Logger - Failed to connect to RabbitMQ: 连接被拒绝
+2026-04-24 15:34:39.713 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:34:39.718 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 15:34:39.718 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:34:39.822 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:34:40.035 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:34:40.064 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 15:34:40.223 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 15:34:40.224 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 15:34:40.224 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 15:34:57.492 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 15:34:57.494 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:34:57.599 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:34:57.827 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:34:57.848 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 15:34:57.849 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:34:57.877 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 15:34:57.893 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 15:34:57.903 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 15:34:57.904 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-24 15:34:57.904 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 15:35:08.131 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 15:35:08.133 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:08.236 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:35:08.483 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:35:08.506 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 15:35:08.506 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:08.534 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 15:35:08.550 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 15:35:08.560 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 15:35:08.560 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-24 15:35:08.560 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 15:35:16.838 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:16.841 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 15:35:16.841 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:16.938 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:35:17.155 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:17.186 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 15:35:17.344 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 15:35:17.345 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 15:35:17.346 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 15:35:34.581 [qtp1389774257-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 15:35:34.616 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 15:35:37.507 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 15:35:37.551 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:35:37.557 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 15:35:37.585 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 15:35:37.585 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 15:35:37.585 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 15:35:37.593 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 15:35:50.582 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - High score updated for yhl: 2
+2026-04-24 15:35:50.582 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - MySQL updated: yhl -> 2
+2026-04-24 15:36:37.566 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 15:36:37.566 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 15:36:37.566 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 15:36:37.566 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 15:36:37.567 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 15:36:37.567 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 15:36:42.572 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 16:16:58.029 [qtp1389774257-98] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:16:49.184 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 17:16:49.193 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:16:49.193 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 17:16:59.122 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:16:59.125 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:16:59.270 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:16:59.286 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:16:59.386 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 17:16:59.387 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 17:17:01.698 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 17:17:01.703 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 17:17:01.703 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 17:17:01.719 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:17:03.014 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 17:17:03.024 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:03.153 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:17:03.396 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:17:03.418 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:17:03.419 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:03.464 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:17:03.480 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 17:17:03.484 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 17:17:03.485 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:17:03.485 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:17:06.948 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:06.957 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 17:17:06.958 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:07.058 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:17:07.273 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:07.306 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:17:07.456 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 17:17:07.457 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:17:07.458 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 17:17:11.933 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:11.943 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 17:17:11.943 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:12.042 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:17:12.259 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:12.302 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:17:12.464 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 17:17:12.465 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:17:12.465 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 17:17:13.702 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 17:17:13.707 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 17:17:13.707 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 17:17:13.717 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:17:18.606 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 17:17:18.615 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:18.711 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:17:18.948 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:17:18.970 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:17:18.970 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:17:19.005 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:17:19.020 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 17:17:19.025 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 17:17:19.026 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:17:19.026 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:17:31.825 [qtp1389774257-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:17:31.857 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:17:34.807 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:17:34.816 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE sent to room queue 1, user yhl
+2026-04-24 17:17:45.004 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - Room queue created: room.commands.3
+2026-04-24 17:17:45.006 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE sent to room queue 3, user yhl
+2026-04-24 17:18:21.767 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:18:21.769 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE sent to room queue 1, user yhl
+2026-04-24 17:18:39.700 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:18:39.702 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE sent to room queue 1, user yhl
+2026-04-24 17:22:28.771 [qtp1389774257-94] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:22:32.904 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 17:22:32.919 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:22:32.919 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 17:22:37.217 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:37.219 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:37.350 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:22:37.365 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:22:37.465 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 17:22:37.465 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 17:22:41.099 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:41.102 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 17:22:41.102 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:41.220 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:22:41.456 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:41.501 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:22:41.663 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 17:22:41.663 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:22:41.664 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 17:22:42.377 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 17:22:42.381 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 17:22:42.381 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 17:22:42.399 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:22:43.443 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 17:22:43.446 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:43.547 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:22:43.778 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:22:43.799 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:22:43.800 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:43.835 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:22:43.851 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 17:22:43.855 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 17:22:43.856 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:22:43.856 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:22:46.139 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 17:22:46.143 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 17:22:46.143 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 17:22:46.163 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:22:47.199 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 17:22:47.208 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:47.325 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:22:47.574 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:22:47.599 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:22:47.600 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:47.637 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:22:47.653 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 17:22:47.657 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 17:22:47.658 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:22:47.658 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:22:50.565 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:50.568 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 17:22:50.568 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:50.668 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:22:50.890 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:22:50.932 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:22:51.096 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 17:22:51.097 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:22:51.097 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 17:23:09.850 [qtp1389774257-55] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:23:09.868 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:23:12.485 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 17:23:12.543 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:23:12.550 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 17:23:12.552 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:23:12.554 [worker-worker-2-dispatch] INFO  snake.base.Logger - Subscribed to room queue: room.commands.1
+2026-04-24 17:23:12.592 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 17:23:12.593 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 17:23:12.593 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 17:23:12.600 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:23:15.569 [actor-1] WARN  snake.base.Logger - Player yhl failed to join actor 1
+2026-04-24 17:23:17.667 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x720ff378, L:/127.0.0.1:44148 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5bb447f5[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:18.573 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:23:18.578 [redisson-3-16] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x6b5f8432, L:/127.0.0.1:43922 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5e4c8b13[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:18.584 [redisson-3-16] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xa967891f, L:/127.0.0.1:43910 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@235a88ba[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:18.589 [redisson-3-14] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x85b10edd, L:/127.0.0.1:55436 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@69c1b8b9[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:18.596 [redisson-3-14] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x5e5b0698, L:/127.0.0.1:55386 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5ca2065[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:20.578 [redisson-3-13] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x854594be, L:/127.0.0.1:43958 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@6c08639a[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:20.580 [redisson-3-15] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x206e0051, L:/127.0.0.1:55464 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@49356597[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:21.353 [gateway-gateway-2-worker-1] ERROR snake.base.Logger - Error processing message: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x10c5c3d1, L:/127.0.0.1:43932 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@2e03ea08[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:21.393 [gateway-gateway-2-worker-1] ERROR snake.base.Logger - Error processing message: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xcb1cc668, L:/127.0.0.1:43918 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@49c030b1[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:23.864 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@33b77217[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:24.691 [qtp1389774257-73] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:23:27.662 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@48fe2e1e[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:33.861 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x5a5e049a, L:/127.0.0.1:44016 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@2c9b4d25[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:37.663 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@32a15dd7[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:43.861 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4d070681[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:47.663 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5481394[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:53.862 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x13cfe9a5, L:/127.0.0.1:43964 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@484b8a26[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:23:57.663 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x5f5232cd, L:/127.0.0.1:44106 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@739cf760[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:03.861 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@55eee5c4[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:07.663 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x5f5232cd, L:/127.0.0.1:44106 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@348f5fca[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:12.564 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 17:24:12.564 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 17:24:12.564 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 17:24:12.565 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 17:24:12.567 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 17:24:12.567 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 17:24:12.571 [redisson-3-15] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0b0436dc, L:/127.0.0.1:43894 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5a3580e7[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:12.572 [redisson-3-16] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x1aa2d851, L:/127.0.0.1:55492 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5c9eea3e[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:12.573 [redisson-3-15] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xa967891f, L:/127.0.0.1:43910 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@65879930[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:12.574 [redisson-3-16] ERROR snake.base.Logger - Error broadcasting room list: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x6267767b, L:/127.0.0.1:55406 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@385e4034[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:13.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@65f1a8c0[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:17.571 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 17:24:17.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@37c7b03d[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:23.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@6490a5b1[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:27.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@24f2648f[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:33.858 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@b105ab[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:37.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@620ee79d[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:43.858 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@8debe9e[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:47.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@65817a12[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:53.858 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@63143934[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:24:57.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@76936244[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:03.859 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5b6fb7a0[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:07.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@3ae49c29[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:13.858 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@660dfeac[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:17.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@1dc520d1[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:23.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5ae682a5[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:27.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5e60697f[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:33.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@43b05715[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:37.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@1e94f111[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:43.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@29af27c9[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:47.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@7c85f7c3[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:53.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@53405110[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:25:57.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@66a4ada2[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:03.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@31ee3673[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:07.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@2532895b[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:13.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@575f0f64[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:17.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@33382b0a[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:23.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@71c72819[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:27.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@32434363[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:33.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@7af50681[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:37.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@5afd7f66[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:43.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@592cd3c0[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:47.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@35b78945[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:53.859 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@381f567c[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:26:57.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@60a3fada[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:03.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@22993800[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:07.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@db5728e[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:13.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@c9042f1[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:17.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@18cd73c6[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:23.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@58170cde[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:27.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4a9186d7[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:33.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@31f3d78d[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:37.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@3f7b8196[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:43.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@34557d64[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:47.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@57422c5d[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:53.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@2a0deda5[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:27:57.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@18125eaa[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:03.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4d59b489[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:07.660 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@7672db27[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:13.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@1a884371[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:17.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@27fd5c83[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:23.858 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@1707a4a4[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:27.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x117b9527, L:/127.0.0.1:44068 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@21e05784[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:33.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xbafa472e, L:/127.0.0.1:43978 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@f7d0a82[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:37.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xc11bb69e, L:/127.0.0.1:44090 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@63b55dcc[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:43.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x0a464a46, L:/127.0.0.1:44002 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4410a1eb[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:47.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x177c59a7, L:/127.0.0.1:44120 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4564e746[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:53.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x98cc2e35, L:/127.0.0.1:44014 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@2f650b03[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:28:57.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xf81ce28a, L:/127.0.0.1:44144 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@1407b622[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:29:03.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x7e004b58, L:/127.0.0.1:44022 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@4a49be86[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:29:07.659 [worker-worker-2-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0xb4f167cf, L:/127.0.0.1:44052 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@74158c50[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:29:13.857 [worker-worker-1-takeover] ERROR snake.base.Logger - Error checking orphan rooms: WRONGTYPE Operation against a key holding the wrong kind of value. channel: [id: 0x9655cf8f, L:/127.0.0.1:44050 - R:localhost/127.0.0.1:6379] command: (HLEN), promise: java.util.concurrent.CompletableFuture@469eaf85[Not completed, 1 dependents], params: [room:state:1]
+2026-04-24 17:29:18.421 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 17:29:18.433 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:29:18.433 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 17:29:22.735 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:22.737 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:22.854 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:29:22.868 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:29:22.968 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 17:29:22.969 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 17:29:27.113 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:27.116 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 17:29:27.116 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:27.210 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:29:27.447 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:27.497 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:29:27.662 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 17:29:27.663 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:29:27.664 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 17:29:28.649 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 17:29:28.653 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 17:29:28.654 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 17:29:28.674 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:29:30.267 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 17:29:30.270 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:30.378 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:29:30.606 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:29:30.628 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:29:30.629 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:30.663 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:29:30.679 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 17:29:30.682 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 17:29:30.683 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:29:30.683 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:29:33.103 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 17:29:33.105 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 17:29:33.106 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 17:29:33.126 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:29:34.262 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 17:29:34.271 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:34.404 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:29:34.641 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:29:34.663 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:29:34.664 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:34.696 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:29:34.712 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 17:29:34.715 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 17:29:34.716 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:29:34.717 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:29:36.726 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:36.729 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 17:29:36.729 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:36.824 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:29:37.052 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:37.096 [main] INFO  snake.base.Logger - MessageBus connected to localhost:5672
+2026-04-24 17:29:37.253 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 17:29:37.253 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:29:37.254 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 17:29:46.514 [qtp1389774257-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:29:46.550 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:29:49.053 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 17:29:49.099 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:49.107 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 17:29:49.109 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:29:49.112 [worker-worker-2-dispatch] INFO  snake.base.Logger - Subscribed to room queue: room.commands.1
+2026-04-24 17:29:49.142 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 17:29:49.142 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 17:29:49.143 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 17:29:49.150 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:30:40.130 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:30:58.760 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:31:10.127 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:31:16.614 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:31:23.954 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:31:34.126 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:31:44.363 [qtp1389774257-92] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:32:19.122 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 17:32:19.122 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 17:32:19.122 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 17:32:19.122 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 17:32:19.124 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 17:32:19.125 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 17:32:24.128 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 17:38:34.182 [qtp1389774257-94] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:38:34.190 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:38:36.703 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 17:38:36.708 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 17:38:36.711 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room queue created: room.commands.1
+2026-04-24 17:38:36.713 [worker-worker-2-dispatch] INFO  snake.base.Logger - Subscribed to room queue: room.commands.1
+2026-04-24 17:38:36.733 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 17:38:36.733 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 17:38:36.733 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 17:38:36.738 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:38:39.769 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:38:53.359 [qtp1389774257-57] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:39:06.738 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:39:46.329 [qtp1389774257-58] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:39:46.342 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 17:39:48.934 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:39:53.253 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:39:59.692 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:40:07.930 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 17:40:13.660 [qtp1389774257-93] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 17:41:06.733 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 17:41:06.733 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 17:41:06.733 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 17:41:06.733 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 17:41:06.735 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 17:41:06.735 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 17:41:11.738 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 17:49:43.300 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 17:49:43.314 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:49:43.314 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 17:49:48.058 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:48.060 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:48.184 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:49:48.198 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:49:48.298 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 17:49:48.298 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 17:49:51.908 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:51.911 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 17:49:51.911 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:52.008 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:49:52.235 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:52.262 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 17:49:52.433 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 17:49:52.434 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:49:52.434 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 17:49:53.078 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 17:49:53.081 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 17:49:53.082 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 17:49:53.097 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:49:54.179 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 17:49:54.181 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:54.306 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:49:54.543 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:49:54.565 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:49:54.566 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:54.597 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 17:49:54.615 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 17:49:54.624 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 17:49:54.624 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-24 17:49:54.624 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 17:49:57.455 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:57.458 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 17:49:57.458 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:57.554 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:49:57.785 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:49:57.810 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 17:49:57.978 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 17:49:57.979 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 17:49:57.979 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 17:49:58.684 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 17:49:58.688 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 17:49:58.688 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 17:49:58.710 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 17:50:00.051 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 17:50:00.053 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:50:00.153 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 17:50:00.380 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 17:50:00.401 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 17:50:00.402 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:50:00.427 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 17:50:00.442 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 17:50:00.449 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 17:50:00.449 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-24 17:50:00.449 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 17:50:13.500 [qtp1389774257-90] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 17:50:13.537 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 17:50:16.220 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 17:50:16.269 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:50:16.276 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 17:50:16.304 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 17:50:16.304 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 17:50:16.304 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by lyz
+2026-04-24 17:50:16.310 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 17:50:25.701 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - High score updated for lyz: 1
+2026-04-24 17:50:25.701 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - MySQL updated: lyz -> 1
+2026-04-24 17:50:29.695 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 17:50:31.348 [gateway-gateway-2-worker-2] WARN  snake.base.Logger - Room -1 not found in Redis
+2026-04-24 17:50:40.074 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 17:50:55.291 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - High score updated for lyz: 3
+2026-04-24 17:50:55.291 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - MySQL updated: lyz -> 3
+2026-04-24 17:50:59.928 [qtp1389774257-56] INFO  snake.base.Logger - User logged out: lyz
+2026-04-24 17:51:46.284 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 17:51:46.284 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 17:51:46.285 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 17:51:46.285 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 17:51:46.286 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 17:51:46.286 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 17:51:51.290 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 19:25:53.441 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 19:25:53.449 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:25:53.449 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 19:25:58.593 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:25:58.595 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:25:58.707 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:25:58.722 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 19:25:58.825 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 19:25:58.825 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 19:26:02.263 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 19:26:02.267 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 19:26:02.267 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 19:26:02.278 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:26:03.512 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 19:26:03.522 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:03.616 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:26:03.838 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:03.865 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:26:03.946 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 19:26:03.954 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 19:26:03.954 [main] INFO  snake.base.Logger - Worker worker-1 started, listening via RabbitMQ
+2026-04-24 19:26:03.954 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 19:26:06.611 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:06.614 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 19:26:06.614 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:06.706 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:26:06.922 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:06.949 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:26:07.095 [main] INFO  snake.base.Logger - Gateway consumer started for gateway-2 on queue gateway.events.gateway-2
+2026-04-24 19:26:07.101 [main] INFO  snake.base.Logger - Room list consumer started for gateway-2 on queue room.list.gateway-2
+2026-04-24 19:26:07.122 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 19:26:07.123 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 19:26:07.123 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 19:26:09.486 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 19:26:09.492 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 19:26:09.492 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 19:26:09.502 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:26:11.410 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 19:26:11.421 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:11.524 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:26:11.745 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:11.776 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:26:11.850 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 19:26:11.861 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 19:26:11.861 [main] INFO  snake.base.Logger - Worker worker-2 started, listening via RabbitMQ
+2026-04-24 19:26:11.861 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 19:26:14.434 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:14.443 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 19:26:14.443 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:14.539 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:26:14.754 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:14.781 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:26:14.911 [main] INFO  snake.base.Logger - Gateway consumer started for gateway-1 on queue gateway.events.gateway-1
+2026-04-24 19:26:14.917 [main] INFO  snake.base.Logger - Room list consumer started for gateway-1 on queue room.list.gateway-1
+2026-04-24 19:26:14.937 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 19:26:14.938 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 19:26:14.939 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 19:26:25.729 [qtp1431710377-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 19:26:25.761 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 19:26:28.639 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 19:26:28.675 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:28.683 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 19:26:28.709 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 19:26:28.709 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 19:26:28.709 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 19:26:28.719 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 19:27:32.401 [qtp1431710377-57] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 19:27:36.295 [actor-1] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:27:41.356 [qtp1431710377-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 19:27:41.368 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 19:28:11.239 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - CREATE routed to worker worker-1 for room 2
+2026-04-24 19:28:11.282 [worker-worker-1-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:28:11.289 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 2 registered in Redis by node worker-1
+2026-04-24 19:28:11.316 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 2 started on worker worker-1
+2026-04-24 19:28:11.316 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 2 created on worker worker-1
+2026-04-24 19:28:11.316 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 2 created by yhl
+2026-04-24 19:28:11.325 [actor-2] INFO  snake.base.Logger - Player yhl joined actor 2
+2026-04-24 19:28:35.331 [qtp1431710377-58] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 19:28:36.304 [actor-1] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:28:36.322 [actor-1] INFO  snake.base.Logger - Player yhl left actor 1
+2026-04-24 19:28:36.332 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 19:28:56.376 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 19:28:56.376 [Thread-0] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 19:28:56.384 [Thread-0] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 19:28:56.384 [Thread-0] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 19:28:56.385 [Thread-0] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 19:28:56.385 [Thread-0] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 19:29:13.549 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 19:29:13.549 [Thread-0] INFO  snake.base.Logger - Actor 2 is stopping...
+2026-04-24 19:29:13.551 [Thread-0] INFO  snake.base.Logger - Actor 2 stopped, cleaning up...
+2026-04-24 19:29:13.551 [Thread-0] INFO  snake.base.Logger - Actor 2 removed from worker worker-1
+2026-04-24 19:29:13.552 [Thread-0] INFO  snake.base.Logger - Room 2 removed from Redis
+2026-04-24 19:29:13.552 [Thread-0] INFO  snake.base.Logger - Room 2 deleted from Redis
+2026-04-24 19:29:17.070 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 19:29:17.086 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:29:17.087 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 19:29:17.701 [actor-2] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:29:36.380 [actor-1] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:29:36.380 [actor-1] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 19:29:36.381 [actor-1] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 19:29:36.381 [actor-1] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 19:29:36.388 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 19:29:36.388 [actor-1] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 19:29:36.389 [actor-1] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 19:29:36.389 [actor-1] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 19:30:17.705 [actor-2] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:30:17.712 [actor-2] INFO  snake.base.Logger - Actor 2 stopped, cleaning up...
+2026-04-24 19:30:17.712 [actor-2] INFO  snake.base.Logger - Room 2 removed from Redis
+2026-04-24 19:30:17.713 [actor-2] INFO  snake.base.Logger - Room 2 deleted from Redis
+2026-04-24 19:30:17.721 [actor-2] INFO  snake.base.Logger - Player yhl left actor 2
+2026-04-24 19:30:17.721 [actor-2] INFO  snake.base.Logger - Actor 2 stopped, cleaning up...
+2026-04-24 19:30:17.722 [actor-2] INFO  snake.base.Logger - Room 2 removed from Redis
+2026-04-24 19:30:17.722 [actor-2] INFO  snake.base.Logger - Room 2 deleted from Redis
+2026-04-24 19:30:17.733 [Thread-0] INFO  snake.base.Logger - Actor 2 destroyed.
+2026-04-24 19:30:17.734 [Thread-0] INFO  snake.base.Logger - Room 2 removed from Redis
+2026-04-24 19:30:17.737 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 19:30:17.737 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 19:30:17.757 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:30:36.426 [actor-1] ERROR snake.base.Logger - Kafka publish failed: Topic game-events not present in metadata after 60000 ms.
+2026-04-24 19:30:36.427 [actor-1] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 19:30:36.428 [actor-1] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 19:30:36.428 [actor-1] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 19:30:36.434 [Thread-0] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 19:30:36.435 [Thread-0] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 19:30:36.437 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 19:30:36.437 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 19:30:36.458 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 19:33:43.203 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:33:43.206 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:33:43.318 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:33:43.328 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 19:33:43.456 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 19:33:43.457 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 19:33:55.366 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 19:33:55.368 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:33:55.464 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:33:55.706 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 19:33:55.730 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 19:33:55.730 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:33:55.760 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:33:55.775 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 19:33:55.781 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-24 19:33:55.781 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-24 19:33:55.781 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 19:34:19.995 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 19:34:20.006 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:34:20.101 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:34:20.362 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 19:34:20.387 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 19:34:20.388 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:34:20.414 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:34:20.429 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 19:34:20.436 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-24 19:34:20.436 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-24 19:34:20.436 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 19:34:52.371 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:34:52.373 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 19:34:52.373 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:34:52.469 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:34:52.717 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:34:52.744 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:34:52.900 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 19:34:52.901 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 19:34:52.902 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 19:35:05.716 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:35:05.719 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 19:35:05.719 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:35:05.823 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 19:35:06.050 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:35:06.075 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-24 19:35:06.237 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 19:35:06.238 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 19:35:06.238 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 19:35:50.654 [qtp1431710377-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 19:35:50.682 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: yhl

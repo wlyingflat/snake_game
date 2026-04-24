@@ -12,11 +12,11 @@ import snake.gateway.reactor.ReactorGateway;
 import snake.gateway.session.ClientSession;
 import snake.gateway.session.DefaultSessionManager;
 import snake.gateway.session.SessionManager;
+import snake.mq.MessageBus; // 新增
 import snake.persistence.DatabaseManager;
 import snake.persistence.PropertiesConfigProvider;
 import snake.persistence.redis.RedissonManager;
 
-/** Reactor Gateway 启动入口 */
 public class GatewayMain {
   public static void main(String[] args) {
     int port = args.length > 0 ? Integer.parseInt(args[0]) : Config.GATEWAY_DEFAULT_PORT;
@@ -42,6 +42,15 @@ public class GatewayMain {
       coordinator = null;
     }
 
+    // 创建 MessageBus 并连接 RabbitMQ
+    MessageBus messageBus = null;
+    try {
+      messageBus = new MessageBus();
+    } catch (Exception e) {
+      logger.error("Failed to connect to RabbitMQ: " + e.getMessage());
+      System.exit(1);
+    }
+
     SessionManager sessionManager = new DefaultSessionManager();
 
     HeartbeatService heartbeatService =
@@ -53,17 +62,15 @@ public class GatewayMain {
             coordinator);
 
     GatewayAuthClient authClient = new GatewayAuthClient(authServiceUrl);
-    MessageDispatcher dispatcher = new MessageDispatcher(coordinator, gatewayId);
+    // 传入 messageBus
+    MessageDispatcher dispatcher = new MessageDispatcher(coordinator, messageBus, gatewayId);
 
     ReactorGateway gateway =
         new ReactorGateway(
             port, sessionManager, heartbeatService, dispatcher, authClient, coordinator, gatewayId);
 
     if (coordinator != null) {
-      coordinator.subscribeRoomListUpdates(
-          (channel, msg) -> {
-            gateway.sendRoomListToLobby();
-          });
+      coordinator.subscribeRoomListUpdates((channel, msg) -> gateway.sendRoomListToLobby());
 
       final DistributedCoordinator finalCoordinator = coordinator;
       coordinator.subscribeGatewayMessages(
@@ -89,6 +96,7 @@ public class GatewayMain {
       System.exit(1);
     }
 
+    final MessageBus finalMessageBus = messageBus;
     final RedissonClient finalRedisson = redisson;
     Runtime.getRuntime()
         .addShutdownHook(
@@ -96,6 +104,7 @@ public class GatewayMain {
                 () -> {
                   logger.info("Shutting down gateway " + gatewayId + "...");
                   gateway.stop();
+                  if (finalMessageBus != null) finalMessageBus.close();
                   if (finalRedisson != null) finalRedisson.shutdown();
                   dbManager.shutdown();
                 }));
