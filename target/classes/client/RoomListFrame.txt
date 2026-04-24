@@ -1,0 +1,383 @@
+package snake.client;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.Socket;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import snake.common.Config;
+import snake.common.Protocol;
+
+public class RoomListFrame extends JFrame {
+  private final String username;
+  private final String gatewayIp;
+  private final int gatewayPort;
+  private final String mainServerIp;
+  private final int mainServerPort;
+
+  private NetworkHandler gatewayHandler;
+  private JTable roomTable;
+  private RoomTableModel tableModel;
+  private JButton createBtn;
+  private JButton logoutBtn;
+  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private volatile boolean running = true;
+
+  private List<RoomEntry> rooms = new ArrayList<>();
+
+  // 构造函数增加主服务器参数
+  public RoomListFrame(
+      String username, String gatewayIp, int gatewayPort, String mainServerIp, int mainServerPort) {
+    System.out.println("RoomListFrame constructor called");
+    this.username = username;
+    this.gatewayIp = gatewayIp;
+    this.gatewayPort = gatewayPort;
+    this.mainServerIp = mainServerIp;
+    this.mainServerPort = mainServerPort;
+    initUI();
+    connectGateway();
+    startListening();
+    if (gatewayHandler != null) {
+      gatewayHandler.send(Protocol.CMD_ROOM_LIST);
+    }
+  }
+
+  private void initUI() {
+    setTitle("Snake Game - Room List");
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setSize(700, 500);
+    setLocationRelativeTo(null);
+
+    tableModel = new RoomTableModel();
+    roomTable = new JTable(tableModel);
+    roomTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    roomTable.getTableHeader().setReorderingAllowed(false);
+    roomTable.setRowHeight(24);
+    JScrollPane scrollPane = new JScrollPane(roomTable);
+
+    createBtn = new JButton("Create Room");
+    logoutBtn = new JButton("Logout");
+    JPanel buttonPanel = new JPanel(new FlowLayout());
+    buttonPanel.add(createBtn);
+    buttonPanel.add(logoutBtn);
+
+    add(scrollPane, BorderLayout.CENTER);
+    add(buttonPanel, BorderLayout.SOUTH);
+
+    // 快捷键
+    roomTable
+        .getInputMap(JComponent.WHEN_FOCUSED)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "join");
+    roomTable
+        .getActionMap()
+        .put(
+            "join",
+            new AbstractAction() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                joinSelectedRoom();
+              }
+            });
+    roomTable
+        .getInputMap(JComponent.WHEN_FOCUSED)
+        .put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0), "create");
+    roomTable
+        .getActionMap()
+        .put(
+            "create",
+            new AbstractAction() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                createRoom();
+              }
+            });
+
+    createBtn.addActionListener(e -> createRoom());
+    logoutBtn.addActionListener(e -> logout());
+
+    addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            running = false;
+            if (gatewayHandler != null) {
+              gatewayHandler.send(Protocol.QUIT);
+              gatewayHandler.close();
+            }
+            executor.shutdown();
+          }
+        });
+  }
+
+  private void connectGateway() {
+    gatewayHandler = new NetworkHandler();
+    try {
+      gatewayHandler.connect(gatewayIp, gatewayPort);
+      gatewayHandler.send(Protocol.USER + " " + username);
+    } catch (IOException e) {
+      JOptionPane.showMessageDialog(this, "Failed to connect to gateway: " + e.getMessage());
+      System.exit(1);
+    }
+  }
+
+  private void startListening() {
+    executor.submit(
+        () -> {
+          while (running && gatewayHandler != null && gatewayHandler.isConnected()) {
+            try {
+              String msg = gatewayHandler.receive();
+              if (msg == null) break;
+              System.out.println("[RoomList] Received from gateway: " + msg);
+              if (msg.startsWith(Protocol.ROOM_LIST_UPDATE + "|")) {
+                String listData = msg.substring(Protocol.ROOM_LIST_UPDATE.length() + 1);
+                System.out.println("[RoomList] Room list data:\n" + listData);
+                updateRoomList(listData);
+              } else if (Protocol.PONG.equals(msg)) {
+                System.out.println("[RoomList] Received PONG");
+              } else {
+                System.out.println("[RoomList] Unknown gateway message: " + msg);
+              }
+            } catch (IOException e) {
+              if (running) {
+                System.err.println("[RoomList] Gateway read error: " + e.getMessage());
+                SwingUtilities.invokeLater(
+                    () -> {
+                      JOptionPane.showMessageDialog(RoomListFrame.this, "Gateway connection lost.");
+                      logout();
+                    });
+              }
+              break;
+            }
+          }
+        });
+    new javax.swing.Timer(
+            Config.HEARTBEAT_INTERVAL * 1000,
+            e -> {
+              if (gatewayHandler != null && gatewayHandler.isConnected()) {
+                System.out.println("[RoomList] Sending PING to gateway");
+                gatewayHandler.send(Protocol.PING);
+              }
+            })
+        .start();
+  }
+
+  private void updateRoomList(String listData) {
+    SwingUtilities.invokeLater(
+        () -> {
+          rooms.clear();
+          String[] lines = listData.split("\n");
+          for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("No active rooms")) continue;
+            String[] parts = line.split("\\s+");
+            if (parts.length >= 3) {
+              try {
+                int id = Integer.parseInt(parts[0]);
+                String status = parts[1];
+                String players = parts[2];
+                int port = parts.length >= 4 ? Integer.parseInt(parts[3]) : -1;
+                String created = parts.length >= 5 ? parts[4] : "";
+                rooms.add(new RoomEntry(id, status, players, port, created));
+              } catch (NumberFormatException ignored) {
+              }
+            }
+          }
+          tableModel.fireTableDataChanged();
+          if (!rooms.isEmpty() && roomTable.getSelectedRow() == -1) {
+            roomTable.setRowSelectionInterval(0, 0);
+          }
+        });
+  }
+
+  private void joinSelectedRoom() {
+    int selectedRow = roomTable.getSelectedRow();
+    if (selectedRow < 0 || selectedRow >= rooms.size()) {
+      JOptionPane.showMessageDialog(this, "Please select a room first.");
+      return;
+    }
+    RoomEntry entry = rooms.get(selectedRow);
+    int roomId = entry.id;
+    // 通过主服务器 JOIN
+    new SwingWorker<String, Void>() {
+      @Override
+      protected String doInBackground() throws Exception {
+        return sendToMainServer("JOIN " + roomId + " " + username);
+      }
+
+      @Override
+      protected void done() {
+        try {
+          String response = get();
+          if (response.startsWith("REDIRECT")) {
+            String[] parts = response.split(" ");
+            int roomPort = Integer.parseInt(parts[1]);
+            int redirectedRoomId = Integer.parseInt(parts[2]);
+            // 连接到房间服务器
+            NetworkHandler roomHandler = new NetworkHandler();
+            roomHandler.connect(mainServerIp, roomPort);
+            roomHandler.send("PLAYER " + username);
+            // 等待 WELCOME
+            String welcome = roomHandler.receive();
+            if (welcome != null && welcome.startsWith("WELCOME")) {
+              // 打开游戏窗口
+              GameFrame gameFrame = new GameFrame(roomHandler, username);
+              gameFrame.setVisible(true);
+              // 关闭当前窗口
+              dispose();
+              running = false;
+              if (gatewayHandler != null) {
+                gatewayHandler.close();
+              }
+            } else {
+              JOptionPane.showMessageDialog(RoomListFrame.this, "Failed to join room: " + welcome);
+              roomHandler.close();
+            }
+          } else {
+            JOptionPane.showMessageDialog(RoomListFrame.this, response);
+          }
+        } catch (Exception ex) {
+          JOptionPane.showMessageDialog(RoomListFrame.this, "Error: " + ex.getMessage());
+        }
+      }
+    }.execute();
+  }
+
+  private void createRoom() {
+    String roomIdStr =
+        JOptionPane.showInputDialog(this, "Enter room ID (0-" + (Config.MAX_ROOMS - 1) + "):");
+    if (roomIdStr == null) return;
+    try {
+      int roomId = Integer.parseInt(roomIdStr);
+      if (roomId < 0 || roomId >= Config.MAX_ROOMS) throw new NumberFormatException();
+      new SwingWorker<String, Void>() {
+        @Override
+        protected String doInBackground() throws Exception {
+          return sendToMainServer("CREATE " + roomId + " " + username);
+        }
+
+        @Override
+        protected void done() {
+          try {
+            String response = get();
+            if (response.startsWith("REDIRECT")) {
+              String[] parts = response.split(" ");
+              int roomPort = Integer.parseInt(parts[1]);
+              int redirectedRoomId = Integer.parseInt(parts[2]);
+              NetworkHandler roomHandler = new NetworkHandler();
+              roomHandler.connect(mainServerIp, roomPort);
+              roomHandler.send("PLAYER " + username);
+              String welcome = roomHandler.receive();
+              if (welcome != null && welcome.startsWith("WELCOME")) {
+                GameFrame gameFrame = new GameFrame(roomHandler, username);
+                gameFrame.setVisible(true);
+                dispose();
+                running = false;
+                if (gatewayHandler != null) {
+                  gatewayHandler.close();
+                }
+              } else {
+                JOptionPane.showMessageDialog(
+                    RoomListFrame.this, "Failed to create room: " + welcome);
+                roomHandler.close();
+              }
+            } else {
+              JOptionPane.showMessageDialog(RoomListFrame.this, response);
+            }
+          } catch (Exception ex) {
+            JOptionPane.showMessageDialog(RoomListFrame.this, "Error: " + ex.getMessage());
+          }
+        }
+      }.execute();
+    } catch (NumberFormatException e) {
+      JOptionPane.showMessageDialog(this, "Invalid room ID.");
+    }
+  }
+
+  private String sendToMainServer(String command) throws IOException {
+    try (Socket socket = new Socket(mainServerIp, mainServerPort);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+      out.println(command);
+      StringBuilder sb = new StringBuilder();
+      String line;
+      while ((line = in.readLine()) != null) {
+        sb.append(line).append("\n");
+      }
+      return sb.toString().trim();
+    }
+  }
+
+  private void logout() {
+    try {
+      sendToMainServer("LOGOUT " + username);
+    } catch (IOException ignored) {
+    }
+    if (gatewayHandler != null) {
+      gatewayHandler.send(Protocol.QUIT);
+      gatewayHandler.close();
+    }
+    running = false;
+    dispose();
+    // 返回到登录界面（需要知道主服务器地址，这里简单重新打开 LoginFrame）
+    new LoginFrame(mainServerIp, mainServerPort).setVisible(true);
+  }
+
+  private class RoomTableModel extends AbstractTableModel {
+    private final String[] columns = {"ID", "Status", "Players", "Port", "Created"};
+
+    @Override
+    public int getRowCount() {
+      return rooms.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columns.length;
+    }
+
+    @Override
+    public Object getValueAt(int row, int col) {
+      RoomEntry e = rooms.get(row);
+      switch (col) {
+        case 0:
+          return e.id;
+        case 1:
+          return e.status;
+        case 2:
+          return e.players;
+        case 3:
+          return e.port;
+        case 4:
+          return e.created;
+        default:
+          return "";
+      }
+    }
+
+    @Override
+    public String getColumnName(int col) {
+      return columns[col];
+    }
+  }
+
+  private static class RoomEntry {
+    int id;
+    String status;
+    String players;
+    int port;
+    String created;
+
+    RoomEntry(int id, String status, String players, int port, String created) {
+      this.id = id;
+      this.status = status;
+      this.players = players;
+      this.port = port;
+      this.created = created;
+    }
+  }
+}

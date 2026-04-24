@@ -1,0 +1,200 @@
+package snake.client;
+
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import javax.swing.*;
+import snake.common.*;
+
+public class GamePanel extends JPanel {
+  private final NetworkHandler roomHandler;
+  private GameStateData currentState;
+  private boolean running = true;
+  private Thread receiveThread;
+  private String username;
+
+  public GamePanel(NetworkHandler roomHandler, String username) {
+    this.roomHandler = roomHandler;
+    this.username = username;
+    setPreferredSize(new Dimension(800, 600));
+    setBackground(Color.BLACK);
+    setFocusable(true);
+    addKeyListener(
+        new KeyAdapter() {
+          @Override
+          public void keyPressed(KeyEvent e) {
+            char dir = 0;
+            switch (e.getKeyCode()) {
+              case KeyEvent.VK_UP:
+                dir = 'w';
+                break;
+              case KeyEvent.VK_DOWN:
+                dir = 's';
+                break;
+              case KeyEvent.VK_LEFT:
+                dir = 'a';
+                break;
+              case KeyEvent.VK_RIGHT:
+                dir = 'd';
+                break;
+            }
+            if (dir != 0) roomHandler.send(String.valueOf(dir));
+            if (e.getKeyChar() == 'q' || e.getKeyChar() == 'Q') {
+              roomHandler.send(Protocol.QUIT);
+              running = false;
+            }
+          }
+        });
+    startReceiving();
+  }
+
+  private void startReceiving() {
+    receiveThread =
+        new Thread(
+            () -> {
+              while (running && roomHandler.isConnected()) {
+                try {
+                  String msg = roomHandler.receive();
+                  if (msg == null) break;
+                  // 尝试解析 JSON 状态消息
+                  if (msg.trim().startsWith("{")) {
+                    System.out.println("[GamePanel] Received JSON, parsing...");
+                    GameStateData newState = MessageParser.deserializeGameState(msg);
+                    if (newState != null) {
+                      currentState = newState;
+                      SwingUtilities.invokeLater(this::repaint);
+                    } else {
+                      System.out.println("[GamePanel] Failed to parse JSON state");
+                    }
+                  } else if (msg.contains("YOU DIED")) {
+                    System.out.println("[GamePanel] Received YOU DIED");
+                    SwingUtilities.invokeLater(
+                        () -> JOptionPane.showMessageDialog(GamePanel.this, "You died!"));
+                  } else if (msg.contains("WELCOME")) {
+                    System.out.println("[GamePanel] Received WELCOME: " + msg);
+                  } else {
+                    System.out.println("[GamePanel] Unknown message: " + msg);
+                  }
+                } catch (IOException e) {
+                  if (running) e.printStackTrace();
+                  break;
+                }
+              }
+              SwingUtilities.invokeLater(
+                  () -> {
+                    JOptionPane.showMessageDialog(GamePanel.this, "Disconnected from room server.");
+                    ((JFrame) SwingUtilities.getWindowAncestor(GamePanel.this)).dispose();
+                  });
+            });
+    receiveThread.start();
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    if (currentState == null) {
+      g.setColor(Color.WHITE);
+      g.drawString("Waiting for game state...", 50, 50);
+      return;
+    }
+
+    drawStaticMap(g);
+    drawFood(g);
+    drawSnakes(g);
+    drawInfo(g);
+  }
+
+  private void drawStaticMap(Graphics g) {
+    int cellSize = 20;
+    int offsetX = 50;
+    int offsetY = 50;
+
+    g.setColor(Color.GRAY);
+    for (int i = 0; i <= Config.MAP_WIDTH; i++) {
+      g.drawLine(
+          offsetX + i * cellSize,
+          offsetY,
+          offsetX + i * cellSize,
+          offsetY + Config.MAP_HEIGHT * cellSize);
+      g.drawLine(
+          offsetX,
+          offsetY + i * cellSize,
+          offsetX + Config.MAP_WIDTH * cellSize,
+          offsetY + i * cellSize);
+    }
+
+    g.setColor(Color.WHITE);
+    for (int x = 0; x < Config.MAP_WIDTH; x++) {
+      fillCell(g, x, 0, cellSize, offsetX, offsetY, Color.WHITE);
+      fillCell(g, x, Config.MAP_HEIGHT - 1, cellSize, offsetX, offsetY, Color.WHITE);
+    }
+    for (int y = 0; y < Config.MAP_HEIGHT; y++) {
+      fillCell(g, 0, y, cellSize, offsetX, offsetY, Color.WHITE);
+      fillCell(g, Config.MAP_WIDTH - 1, y, cellSize, offsetX, offsetY, Color.WHITE);
+    }
+
+    if (currentState.obstacles != null) {
+      g.setColor(Color.YELLOW);
+      for (int i = 0; i < currentState.obstacleCount; i++) {
+        Position p = currentState.obstacles[i];
+        if (p != null) fillCell(g, p.x, p.y, cellSize, offsetX, offsetY, Color.YELLOW);
+      }
+    }
+  }
+
+  private void drawFood(Graphics g) {
+    if (currentState.food != null) {
+      fillCell(g, currentState.food.x, currentState.food.y, 20, 50, 50, Color.RED);
+    }
+  }
+
+  private void drawSnakes(Graphics g) {
+    int cellSize = 20;
+    int offsetX = 50;
+    int offsetY = 50;
+    for (int i = 0; i < currentState.playerCount; i++) {
+      GameStateData.PlayerInfo p = currentState.players[i];
+      if (p == null) continue;
+      Color snakeColor = p.isYou ? Color.GREEN : Color.CYAN;
+      Color deadColor = Color.DARK_GRAY;
+      for (int j = 0; j < p.length; j++) {
+        Position pos = p.body[j];
+        if (pos == null) continue;
+        Color c = p.isDead ? deadColor : (j == 0 ? snakeColor : snakeColor.darker());
+        fillCell(g, pos.x, pos.y, cellSize, offsetX, offsetY, c);
+      }
+    }
+  }
+
+  private void fillCell(
+      Graphics g, int x, int y, int cellSize, int offsetX, int offsetY, Color color) {
+    g.setColor(color);
+    g.fillRect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize - 1, cellSize - 1);
+  }
+
+  private void drawInfo(Graphics g) {
+    int infoX = 50 + Config.MAP_WIDTH * 20 + 20;
+    int infoY = 50;
+    g.setColor(Color.WHITE);
+    g.drawString(
+        "Players (" + currentState.activePlayers + "/" + currentState.totalPlayers + ")",
+        infoX,
+        infoY);
+    infoY += 20;
+    for (int i = 0; i < currentState.playerCount; i++) {
+      GameStateData.PlayerInfo p = currentState.players[i];
+      if (p == null) continue;
+      String status = p.isDead ? "DEAD" : "ALIVE";
+      String you = p.isYou ? " (YOU)" : "";
+      g.drawString(
+          p.name + ": Score=" + p.score + ", Len=" + p.length + ", " + status + you, infoX, infoY);
+      infoY += 18;
+    }
+  }
+
+  public void stop() {
+    running = false;
+    if (receiveThread != null) receiveThread.interrupt();
+  }
+}

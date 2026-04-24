@@ -1,0 +1,59 @@
+package snake.client;
+
+import java.io.*;
+import java.net.Socket;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class NetworkHandler {
+  private Socket socket;
+  private PrintWriter out;
+  private BufferedReader in;
+  private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+
+  private void log(String msg) {
+    System.out.println("[" + LocalTime.now().format(TIME_FORMAT) + "] [Network] " + msg);
+  }
+
+  public void connect(String host, int port) throws IOException {
+    log("Connecting to " + host + ":" + port);
+    socket = new Socket(host, port);
+    out = new PrintWriter(socket.getOutputStream(), true);
+    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    log("Connected");
+  }
+
+  public void send(String message) {
+    log("SEND: " + message);
+    out.println(message);
+  }
+
+  public String receive() throws IOException {
+    String line = in.readLine();
+    if (line != null) {
+      log("RECV: " + line);
+    } else {
+      log("RECV: null (connection closed)");
+    }
+    return line;
+  }
+
+  public boolean isConnected() {
+    return socket != null && socket.isConnected() && !socket.isClosed();
+  }
+
+  public void close() {
+    log("Closing connection");
+    try {
+      if (in != null) in.close();
+      if (out != null) out.close();
+      if (socket != null) socket.close();
+    } catch (IOException ignored) {
+    }
+    log("Closed");
+  }
+
+  public Socket getSocket() {
+    return socket;
+  }
+}
