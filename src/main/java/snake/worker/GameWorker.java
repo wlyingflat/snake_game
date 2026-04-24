@@ -30,7 +30,7 @@ public class GameWorker {
     this.coordinator = coordinator;
     this.eventProducer = eventProducer;
     this.messageBus = messageBus;
-    this.actorManager = new ActorManager(coordinator, workerId, eventProducer);
+    this.actorManager = new ActorManager(coordinator, workerId, eventProducer, messageBus);
     this.dispatchPool =
         Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),

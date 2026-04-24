@@ -13,6 +13,7 @@ import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
 import snake.game.event.*;
 import snake.game.state.GameState;
+import snake.mq.MessageBus;
 import snake.network.Serializer;
 
 /**
@@ -41,13 +42,14 @@ public class GameActor {
       DistributedCoordinator coordinator,
       String workerId,
       KafkaEventProducer eventProducer,
+      MessageBus messageBus,
       Runnable onStatusChange) {
     this.roomId = roomId;
     this.coordinator = coordinator;
     this.workerId = workerId;
     this.onStatusChange = onStatusChange;
     this.state = new GameState(roomId);
-    this.notifier = new ActorNotifier(coordinator, eventProducer);
+    this.notifier = new ActorNotifier(coordinator, eventProducer, messageBus);
     this.lastActiveTime = System.currentTimeMillis();
 
     // Disruptor 设置

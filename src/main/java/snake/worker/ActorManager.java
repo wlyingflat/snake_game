@@ -9,20 +9,26 @@ import snake.base.ILogger;
 import snake.base.Logger;
 import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
+import snake.mq.MessageBus;
 
 public class ActorManager {
   private final Map<Integer, GameActor> actors = new ConcurrentHashMap<>();
   private final DistributedCoordinator coordinator;
   private final String workerId;
   private final KafkaEventProducer eventProducer;
+  private final MessageBus messageBus;
   private final ILogger logger = Logger.getInstance();
   private Runnable onActorStatusChange;
 
   public ActorManager(
-      DistributedCoordinator coordinator, String workerId, KafkaEventProducer eventProducer) {
+      DistributedCoordinator coordinator,
+      String workerId,
+      KafkaEventProducer eventProducer,
+      MessageBus messageBus) {
     this.coordinator = coordinator;
     this.workerId = workerId;
     this.eventProducer = eventProducer;
+    this.messageBus = messageBus;
   }
 
   public void setOnActorStatusChange(Runnable callback) {
@@ -58,6 +64,7 @@ public class ActorManager {
             coordinator,
             workerId,
             eventProducer,
+            messageBus,
             () -> {
               GameActor a = actorRef.get();
               if (a != null && a.isRunning()) {

@@ -12,7 +12,7 @@ import snake.gateway.reactor.ReactorGateway;
 import snake.gateway.session.ClientSession;
 import snake.gateway.session.DefaultSessionManager;
 import snake.gateway.session.SessionManager;
-import snake.mq.MessageBus; // 新增
+import snake.mq.MessageBus;
 import snake.persistence.DatabaseManager;
 import snake.persistence.PropertiesConfigProvider;
 import snake.persistence.redis.RedissonManager;
@@ -62,7 +62,6 @@ public class GatewayMain {
             coordinator);
 
     GatewayAuthClient authClient = new GatewayAuthClient(authServiceUrl);
-    // 传入 messageBus
     MessageDispatcher dispatcher = new MessageDispatcher(coordinator, messageBus, gatewayId);
 
     ReactorGateway gateway =
@@ -76,23 +75,31 @@ public class GatewayMain {
             messageBus,
             gatewayId);
 
+    // 订阅房间列表更新（Redis）
     if (coordinator != null) {
       coordinator.subscribeRoomListUpdates((channel, msg) -> gateway.sendRoomListToLobby());
+    }
 
-      final DistributedCoordinator finalCoordinator = coordinator;
-      coordinator.subscribeGatewayMessages(
-          gatewayId,
-          (pattern, channel, msg) -> {
-            String ch = channel.toString();
-            String[] parts = ch.split(":");
-            if (parts.length >= 4) {
-              String username = parts[3];
+    // 订阅 RabbitMQ 本 Gateway 的玩家消息（Worker → Gateway）
+    if (messageBus != null) {
+      try {
+        messageBus.subscribeGateway(
+            gatewayId,
+            (routingKey, message) -> {
+              // 从 routingKey 中提取用户名：格式 gateway.{gatewayId}.player.{username}
+              String[] parts = routingKey.split("\\.");
+              String username = (parts.length >= 4) ? parts[3] : null;
+              if (username == null) return;
               ClientSession session = sessionManager.getSessionByUsername(username);
               if (session != null && !session.closed) {
-                session.sendMessage(msg);
+                session.sendMessage(message);
+              } else {
+                logger.warn("Player " + username + " not online, discarding message");
               }
-            }
-          });
+            });
+      } catch (Exception e) {
+        logger.error("Failed to subscribe RabbitMQ for gateway: " + e.getMessage());
+      }
     }
 
     try {

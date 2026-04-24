@@ -7,29 +7,24 @@ import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
 import snake.event.PlayerDiedEvent;
 import snake.event.ScoreChangedEvent;
+import snake.mq.MessageBus; // 新增
 
-/** Actor 的通知器 负责将消息发送到正确的 Gateway，再由 Gateway 转发给客户端 */
 public class ActorNotifier {
   private final DistributedCoordinator coordinator;
   private final KafkaEventProducer eventProducer;
+  private final MessageBus messageBus; // 新增
   private final ILogger logger = Logger.getInstance();
 
-  public ActorNotifier(DistributedCoordinator coordinator, KafkaEventProducer eventProducer) {
+  public ActorNotifier(
+      DistributedCoordinator coordinator, KafkaEventProducer eventProducer, MessageBus messageBus) {
     this.coordinator = coordinator;
     this.eventProducer = eventProducer;
+    this.messageBus = messageBus;
   }
 
-  /**
-   * 发送消息给指定玩家
-   *
-   * @param username 玩家名
-   * @param gatewayId 玩家所在 Gateway ID（null 时从 Redis 查询）
-   * @param message 消息内容
-   */
   public void sendToPlayer(String username, String gatewayId, String message) {
     if (username == null) return;
 
-    // 如果没有指定 gatewayId，从 Redis 查询
     if (gatewayId == null) {
       DistributedCoordinator.PlayerLocation loc = coordinator.getPlayerLocation(username);
       if (loc == null) {
@@ -39,8 +34,12 @@ public class ActorNotifier {
       gatewayId = loc.gatewayId();
     }
 
-    // 发布到玩家所在 Gateway 的频道
-    coordinator.publishToGateway(gatewayId, username, message);
+    // 优先使用 RabbitMQ（如果可用），否则降级到 Redis
+    if (messageBus != null) {
+      messageBus.publishToPlayer(gatewayId, username, message);
+    } else {
+      coordinator.publishToGateway(gatewayId, username, message);
+    }
 
     if (Config.DEBUG_MESSAGE_LOGGING) {
       logger.debug("Actor sent to " + username + " via gateway " + gatewayId);
