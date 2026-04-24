@@ -164,11 +164,11 @@ public class GameState {
     Player p = players.get(username);
     if (p != null && !p.isDead) {
       p.direction = dir;
-      Logger.debug("Player " + username + " direction updated to " + dir);
+      Logger.getInstance().debug("Player " + username + " direction updated to " + dir);
     } else if (p != null && p.isDead) {
-      Logger.debug("Ignored direction for dead player: " + username);
+      Logger.getInstance().debug("Ignored direction for dead player: " + username);
     } else {
-      Logger.debug("Player not found: " + username);
+      Logger.getInstance().debug("Player not found: " + username);
     }
   }
 

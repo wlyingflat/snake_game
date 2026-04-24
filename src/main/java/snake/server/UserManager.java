@@ -7,12 +7,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import snake.common.User;
+import snake.util.ILogger;
 import snake.util.Logger;
 
-public class UserManager {
+public class UserManager implements IAuthenticationService, IUserRepository {
   private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
   private final String filename;
   private final ReentrantReadWriteLock fileLock = new ReentrantReadWriteLock();
+  private final ILogger logger = Logger.getInstance();
 
   public UserManager(String filename) {
     this.filename = filename;
@@ -20,6 +22,7 @@ public class UserManager {
     Runtime.getRuntime().addShutdownHook(new Thread(this::save));
   }
 
+  @Override
   public boolean register(String username, String password) {
     User newUser = new User();
     newUser.name = username;
@@ -29,17 +32,15 @@ public class UserManager {
     newUser.lastActive = System.currentTimeMillis() / 1000;
 
     User existing = users.putIfAbsent(username, newUser);
-    if (existing != null) {
-      return false; // 用户名已存在
-    }
-    save(); // 持久化
+    if (existing != null) return false;
+    save();
     return true;
   }
 
+  @Override
   public boolean login(String username, String password) {
     User user = users.get(username);
     if (user == null) return false;
-
     synchronized (user) {
       if (user.online) return false;
       byte[] hash = hashPassword(password, user.salt);
@@ -50,16 +51,37 @@ public class UserManager {
     return true;
   }
 
-  public boolean logout(String username) {
+  @Override
+  public void logout(String username) {
     User user = users.get(username);
-    if (user == null) return false;
-
+    if (user == null) return;
     synchronized (user) {
-      if (!user.online) return false;
+      if (!user.online) return;
       user.online = false;
       user.lastActive = System.currentTimeMillis() / 1000;
     }
-    return true;
+  }
+
+  @Override
+  public User findByName(String username) {
+    return users.get(username);
+  }
+
+  @Override
+  public void save(User user) {
+    users.put(user.name, user);
+    save();
+  }
+
+  @Override
+  public void delete(String username) {
+    users.remove(username);
+    save();
+  }
+
+  @Override
+  public List<User> findAll() {
+    return new ArrayList<>(users.values());
   }
 
   private byte[] hashPassword(String password, int salt) {
@@ -78,11 +100,10 @@ public class UserManager {
       try {
         file.createNewFile();
       } catch (IOException e) {
-        Logger.error("Cannot create user file: " + e.getMessage());
+        logger.error("Cannot create user file: " + e.getMessage());
       }
       return;
     }
-
     fileLock.readLock().lock();
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line;
@@ -90,14 +111,12 @@ public class UserManager {
         if (line.isEmpty() || line.startsWith("#")) continue;
         String[] parts = line.split(" ");
         if (parts.length < 5) continue;
-
         String username = parts[0];
         int salt = (int) Long.parseLong(parts[1], 16);
         String hashHex = parts[2];
         byte[] hash = hexToBytes(hashHex);
         boolean online = Integer.parseInt(parts[3]) != 0;
         long lastActive = Long.parseLong(parts[4]);
-
         User user = new User();
         user.name = username;
         user.salt = salt;
@@ -107,14 +126,13 @@ public class UserManager {
         users.put(username, user);
       }
     } catch (IOException e) {
-      Logger.error("Load users error: " + e.getMessage());
+      logger.error("Load users error: " + e.getMessage());
     } finally {
       fileLock.readLock().unlock();
     }
   }
 
   public void save() {
-    // 创建快照，避免在写文件过程中 users 被修改
     List<User> snapshot = new ArrayList<>(users.values());
     File tempFile = new File(filename + ".tmp");
     fileLock.writeLock().lock();
@@ -130,17 +148,16 @@ public class UserManager {
                 user.lastActive));
       }
       bw.flush();
-
       File target = new File(filename);
       if (target.exists() && !target.delete()) {
-        Logger.error("Failed to delete old user file");
+        logger.error("Failed to delete old user file");
         return;
       }
       if (!tempFile.renameTo(target)) {
-        Logger.error("Failed to rename temp file to user file");
+        logger.error("Failed to rename temp file to user file");
       }
     } catch (IOException e) {
-      Logger.error("Save users error: " + e.getMessage());
+      logger.error("Save users error: " + e.getMessage());
     } finally {
       fileLock.writeLock().unlock();
     }

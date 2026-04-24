@@ -133,16 +133,23 @@ public class RoomListFrame extends JFrame {
     }
   }
 
+  // snake/client/swing/RoomListFrame.java
   private boolean waitForJoinOk() {
     GatewayClient gateway = app.getGatewayClient();
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < 5000) {
       String msg = gateway.pollMessage();
       if (msg != null) {
-        if (msg.contains("\"cmd\":\"JOIN_OK\"")) return true;
-        if (msg.contains("\"cmd\":\"JOIN_FAIL\"") || msg.contains("\"cmd\":\"ERROR\""))
+        // 接受 CREATE_OK 或 JOIN_OK
+        if (msg.contains("\"cmd\":\"CREATE_OK\"") || msg.contains("\"cmd\":\"JOIN_OK\"")) {
+          return true;
+        }
+        if (msg.contains("\"cmd\":\"JOIN_FAIL\"") || msg.contains("\"cmd\":\"ERROR\"")) {
           return false;
-        if (msg.contains("\"cmd\":\"PING\"")) gateway.sendCommand("PONG");
+        }
+        if (msg.contains("\"cmd\":\"PING\"")) {
+          gateway.sendCommand("PONG");
+        }
       }
       try {
         Thread.sleep(50);

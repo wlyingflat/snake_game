@@ -7,12 +7,9 @@ import snake.common.NioSession;
 public class ClientSession extends NioSession {
   public String username;
   public volatile int roomId = -1;
-
-  // 心跳相关字段 —— 添加 volatile 保证多线程可见性
   public volatile long lastHeartbeat;
   public volatile long lastPingSent;
   public volatile boolean pendingPong;
-
   public volatile boolean closed = false;
 
   public ClientSession(SocketChannel channel, NioServer server) {
@@ -23,10 +20,8 @@ public class ClientSession extends NioSession {
   }
 
   @Override
-  public void enqueueResponse(String response) {
-    if (closed) {
-      return;
-    }
-    super.enqueueResponse(response);
+  public void sendMessage(String response) {
+    if (closed) return;
+    super.sendMessage(response);
   }
 }
