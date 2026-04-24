@@ -1,3 +1,4 @@
+// snake/server/MainServer.java
 package snake.server;
 
 import java.io.*;
@@ -10,18 +11,12 @@ import snake.util.*;
 
 public class MainServer extends NioServer {
   private UserManager userManager;
-  private RoomManager roomManager;
-  private GatewayNotifier gatewayNotifier;
-  private ServerSocket registerServer;
-  private ServerSocket listQueryServer;
   private Map<SocketChannel, MainSession> sessions = new ConcurrentHashMap<>();
 
   public MainServer(int port, int gatewayPort) {
     super(port);
     this.userManager = new UserManager("users.txt");
-    this.roomManager = new RoomManager();
     startGatewayProcess(gatewayPort);
-    this.gatewayNotifier = new GatewayNotifier("localhost", Config.GATEWAY_NOTIFY_PORT);
   }
 
   @Override
@@ -79,9 +74,9 @@ public class MainServer extends NioServer {
           if (parts.length >= 3) {
             int roomId = Integer.parseInt(parts[1]);
             String creator = parts[2];
-            if (roomManager.createRoom(roomId, creator)) {
-              mainSession.enqueueResponse(
-                  Protocol.RESP_REDIRECT + " " + roomManager.getRoom(roomId).port + " " + roomId);
+            if (sendCreateRoomToGateway(roomId)) {
+              // 返回房间ID（端口不再需要）
+              mainSession.enqueueResponse(Protocol.RESP_REDIRECT + " " + roomId + " " + roomId);
             } else {
               mainSession.enqueueResponse(Protocol.RESP_ERROR + " Cannot create room");
             }
@@ -93,12 +88,9 @@ public class MainServer extends NioServer {
           if (parts.length >= 3) {
             int roomId = Integer.parseInt(parts[1]);
             String username = parts[2];
-            if (roomManager.joinRoom(roomId, username)) {
-              RoomInfo room = roomManager.getRoom(roomId);
-              mainSession.enqueueResponse(Protocol.RESP_REDIRECT + " " + room.port + " " + roomId);
-            } else {
-              mainSession.enqueueResponse(Protocol.RESP_ERROR + " Cannot join room");
-            }
+            // 直接返回网关地址，房间ID用于后续加入
+            mainSession.enqueueResponse(
+                Protocol.RESP_REDIRECT + " " + Config.GATEWAY_DEFAULT_PORT + " " + roomId);
           } else {
             mainSession.enqueueResponse(Protocol.RESP_ERROR + " Invalid JOIN command");
           }
@@ -113,7 +105,7 @@ public class MainServer extends NioServer {
           }
           break;
         case Protocol.CMD_ROOM_LIST:
-          mainSession.enqueueResponse(roomManager.getRoomList());
+          mainSession.enqueueResponse(fetchRoomListFromGateway());
           break;
         default:
           mainSession.enqueueResponse(Protocol.RESP_ERROR + " Unknown command");
@@ -129,9 +121,38 @@ public class MainServer extends NioServer {
     sessions.remove(session.channel);
   }
 
+  private boolean sendCreateRoomToGateway(int roomId) {
+    try (Socket socket = new Socket("localhost", 19004);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+      out.println("CREATE_ROOM " + roomId);
+      String resp = in.readLine();
+      return "OK".equals(resp);
+    } catch (IOException e) {
+      Logger.error("Failed to contact Gateway: " + e.getMessage());
+      return false;
+    }
+  }
+
+  private String fetchRoomListFromGateway() {
+    try (Socket socket = new Socket("localhost", Config.ROOM_LIST_QUERY_PORT);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+      out.println("LIST");
+      StringBuilder sb = new StringBuilder();
+      String line;
+      while ((line = in.readLine()) != null) {
+        sb.append(line).append("\n");
+      }
+      return sb.toString();
+    } catch (IOException e) {
+      Logger.error("Failed to fetch room list from Gateway: " + e.getMessage());
+      return "No active rooms.\n";
+    }
+  }
+
   private void startGatewayProcess(int gatewayPort) {
     try {
-      // 获取项目根目录（假设主服务器运行在项目根目录）
       String projectDir = System.getProperty("user.dir");
       ProcessBuilder pb =
           new ProcessBuilder(
@@ -149,118 +170,15 @@ public class MainServer extends NioServer {
     }
   }
 
-  private void startRoomRegisterServer() throws IOException {
-    registerServer = new ServerSocket(Config.ROOM_REGISTER_PORT);
-    Logger.info("Room register server listening on port " + Config.ROOM_REGISTER_PORT);
-    new Thread(
-            () -> {
-              while (running) {
-                try {
-                  Socket regSocket = registerServer.accept();
-                  new Thread(() -> handleRoomRegistration(regSocket)).start();
-                } catch (IOException e) {
-                  if (running) Logger.error("Room register accept error: " + e.getMessage());
-                }
-              }
-            })
-        .start();
-  }
-
-  private void handleRoomRegistration(Socket socket) {
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-      String line = in.readLine();
-      if (line == null) return;
-      Logger.info("[MainServer] Received from room register: " + line);
-      String[] parts = line.split(" ");
-      if (parts[0].equals("REGISTER")) {
-        int roomId = Integer.parseInt(parts[1]);
-        int port = Integer.parseInt(parts[2]);
-        roomManager.registerRoomProcess(roomId, port);
-        out.println("OK");
-        Logger.info("Room " + roomId + " registered on port " + port);
-        Logger.info("[MainServer] Notifying gateway to refresh room list (REGISTER)");
-        gatewayNotifier.notifyRefresh();
-      } else if (parts[0].equals("UNREGISTER")) {
-        int roomId = Integer.parseInt(parts[1]);
-        roomManager.unregisterRoom(roomId);
-        out.println("OK");
-        Logger.info("Room " + roomId + " unregistered");
-        Logger.info("[MainServer] Notifying gateway to refresh room list (UNREGISTER)");
-        gatewayNotifier.notifyRefresh();
-      } else if (parts[0].equals("UPDATE")) {
-        int roomId = Integer.parseInt(parts[1]);
-        int playerCount = Integer.parseInt(parts[2]);
-        int activePlayers = parts.length >= 4 ? Integer.parseInt(parts[3]) : 0;
-        roomManager.updateRoomStatus(roomId, playerCount, activePlayers);
-        out.println("OK");
-        Logger.info(
-            "Room "
-                + roomId
-                + " status updated: players="
-                + playerCount
-                + ", active="
-                + activePlayers);
-        Logger.info("[MainServer] Notifying gateway to refresh room list (UPDATE)");
-        gatewayNotifier.notifyRefresh();
-      } else {
-        Logger.warn("[MainServer] Unknown command from room register: " + line);
-      }
-    } catch (IOException e) {
-      Logger.error("Room registration error: " + e.getMessage());
-    }
-  }
-
-  private void startRoomListQueryServer() throws IOException {
-    listQueryServer = new ServerSocket(Config.ROOM_LIST_QUERY_PORT);
-    Logger.info("Room list query server listening on port " + Config.ROOM_LIST_QUERY_PORT);
-    new Thread(
-            () -> {
-              while (running) {
-                try {
-                  Socket socket = listQueryServer.accept();
-                  new Thread(() -> handleRoomListQuery(socket)).start();
-                } catch (IOException e) {
-                  if (running) Logger.error("Room list query accept error: " + e.getMessage());
-                }
-              }
-            })
-        .start();
-  }
-
-  private void handleRoomListQuery(Socket socket) {
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-      String cmd = in.readLine();
-      if ("LIST".equals(cmd)) {
-        String data = roomManager.getRoomListDataOnly();
-        Logger.debug("[MainServer] Sending room list data to gateway:\n" + data);
-        out.print(data);
-        out.flush();
-      }
-    } catch (IOException e) {
-      Logger.error("Room list query handler error: " + e.getMessage());
-    }
-  }
-
   @Override
   public void start() throws IOException {
-    startRoomRegisterServer();
-    startRoomListQueryServer();
     super.start();
   }
 
   @Override
   protected void cleanup() {
     running = false;
-    try {
-      if (registerServer != null) registerServer.close();
-      if (listQueryServer != null) listQueryServer.close();
-    } catch (IOException e) {
-    }
-    gatewayNotifier.close();
     userManager.save();
-    roomManager.shutdown();
     super.cleanup();
   }
 

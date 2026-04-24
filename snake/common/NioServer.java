@@ -104,6 +104,7 @@ public abstract class NioServer {
     SocketChannel client = session.channel;
     ByteBuffer buf = session.readBuffer;
     try {
+      // NioServer.java - handleRead 方法内
       int bytesRead = client.read(buf);
       if (bytesRead == -1) {
         closeSession(session);
@@ -114,6 +115,9 @@ public abstract class NioServer {
       buf.get(data);
       buf.clear();
       String chunk = new String(data, StandardCharsets.UTF_8);
+      // 添加调试：打印接收到的原始数据块，转义不可见字符以便观察
+      String printable = chunk.replace("\n", "\\n").replace("\r", "\\r");
+      Logger.debug("[" + getServerName() + "] Raw received: " + printable);
       session.pendingMessage.append(chunk);
 
       String fullMsg;

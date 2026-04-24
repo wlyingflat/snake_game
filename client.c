@@ -1,10 +1,7 @@
 /**
- * client.c - 贪吃蛇游戏客户端（适配 Java 服务器 JSON 协议）
+ * client.c - 贪吃蛇游戏客户端（适配新架构）
  *
- * 功能：提供基于 ncurses
- * 的终端界面，处理用户交互，登录后连接网关接收实时房间列表更新。 适配 Java
- * 服务器：游戏状态使用 JSON 格式（{"type":"STATE","data":{...}}）。 编译：gcc
- * -o client client.c cJSON.c -lncurses -lm
+ * 与 Java 服务器通信，使用网关进行所有操作。
  */
 
 #include <arpa/inet.h>
@@ -14,56 +11,107 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/select.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "cJSON.h"
+#include "network.h" // 包含 common.h，其中定义了 Position、GameStateData 等
 
-/* ---------------------------- 常量定义（与服务器保持一致）
- * ---------------------------- */
+/* ========================== 常量定义 ========================== */
+// 游戏参数（common.h 中未定义）
 #define MAP_WIDTH 40
 #define MAP_HEIGHT 20
-#define MAX_SNAKE_LENGTH 63
 #define MAX_PLAYERS_PER_ROOM 8
-#define OBSTACLE_COUNT 15
-#define MAX_ROOMS 8
 #define USERNAME_LEN 32
-#define HEARTBEAT_INTERVAL 30
-#define HEARTBEAT_TIMEOUT 60
-#define MAX_RETRY_ATTEMPTS 5
-#define RETRY_DELAY_MS 200
-#define BUFFER_SIZE 32768       /* 发送缓冲区大小 */
-#define RECV_BUFFER_SIZE 65536  /* 接收缓冲区大小 */
-#define RECV_TIMEOUT_MS 5000    /* 接收超时（毫秒） */
-#define SELECT_TIMEOUT_US 10000 /* select 超时微秒 */
+#define OBSTACLE_COUNT 15
+#define MAX_SNAKE_LENGTH 63
+#define MAX_ROOMS 8
+#define BUFFER_SIZE 8192
+#define RECV_TIMEOUT 5          // 秒
+#define HEARTBEAT_INTERVAL 30   // 秒
+#define SELECT_TIMEOUT_US 10000 // 10ms
 
-/* 协议相关常量（与 Java 服务器保持一致） */
-#define CMD_REGISTER "REG"
-#define CMD_LOGIN "LOGIN"
-#define CMD_CREATE "CREATE"
-#define CMD_JOIN "JOIN"
-#define CMD_LOGOUT "LOGOUT"
-#define CMD_ROOM_LIST "ROOM_LIST"
-#define RESP_OK "OK"
-#define RESP_ERROR "ERROR"
-#define RESP_REDIRECT "REDIRECT"
-#define PROTOCOL_PING "PING"
-#define PROTOCOL_PONG "PONG"
-#define PROTOCOL_USER "USER"
-#define PROTOCOL_QUIT "QUIT"
-#define PROTOCOL_PLAYER "PLAYER"
-#define PROTOCOL_WELCOME "WELCOME"
-#define PROTOCOL_YOU_DIED "YOU DIED"
-#define ROOM_LIST_UPDATE_PREFIX "ROOM_LIST_UPDATE|"
-
-/* ---------------------------- 界面常量 ---------------------------- */
-#define STATUS_BAR_Y (LINES - 1)
-#define MENU_START_Y 5
+// 界面布局（从原 client.c 恢复）
 #define MAP_RENDER_START_Y 3
 #define INFO_PANEL_X_OFFSET (MAP_WIDTH + 5)
+#define MENU_START_Y 5
 
-/* 颜色对索引 */
+/* ========================== 数据结构 ========================== */
+// 蛇的缓存结构，用于局部刷新
+typedef struct {
+  char name[USERNAME_LEN];
+  Position body[MAX_SNAKE_LENGTH];
+  int length;
+  int is_dead;
+} SnakeCache;
+
+typedef struct {
+  int id;
+  char line[256];
+} RoomEntry;
+
+typedef enum { OP_CREATE, OP_JOIN } RoomOp;
+
+typedef enum { FOCUS_ROOM_LIST, FOCUS_CREATE, FOCUS_LOGOUT } FocusType;
+
+typedef enum {
+  AUTH_FOCUS_USERNAME,
+  AUTH_FOCUS_PASSWORD,
+  AUTH_FOCUS_SUBMIT
+} AuthFocus;
+
+typedef enum {
+  STATE_AUTH,
+  STATE_ROOM_LIST,
+  STATE_IN_ROOM,
+  STATE_GAME_OVER,
+  STATE_EXIT
+} ClientState;
+
+typedef struct {
+  ClientState state;
+  char username[USERNAME_LEN];
+  char password[USERNAME_LEN];
+  int is_logged_in;
+  Connection *gateway_conn; // 唯一连接，用于所有通信
+  char server_ip[64];
+  int server_port;
+  char gateway_ip[64];
+  int gateway_port;
+} ClientContext;
+
+/* 渲染缓存全局变量 */
+static SnakeCache prev_snakes[MAX_PLAYERS_PER_ROOM];
+static int prev_snake_count = 0;
+static Position prev_food = {-1, -1};
+static int static_map_drawn = 0;
+
+/* ========================== 函数声明 ========================== */
+static int read_int_input_ncurses(int min, int max);
+static void show_message_centered(const char *msg);
+static void draw_border(void);
+static void init_color_pairs(void);
+static void draw_status_bar(ClientContext *ctx);
+static void draw_menu_options(const char *options[], int n_options,
+                              int selected, int start_y);
+static int send_request_to_main_server(ClientContext *ctx, char *response_buf,
+                                       int buf_size, const char *fmt, ...);
+static int connect_and_send_auth(ClientContext *ctx, int is_register);
+static int send_join_to_gateway(ClientContext *ctx, int room_id);
+static int send_create_to_gateway(ClientContext *ctx, int room_id);
+static int show_auth_menu_ncurses(ClientContext *ctx);
+static int show_room_menu_with_gateway(ClientContext *ctx);
+static int game_loop_ncurses(ClientContext *ctx);
+static void render_game_state(const GameStateData *state_data);
+static void draw_static_map(const GameStateData *state_data);
+static void init_client_context(ClientContext *ctx, const char *ip, int port);
+static void cleanup_client_context(ClientContext *ctx);
+static int input_string(int y, int x, char *buffer, int max_len, int echo);
+static int auth_input_form(ClientContext *ctx, int is_register);
+static void parse_room_list(const char *list, RoomEntry *rooms, int *count);
+static int deserialize_game_state_json(const char *json, GameStateData *state);
+
+/* ========================== 图形界面辅助 ========================== */
 enum {
   COLOR_PAIR_NORMAL = 1,
   COLOR_PAIR_TITLE,
@@ -77,214 +125,6 @@ enum {
   COLOR_PAIR_BORDER
 };
 
-/* 焦点区域 */
-typedef enum { FOCUS_ROOM_LIST, FOCUS_CREATE, FOCUS_LOGOUT } FocusType;
-typedef enum {
-  AUTH_FOCUS_USERNAME,
-  AUTH_FOCUS_PASSWORD,
-  AUTH_FOCUS_SUBMIT
-} AuthFocus;
-typedef enum {
-  STATE_AUTH,
-  STATE_ROOM_LIST,
-  STATE_IN_ROOM,
-  STATE_GAME_OVER,
-  STATE_EXIT
-} ClientState;
-typedef enum { OP_CREATE, OP_JOIN } RoomOp;
-
-/* ---------------------------- 数据结构定义 ---------------------------- */
-typedef struct {
-  int x, y;
-} Position;
-
-typedef struct {
-  char name[USERNAME_LEN];
-  Position head;
-  Position body[MAX_SNAKE_LENGTH];
-  int length;
-  int direction; // 0:UP,1:DOWN,2:LEFT,3:RIGHT
-  int score;
-  int is_dead;
-  int is_you;
-} PlayerInfo;
-
-typedef struct {
-  int room_id;
-  Position food;
-  Position obstacles[OBSTACLE_COUNT];
-  int obstacle_count;
-  PlayerInfo players[MAX_PLAYERS_PER_ROOM];
-  int player_count;
-  int active_players;
-  int total_players;
-} GameStateData;
-
-/* 连接结构体（简化版） */
-typedef struct {
-  int socket_fd;
-} Connection;
-
-/* 客户端上下文 */
-typedef struct {
-  ClientState state;
-  char username[USERNAME_LEN];
-  char password[USERNAME_LEN];
-  int is_logged_in;
-  Connection *room_conn;
-  Connection *gateway_conn;
-  char server_ip[64];
-  int server_port;
-  char gateway_ip[64];
-  int gateway_port;
-} ClientContext;
-
-/* 房间条目结构 */
-typedef struct {
-  int id;
-  char line[256];
-} RoomEntry;
-
-/* 游戏画面缓存 */
-typedef struct {
-  char name[USERNAME_LEN];
-  Position body[MAX_SNAKE_LENGTH];
-  int length;
-  int is_dead;
-} SnakeCache;
-
-static SnakeCache prev_snakes[MAX_PLAYERS_PER_ROOM];
-static int prev_snake_count = 0;
-static Position prev_food = {-1, -1};
-static int static_map_drawn = 0;
-
-/* ---------------------------- 函数声明 ---------------------------- */
-static int recv_line(int fd, char *buffer, size_t size, int timeout_ms);
-static Connection *connection_create(void);
-static int connection_connect(Connection *conn, const char *ip, int port);
-static void connection_destroy(Connection *conn);
-static int send_message(int fd, const char *message);
-static int read_int_input_ncurses(int min, int max);
-static void show_message_centered(const char *msg);
-static void draw_border(void);
-static void init_color_pairs(void);
-static void draw_status_bar(ClientContext *ctx);
-static void draw_menu_options(const char *options[], int n_options,
-                              int selected, int start_y);
-static int send_request_to_main_server(ClientContext *ctx, char *response_buf,
-                                       int buf_size, const char *fmt, ...);
-static int connect_and_send_auth(ClientContext *ctx, int is_register);
-static int connect_to_room_server(ClientContext *ctx, int port);
-static int send_room_operation(ClientContext *ctx, RoomOp op, int room_id);
-static int show_auth_menu_ncurses(ClientContext *ctx);
-static int auth_input_form(ClientContext *ctx, int is_register);
-static int show_room_menu_with_gateway(ClientContext *ctx);
-static int game_loop_ncurses(ClientContext *ctx);
-static void render_game_state(const GameStateData *state);
-static void draw_static_map(const GameStateData *state);
-static void parse_room_list(const char *list, RoomEntry *rooms, int *count);
-static int deserialize_game_state_json(const char *json, GameStateData *state);
-static void init_client_context(ClientContext *ctx, const char *ip, int port);
-static void cleanup_client_context(ClientContext *ctx);
-
-/* ---------------------------- 网络辅助函数 ---------------------------- */
-static Connection *connection_create(void) {
-  Connection *conn = malloc(sizeof(Connection));
-  if (conn) {
-    conn->socket_fd = -1;
-  }
-  return conn;
-}
-
-static int connection_connect(Connection *conn, const char *ip, int port) {
-  if (!conn)
-    return -1;
-  conn->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (conn->socket_fd < 0)
-    return -1;
-
-  struct sockaddr_in addr;
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(port);
-  if (inet_pton(AF_INET, ip, &addr.sin_addr) <= 0) {
-    close(conn->socket_fd);
-    conn->socket_fd = -1;
-    return -1;
-  }
-  if (connect(conn->socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    close(conn->socket_fd);
-    conn->socket_fd = -1;
-    return -1;
-  }
-  return 0;
-}
-
-static void connection_destroy(Connection *conn) {
-  if (!conn)
-    return;
-  if (conn->socket_fd >= 0)
-    close(conn->socket_fd);
-  free(conn);
-}
-
-static int send_message(int fd, const char *message) {
-  if (fd < 0 || !message)
-    return -1;
-  size_t len = strlen(message);
-  char *buf = malloc(len + 2);
-  if (!buf)
-    return -1;
-  snprintf(buf, len + 2, "%s\n", message);
-  ssize_t sent = send(fd, buf, len + 1, 0);
-  free(buf);
-  return (sent >= 0) ? 0 : -1;
-}
-
-/**
- * 从 socket 读取一行（以 \n 结尾），支持超时（毫秒）
- * 返回读取的字节数（不含换行），超时或错误返回 -1，连接关闭返回 0
- */
-static int recv_line(int fd, char *buffer, size_t size, int timeout_ms) {
-  if (fd < 0 || !buffer || size == 0)
-    return -1;
-  size_t pos = 0;
-  struct timeval tv;
-  fd_set fds;
-  int ret;
-  char ch;
-
-  while (pos < size - 1) {
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-    tv.tv_sec = timeout_ms / 1000;
-    tv.tv_usec = (timeout_ms % 1000) * 1000;
-    ret = select(fd + 1, &fds, NULL, NULL, &tv);
-    if (ret < 0) {
-      if (errno == EINTR)
-        continue;
-      return -1;
-    } else if (ret == 0) {
-      return -1; // timeout
-    }
-    ssize_t n = recv(fd, &ch, 1, 0);
-    if (n == 0) {
-      return 0; // connection closed
-    } else if (n < 0) {
-      return -1;
-    }
-    if (ch == '\n') {
-      buffer[pos] = '\0';
-      return (int)pos;
-    }
-    buffer[pos++] = ch;
-  }
-  buffer[pos] = '\0';
-  return (int)pos;
-}
-
-/* ---------------------------- 辅助函数（界面美化）
- * ---------------------------- */
 static void init_color_pairs(void) {
   if (has_colors()) {
     start_color();
@@ -309,7 +149,7 @@ static void draw_border(void) {
 
 static void draw_status_bar(ClientContext *ctx) {
   attron(COLOR_PAIR(COLOR_PAIR_STATUS));
-  mvhline(STATUS_BAR_Y, 0, ' ', COLS);
+  mvhline(LINES - 1, 0, ' ', COLS);
   char status[COLS];
   const char *state_str = "";
   switch (ctx->state) {
@@ -332,7 +172,7 @@ static void draw_status_bar(ClientContext *ctx) {
   snprintf(status, sizeof(status), " User: %s | State: %s | Server: %s:%d ",
            ctx->is_logged_in ? ctx->username : "Not logged in", state_str,
            ctx->server_ip, ctx->server_port);
-  mvprintw(STATUS_BAR_Y, 1, "%-*s", COLS - 2, status);
+  mvprintw(LINES - 1, 1, "%-*s", COLS - 2, status);
   attroff(COLOR_PAIR(COLOR_PAIR_STATUS));
   refresh();
 }
@@ -397,111 +237,9 @@ static void show_message_centered(const char *msg) {
   getch();
 }
 
-/* ---------------------------- 网络请求辅助 ---------------------------- */
-static int send_request_to_main_server(ClientContext *ctx, char *response_buf,
-                                       int buf_size, const char *fmt, ...) {
-  Connection *conn = connection_create();
-  if (!conn)
-    return -1;
-  if (connection_connect(conn, ctx->server_ip, ctx->server_port) < 0) {
-    connection_destroy(conn);
-    return -1;
-  }
-  va_list args;
-  va_start(args, fmt);
-  char request[BUFFER_SIZE];
-  vsnprintf(request, sizeof(request), fmt, args);
-  va_end(args);
-  send_message(conn->socket_fd, request);
-
-  char response[BUFFER_SIZE];
-  int n =
-      recv_line(conn->socket_fd, response, sizeof(response), RECV_TIMEOUT_MS);
-  if (n <= 0) {
-    connection_destroy(conn);
-    return -1;
-  }
-  if (response_buf && buf_size > 0) {
-    strncpy(response_buf, response, buf_size - 1);
-    response_buf[buf_size - 1] = '\0';
-  }
-  connection_destroy(conn);
-  return 0;
-}
-
-/* ---------------------------- 认证相关 ---------------------------- */
-static int connect_and_send_auth(ClientContext *ctx, int is_register) {
-  Connection *conn = connection_create();
-  if (!conn) {
-    show_message_centered("Failed to create connection");
-    return STATE_AUTH;
-  }
-
-  // 连接主服务器
-  if (connection_connect(conn, ctx->server_ip, ctx->server_port) < 0) {
-    show_message_centered("Failed to connect to main server");
-    connection_destroy(conn);
-    return STATE_AUTH;
-  }
-
-  // 发送注册/登录命令
-  const char *cmd = is_register ? CMD_REGISTER : CMD_LOGIN;
-  char request[BUFFER_SIZE];
-  snprintf(request, sizeof(request), "%s %s %s", cmd, ctx->username,
-           ctx->password);
-  send_message(conn->socket_fd, request);
-
-  // 读取第一行响应（如 "OK Registration successful"）
-  char line1[BUFFER_SIZE];
-  int n1 = recv_line(conn->socket_fd, line1, sizeof(line1), RECV_TIMEOUT_MS);
-  if (n1 <= 0) {
-    show_message_centered("No response from server");
-    connection_destroy(conn);
-    return STATE_AUTH;
-  }
-
-  // 检查第一行是否成功
-  if (strncmp(line1, "OK", 2) != 0) {
-    show_message_centered(line1);
-    connection_destroy(conn);
-    return STATE_AUTH;
-  }
-
-  // 读取第二行（网关信息），超时设为 500ms，因为服务器会立即发送
-  char line2[BUFFER_SIZE];
-  int n2 = recv_line(conn->socket_fd, line2, sizeof(line2), 500);
-  if (n2 <= 0 || sscanf(line2, "GATEWAY %63s %d", ctx->gateway_ip,
-                        &ctx->gateway_port) != 2) {
-    show_message_centered("Invalid gateway info from server");
-    connection_destroy(conn);
-    return STATE_AUTH;
-  }
-
-  connection_destroy(conn); // 关闭主服务器连接
-
-  // 连接网关
-  ctx->gateway_conn = connection_create();
-  if (!ctx->gateway_conn ||
-      connection_connect(ctx->gateway_conn, ctx->gateway_ip,
-                         ctx->gateway_port) < 0) {
-    show_message_centered("Failed to connect to gateway");
-    if (ctx->gateway_conn)
-      connection_destroy(ctx->gateway_conn);
-    ctx->gateway_conn = NULL;
-    return STATE_AUTH;
-  }
-
-  // 发送用户标识
-  char user_msg[USERNAME_LEN + 16];
-  snprintf(user_msg, sizeof(user_msg), "USER %s", ctx->username);
-  send_message(ctx->gateway_conn->socket_fd, user_msg);
-  ctx->is_logged_in = 1;
-
-  return STATE_ROOM_LIST;
-}
-
 static int input_string(int y, int x, char *buffer, int max_len, int echo) {
-  int pos = 0, ch;
+  int pos = 0;
+  int ch;
   buffer[0] = '\0';
   move(y, x);
   curs_set(1);
@@ -541,10 +279,13 @@ static int auth_input_form(ClientContext *ctx, int is_register) {
   attron(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
   mvprintw(3, (COLS - strlen(title)) / 2, "%s", title);
   attroff(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
-  int start_y = 7, label_x = COLS / 2 - 15, input_x = label_x + 12;
+  int start_y = 7;
+  int label_x = COLS / 2 - 15;
+  int input_x = label_x + 12;
   mvprintw(start_y, label_x, "Username:");
   mvprintw(start_y + 2, label_x, "Password:");
-  int btn_y = start_y + 5, btn_x = COLS / 2 - 5;
+  int btn_y = start_y + 5;
+  int btn_x = COLS / 2 - 5;
   mvprintw(btn_y, btn_x, "[ Submit ]");
   AuthFocus focus = AUTH_FOCUS_USERNAME;
   int redraw = 1;
@@ -634,40 +375,137 @@ static int auth_input_form(ClientContext *ctx, int is_register) {
   }
 }
 
-static int show_auth_menu_ncurses(ClientContext *ctx) {
-  const char *options[] = {"Register", "Login", "Exit"};
-  int selected = 0;
+/* ========================== 网络通信 ========================== */
+static int send_request_to_main_server(ClientContext *ctx, char *response_buf,
+                                       int buf_size, const char *fmt, ...) {
+  Connection *conn = connection_create();
+  if (!conn)
+    return -1;
+  if (connection_connect(conn, ctx->server_ip, ctx->server_port) < 0) {
+    connection_destroy(conn);
+    return -1;
+  }
+  va_list args;
+  va_start(args, fmt);
+  char request[BUFFER_SIZE];
+  vsnprintf(request, sizeof(request), fmt, args);
+  va_end(args);
+  send_message(conn->socket_fd, request);
+  char response[BUFFER_SIZE];
+  int n = receive_message(conn->socket_fd, response, sizeof(response),
+                          RECV_TIMEOUT * 1000);
+  if (n <= 0) {
+    connection_destroy(conn);
+    return -1;
+  }
+  response[n] = '\0';
+  if (response_buf && buf_size > 0) {
+    strncpy(response_buf, response, buf_size - 1);
+    response_buf[buf_size - 1] = '\0';
+  }
+  connection_destroy(conn);
+  return 0;
+}
+
+static int connect_and_send_auth(ClientContext *ctx, int is_register) {
+  char response[BUFFER_SIZE];
+  const char *cmd = is_register ? "REG" : "LOGIN";
+  if (send_request_to_main_server(ctx, response, sizeof(response), "%s %s %s",
+                                  cmd, ctx->username, ctx->password) < 0) {
+    show_message_centered("Failed to communicate with server");
+    return STATE_AUTH;
+  }
+  char *saveptr;
+  char *line = strtok_r(response, "\n", &saveptr);
+  if (strcmp(line, "OK Login successful") != 0 &&
+      strcmp(line, "OK Registration successful") != 0) {
+    show_message_centered(line);
+    return STATE_AUTH;
+  }
+  line = strtok_r(NULL, "\n", &saveptr);
+  if (!line || sscanf(line, "GATEWAY %63s %d", ctx->gateway_ip,
+                      &ctx->gateway_port) != 2) {
+    show_message_centered("Invalid gateway info from server");
+    return STATE_AUTH;
+  }
+  ctx->gateway_conn = connection_create();
+  if (!ctx->gateway_conn) {
+    show_message_centered("Failed to create gateway connection");
+    return STATE_AUTH;
+  }
+  if (connection_connect(ctx->gateway_conn, ctx->gateway_ip,
+                         ctx->gateway_port) < 0) {
+    show_message_centered("Failed to connect to gateway");
+    connection_destroy(ctx->gateway_conn);
+    ctx->gateway_conn = NULL;
+    return STATE_AUTH;
+  }
+  char user_msg[USERNAME_LEN + 16];
+  snprintf(user_msg, sizeof(user_msg), "USER %s", ctx->username);
+  send_message(ctx->gateway_conn->socket_fd, user_msg);
+  ctx->is_logged_in = 1;
+  return STATE_ROOM_LIST;
+}
+
+/* 加入房间：发送 JOIN，等待 JOIN_OK，同时处理心跳 */
+static int send_join_to_gateway(ClientContext *ctx, int room_id) {
+  char cmd[64];
+  snprintf(cmd, sizeof(cmd), "JOIN %d", room_id);
+  send_message(ctx->gateway_conn->socket_fd, cmd);
+  char response[BUFFER_SIZE];
   while (1) {
-    clear();
-    draw_border();
-    draw_status_bar(ctx);
-    attron(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
-    mvprintw(2, (COLS - strlen("=== Snake Game ===")) / 2,
-             "=== Snake Game ===");
-    attroff(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
-    draw_menu_options(options, 3, selected, MENU_START_Y);
-    mvprintw(LINES - 4, 2, "Use Up/Down arrows to navigate, Enter to select.");
-    refresh();
-    int ch = getch();
-    switch (ch) {
-    case KEY_UP:
-      selected = (selected - 1 + 3) % 3;
-      break;
-    case KEY_DOWN:
-      selected = (selected + 1) % 3;
-      break;
-    case '\n':
-    case KEY_ENTER:
-      if (selected == 2)
-        return STATE_EXIT;
-      return auth_input_form(ctx, selected == 0);
-    default:
-      break;
+    int n = receive_message(ctx->gateway_conn->socket_fd, response,
+                            sizeof(response), 5000);
+    if (n <= 0) {
+      show_message_centered("Gateway connection lost");
+      return STATE_ROOM_LIST;
+    }
+    response[n] = '\0';
+    if (strncmp(response, "JOIN_OK ", 7) == 0) {
+      return STATE_IN_ROOM;
+    } else if (strcmp(response, "JOIN_FAIL") == 0) {
+      show_message_centered("Failed to join room");
+      return STATE_ROOM_LIST;
+    } else if (strcmp(response, "ERROR") == 0) {
+      show_message_centered("Room error");
+      return STATE_ROOM_LIST;
+    } else if (strcmp(response, "PING") == 0) {
+      send_message(ctx->gateway_conn->socket_fd, "PONG");
+      // 继续等待 JOIN_OK
+    }
+    // 其他消息（如 ROOM_LIST_UPDATE）忽略，继续等待
+  }
+}
+
+/* 创建房间：发送 CREATE，等待 JOIN_OK，同时处理心跳 */
+static int send_create_to_gateway(ClientContext *ctx, int room_id) {
+  char cmd[64];
+  snprintf(cmd, sizeof(cmd), "CREATE %d", room_id);
+  send_message(ctx->gateway_conn->socket_fd, cmd);
+  char response[BUFFER_SIZE];
+  while (1) {
+    int n = receive_message(ctx->gateway_conn->socket_fd, response,
+                            sizeof(response), 5000);
+    if (n <= 0) {
+      show_message_centered("Gateway connection lost");
+      return STATE_ROOM_LIST;
+    }
+    response[n] = '\0';
+    if (strncmp(response, "JOIN_OK ", 7) == 0) {
+      return STATE_IN_ROOM;
+    } else if (strcmp(response, "JOIN_FAIL") == 0) {
+      show_message_centered("Failed to create room");
+      return STATE_ROOM_LIST;
+    } else if (strcmp(response, "ERROR") == 0) {
+      show_message_centered("Room creation error");
+      return STATE_ROOM_LIST;
+    } else if (strcmp(response, "PING") == 0) {
+      send_message(ctx->gateway_conn->socket_fd, "PONG");
     }
   }
 }
 
-/* ---------------------------- 房间列表相关 ---------------------------- */
+/* ========================== 房间列表界面 ========================== */
 static void parse_room_list(const char *list, RoomEntry *rooms, int *count) {
   *count = 0;
   if (!list)
@@ -754,7 +592,9 @@ static void draw_room_list_menu(const RoomEntry *rooms, int room_count,
     mvprintw(6, start_x, "%-*s", max_width, "No active rooms.");
   }
   int btn_y = LINES - 4;
-  int btn1_len = 14, btn2_len = 10, spacing = 4;
+  int btn1_len = 14;
+  int btn2_len = 10;
+  int spacing = 4;
   int total_width = btn1_len + spacing + btn2_len;
   int btn_start_x = (COLS - total_width) / 2;
   attron(COLOR_PAIR(COLOR_PAIR_MENU));
@@ -783,7 +623,8 @@ static void update_room_list_dynamic(const RoomEntry *rooms, int room_count,
   int start_x = (COLS - max_width) / 2;
   if (start_x < 0)
     start_x = 0;
-  int start_y = 6, end_y = LINES - 6;
+  int start_y = 6;
+  int end_y = LINES - 6;
   if (room_count > 0) {
     for (int i = 0; i < room_count; i++) {
       int y = start_y + i;
@@ -807,7 +648,9 @@ static void update_room_list_dynamic(const RoomEntry *rooms, int room_count,
     }
   }
   int btn_y = LINES - 4;
-  int btn1_len = 14, btn2_len = 10, spacing = 4;
+  int btn1_len = 14;
+  int btn2_len = 10;
+  int spacing = 4;
   int total_width = btn1_len + spacing + btn2_len;
   int btn_start_x = (COLS - total_width) / 2;
   mvprintw(btn_y, btn_start_x, "%-*s", btn1_len, "");
@@ -827,32 +670,6 @@ static void update_room_list_dynamic(const RoomEntry *rooms, int room_count,
     attroff(A_REVERSE);
   attroff(COLOR_PAIR(COLOR_PAIR_MENU));
   refresh();
-}
-
-static int send_room_operation(ClientContext *ctx, RoomOp op, int room_id) {
-  char response[BUFFER_SIZE];
-  const char *op_str = (op == OP_CREATE) ? "CREATE" : "JOIN";
-  if (send_request_to_main_server(ctx, response, sizeof(response), "%s %d %s",
-                                  op_str, room_id, ctx->username) < 0) {
-    show_message_centered("Failed to contact main server");
-    return STATE_ROOM_LIST;
-  }
-  if (strncmp(response, "REDIRECT", 8) == 0) {
-    int room_port = 0, redirected_room_id = -1;
-    sscanf(response + 9, "%d %d", &room_port, &redirected_room_id);
-    if (connect_to_room_server(ctx, room_port) == 0) {
-      if (ctx->gateway_conn) {
-        send_message(ctx->gateway_conn->socket_fd, "QUIT");
-        connection_destroy(ctx->gateway_conn);
-        ctx->gateway_conn = NULL;
-      }
-      return STATE_IN_ROOM;
-    }
-    return STATE_ROOM_LIST;
-  } else {
-    show_message_centered(response);
-    return STATE_ROOM_LIST;
-  }
 }
 
 static int show_room_menu_with_gateway(ClientContext *ctx) {
@@ -882,12 +699,17 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
       return STATE_AUTH;
     }
   }
+
   RoomEntry rooms[MAX_ROOMS];
-  int room_count = 0, selected_room = -1;
+  int room_count = 0;
+  int selected_room = -1;
   FocusType focus = FOCUS_ROOM_LIST;
-  int need_redraw = 1, first_draw = 1;
+  int need_redraw = 1;
+  int first_draw = 1;
   time_t last_heartbeat = time(NULL);
+  struct timeval tv;
   fd_set read_fds;
+
   while (1) {
     FD_ZERO(&read_fds);
     FD_SET(STDIN_FILENO, &read_fds);
@@ -897,37 +719,45 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
       if (ctx->gateway_conn->socket_fd > max_fd)
         max_fd = ctx->gateway_conn->socket_fd;
     }
-    struct timeval tv = {1, 0};
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
     if (select(max_fd + 1, &read_fds, NULL, NULL, &tv) < 0) {
       if (errno == EINTR)
         continue;
       break;
     }
+
     if (ctx->gateway_conn &&
         FD_ISSET(ctx->gateway_conn->socket_fd, &read_fds)) {
       char buffer[BUFFER_SIZE];
-      int n =
-          recv_line(ctx->gateway_conn->socket_fd, buffer, sizeof(buffer), 0);
+      int n = receive_message(ctx->gateway_conn->socket_fd, buffer,
+                              sizeof(buffer), 0);
       if (n <= 0) {
         show_message_centered("Gateway connection lost");
         connection_destroy(ctx->gateway_conn);
         ctx->gateway_conn = NULL;
         break;
       }
-      if (strncmp(buffer, ROOM_LIST_UPDATE_PREFIX,
-                  strlen(ROOM_LIST_UPDATE_PREFIX)) == 0) {
-        char *content = buffer + strlen(ROOM_LIST_UPDATE_PREFIX);
+      // 处理 PING
+      if (strcmp(buffer, "PING") == 0) {
+        send_message(ctx->gateway_conn->socket_fd, "PONG");
+        continue;
+      }
+      if (strncmp(buffer, "ROOM_LIST_UPDATE|", 17) == 0) {
+        char *content = buffer + 17;
         parse_room_list(content, rooms, &room_count);
         selected_room = (room_count > 0) ? 0 : -1;
         focus = (room_count > 0) ? FOCUS_ROOM_LIST : FOCUS_CREATE;
         need_redraw = 1;
       }
     }
+
     time_t now = time(NULL);
     if (ctx->gateway_conn && now - last_heartbeat >= HEARTBEAT_INTERVAL) {
       send_message(ctx->gateway_conn->socket_fd, "PING");
       last_heartbeat = now;
     }
+
     if (FD_ISSET(STDIN_FILENO, &read_fds)) {
       int ch = getch();
       switch (ch) {
@@ -961,7 +791,7 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
       case KEY_ENTER:
         if (focus == FOCUS_ROOM_LIST && selected_room != -1) {
           int room_id = rooms[selected_room].id;
-          int next_state = send_room_operation(ctx, OP_JOIN, room_id);
+          int next_state = send_join_to_gateway(ctx, room_id);
           if (next_state == STATE_IN_ROOM)
             return next_state;
           focus = FOCUS_ROOM_LIST;
@@ -975,7 +805,7 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
           mvprintw(5, 2, "Enter room id (0-%d): ", MAX_ROOMS - 1);
           int room_id = read_int_input_ncurses(0, MAX_ROOMS - 1);
           if (room_id != -1) {
-            int next_state = send_room_operation(ctx, OP_CREATE, room_id);
+            int next_state = send_create_to_gateway(ctx, room_id);
             if (next_state == STATE_IN_ROOM)
               return next_state;
           }
@@ -1002,7 +832,7 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
         mvprintw(5, 2, "Enter room id (0-%d): ", MAX_ROOMS - 1);
         int room_id = read_int_input_ncurses(0, MAX_ROOMS - 1);
         if (room_id != -1) {
-          int next_state = send_room_operation(ctx, OP_CREATE, room_id);
+          int next_state = send_create_to_gateway(ctx, room_id);
           if (next_state == STATE_IN_ROOM)
             return next_state;
         }
@@ -1023,6 +853,7 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
         break;
       }
     }
+
     if (first_draw) {
       draw_room_list_menu(rooms, room_count, selected_room, ctx, focus);
       first_draw = 0;
@@ -1034,35 +865,117 @@ static int show_room_menu_with_gateway(ClientContext *ctx) {
   return STATE_AUTH;
 }
 
-/* ---------------------------- 游戏界面（JSON适配版）
- * ---------------------------- */
-static int connect_to_room_server(ClientContext *ctx, int port) {
-  ctx->room_conn = connection_create();
-  if (!ctx->room_conn) {
-    show_message_centered("Failed to create room connection");
+/* ========================== JSON 解析（字段名适配 common.h）
+ * ========================== */
+static int deserialize_game_state_json(const char *json, GameStateData *state) {
+  cJSON *root = cJSON_Parse(json);
+  if (!root)
+    return -1;
+
+  cJSON *type = cJSON_GetObjectItem(root, "type");
+  if (!type || strcmp(type->valuestring, "STATE") != 0) {
+    cJSON_Delete(root);
     return -1;
   }
-  int attempts = 0;
-  while (attempts < MAX_RETRY_ATTEMPTS) {
-    if (connection_connect(ctx->room_conn, ctx->server_ip, port) >= 0)
-      break;
-    usleep(RETRY_DELAY_MS * 1000);
-    attempts++;
-  }
-  if (attempts == MAX_RETRY_ATTEMPTS) {
-    show_message_centered("Failed to connect to room server");
-    connection_destroy(ctx->room_conn);
-    ctx->room_conn = NULL;
+
+  cJSON *data = cJSON_GetObjectItem(root, "data");
+  if (!data) {
+    cJSON_Delete(root);
     return -1;
   }
-  char player_info[BUFFER_SIZE];
-  snprintf(player_info, sizeof(player_info), "PLAYER %s", ctx->username);
-  send_message(ctx->room_conn->socket_fd, player_info);
+
+  // room_id
+  cJSON *roomId = cJSON_GetObjectItem(data, "roomId");
+  state->room_id = roomId ? roomId->valueint : 0;
+
+  // food
+  cJSON *food = cJSON_GetObjectItem(data, "food");
+  if (food) {
+    cJSON *fx = cJSON_GetObjectItem(food, "x");
+    cJSON *fy = cJSON_GetObjectItem(food, "y");
+    state->food.x = fx ? fx->valueint : 0;
+    state->food.y = fy ? fy->valueint : 0;
+  }
+
+  // obstacles
+  cJSON *obstacles = cJSON_GetObjectItem(data, "obstacles");
+  cJSON *obstacleCount = cJSON_GetObjectItem(data, "obstacleCount");
+  state->obstacle_count = obstacleCount ? obstacleCount->valueint : 0;
+  if (obstacles && cJSON_IsArray(obstacles)) {
+    int arr_size = cJSON_GetArraySize(obstacles);
+    for (int i = 0; i < arr_size && i < OBSTACLE_COUNT; i++) {
+      cJSON *obs = cJSON_GetArrayItem(obstacles, i);
+      if (obs) {
+        cJSON *ox = cJSON_GetObjectItem(obs, "x");
+        cJSON *oy = cJSON_GetObjectItem(obs, "y");
+        state->obstacles[i].x = ox ? ox->valueint : 0;
+        state->obstacles[i].y = oy ? oy->valueint : 0;
+      }
+    }
+  }
+
+  // players
+  cJSON *players = cJSON_GetObjectItem(data, "players");
+  cJSON *playerCount = cJSON_GetObjectItem(data, "playerCount");
+  state->player_count = playerCount ? playerCount->valueint : 0;
+  if (players && cJSON_IsArray(players)) {
+    int arr_size = cJSON_GetArraySize(players);
+    for (int i = 0; i < arr_size && i < MAX_PLAYERS_PER_ROOM; i++) {
+      cJSON *p = cJSON_GetArrayItem(players, i);
+      if (!p)
+        continue;
+      cJSON *name = cJSON_GetObjectItem(p, "name");
+      if (name)
+        strncpy(state->players[i].name, name->valuestring, USERNAME_LEN - 1);
+      cJSON *head = cJSON_GetObjectItem(p, "head");
+      if (head) {
+        cJSON *hx = cJSON_GetObjectItem(head, "x");
+        cJSON *hy = cJSON_GetObjectItem(head, "y");
+        state->players[i].head.x = hx ? hx->valueint : 0;
+        state->players[i].head.y = hy ? hy->valueint : 0;
+      }
+      cJSON *body = cJSON_GetObjectItem(p, "body");
+      cJSON *length = cJSON_GetObjectItem(p, "length");
+      state->players[i].length = length ? length->valueint : 0;
+      if (body && cJSON_IsArray(body)) {
+        int body_size = cJSON_GetArraySize(body);
+        for (int j = 0; j < body_size && j < state->players[i].length; j++) {
+          cJSON *seg = cJSON_GetArrayItem(body, j);
+          if (seg) {
+            cJSON *sx = cJSON_GetObjectItem(seg, "x");
+            cJSON *sy = cJSON_GetObjectItem(seg, "y");
+            state->players[i].body[j].x = sx ? sx->valueint : 0;
+            state->players[i].body[j].y = sy ? sy->valueint : 0;
+          }
+        }
+      }
+      cJSON *direction = cJSON_GetObjectItem(p, "direction");
+      state->players[i].direction = direction ? direction->valueint : 0;
+      cJSON *score = cJSON_GetObjectItem(p, "score");
+      state->players[i].score = score ? score->valueint : 0;
+      cJSON *isDead = cJSON_GetObjectItem(p, "isDead");
+      state->players[i].is_dead = isDead ? isDead->valueint : 0;
+      cJSON *isYou = cJSON_GetObjectItem(p, "isYou");
+      state->players[i].is_you = isYou ? isYou->valueint : 0;
+    }
+  }
+
+  // active_players, total_players
+  cJSON *activePlayers = cJSON_GetObjectItem(data, "activePlayers");
+  state->active_players = activePlayers ? activePlayers->valueint : 0;
+  cJSON *totalPlayers = cJSON_GetObjectItem(data, "totalPlayers");
+  state->total_players = totalPlayers ? totalPlayers->valueint : 0;
+
+  cJSON_Delete(root);
   return 0;
 }
 
-static void draw_static_map(const GameStateData *state) {
+/* ========================== 游戏渲染 ========================== */
+static void draw_static_map(const GameStateData *state_data) {
   int map_start_y = MAP_RENDER_START_Y;
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    mvhline(map_start_y + y, 1, ' ', MAP_WIDTH);
+  }
   attron(COLOR_PAIR(COLOR_PAIR_WALL));
   for (int x = 0; x < MAP_WIDTH; x++) {
     mvaddch(map_start_y, x + 1, '#');
@@ -1074,9 +987,9 @@ static void draw_static_map(const GameStateData *state) {
   }
   attroff(COLOR_PAIR(COLOR_PAIR_WALL));
   attron(COLOR_PAIR(COLOR_PAIR_OBSTACLE));
-  for (int i = 0; i < state->obstacle_count; i++) {
-    int x = state->obstacles[i].x;
-    int y = state->obstacles[i].y;
+  for (int i = 0; i < state_data->obstacle_count; i++) {
+    int x = state_data->obstacles[i].x;
+    int y = state_data->obstacles[i].y;
     if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
       mvaddch(map_start_y + y, x + 1, 'X');
     }
@@ -1111,25 +1024,30 @@ static int find_snake_cache_index(const char *name) {
   return -1;
 }
 
-static void render_game_state(const GameStateData *state) {
+static void render_game_state(const GameStateData *state_data) {
   int map_start_y = MAP_RENDER_START_Y;
   if (!static_map_drawn)
-    draw_static_map(state);
+    draw_static_map(state_data);
+
   SnakeCache new_snakes[MAX_PLAYERS_PER_ROOM];
-  int new_snake_count = state->player_count;
+  int new_snake_count = state_data->player_count;
   for (int i = 0; i < new_snake_count; i++) {
-    strcpy(new_snakes[i].name, state->players[i].name);
-    new_snakes[i].length = state->players[i].length;
-    new_snakes[i].is_dead = state->players[i].is_dead;
-    for (int j = 0; j < state->players[i].length; j++) {
-      new_snakes[i].body[j] = state->players[i].body[j];
+    strcpy(new_snakes[i].name, state_data->players[i].name);
+    new_snakes[i].length = state_data->players[i].length;
+    new_snakes[i].is_dead = state_data->players[i].is_dead;
+    for (int j = 0; j < state_data->players[i].length; j++) {
+      new_snakes[i].body[j].x = state_data->players[i].body[j].x;
+      new_snakes[i].body[j].y = state_data->players[i].body[j].y;
     }
   }
+
+  // 处理蛇的变化
   for (int i = 0; i < new_snake_count; i++) {
     int idx = find_snake_cache_index(new_snakes[i].name);
     if (idx == -1) {
       for (int j = 0; j < new_snakes[i].length; j++) {
-        int x = new_snakes[i].body[j].x, y = new_snakes[i].body[j].y;
+        int x = new_snakes[i].body[j].x;
+        int y = new_snakes[i].body[j].y;
         char c = (j == 0) ? '@' : 'o';
         if (new_snakes[i].is_dead)
           c = (j == 0) ? 'X' : 'x';
@@ -1139,27 +1057,36 @@ static void render_game_state(const GameStateData *state) {
       SnakeCache *prev = &prev_snakes[idx];
       if (new_snakes[i].is_dead && !prev->is_dead) {
         for (int j = 0; j < prev->length; j++) {
+          int x = prev->body[j].x;
+          int y = prev->body[j].y;
           char c = (j == 0) ? 'X' : 'x';
-          draw_char_at(prev->body[j].x, prev->body[j].y, c);
+          draw_char_at(x, y, c);
         }
       } else if (new_snakes[i].length > prev->length &&
                  new_snakes[i].body[new_snakes[i].length - 1].x ==
                      prev->body[prev->length - 1].x &&
                  new_snakes[i].body[new_snakes[i].length - 1].y ==
                      prev->body[prev->length - 1].y) {
-        draw_char_at(new_snakes[i].body[0].x, new_snakes[i].body[0].y, '@');
+        int head_x = new_snakes[i].body[0].x;
+        int head_y = new_snakes[i].body[0].y;
+        draw_char_at(head_x, head_y, '@');
         if (prev->length >= 1)
           draw_char_at(prev->body[0].x, prev->body[0].y, 'o');
       } else if (new_snakes[i].length == prev->length &&
                  !new_snakes[i].is_dead) {
-        erase_char_at(prev->body[prev->length - 1].x,
-                      prev->body[prev->length - 1].y);
-        draw_char_at(new_snakes[i].body[0].x, new_snakes[i].body[0].y, '@');
+        int old_tail_x = prev->body[prev->length - 1].x;
+        int old_tail_y = prev->body[prev->length - 1].y;
+        erase_char_at(old_tail_x, old_tail_y);
+        int new_head_x = new_snakes[i].body[0].x;
+        int new_head_y = new_snakes[i].body[0].y;
+        draw_char_at(new_head_x, new_head_y, '@');
         if (prev->length > 1)
           draw_char_at(prev->body[0].x, prev->body[0].y, 'o');
       }
     }
   }
+
+  // 移除已消失的蛇
   for (int i = 0; i < prev_snake_count; i++) {
     int found = 0;
     for (int j = 0; j < new_snake_count; j++) {
@@ -1174,149 +1101,45 @@ static void render_game_state(const GameStateData *state) {
       }
     }
   }
-  if (prev_food.x != state->food.x || prev_food.y != state->food.y) {
+
+  // 食物变化
+  if (prev_food.x != state_data->food.x || prev_food.y != state_data->food.y) {
     if (prev_food.x != -1)
       erase_char_at(prev_food.x, prev_food.y);
-    draw_char_at(state->food.x, state->food.y, '*');
+    draw_char_at(state_data->food.x, state_data->food.y, '*');
   }
-  int info_x = INFO_PANEL_X_OFFSET, info_y = map_start_y;
+
+  // 信息面板
+  int info_x = INFO_PANEL_X_OFFSET;
+  int info_y = map_start_y;
   for (int line = 0; line < 10; line++)
     mvprintw(info_y + line, info_x, "%-40s", "");
-  mvprintw(info_y, info_x, "=== Players (%d/%d) ===", state->active_players,
-           state->total_players);
+  mvprintw(info_y, info_x,
+           "=== Players (%d/%d) ===", state_data->active_players,
+           state_data->total_players);
   info_y += 2;
-  for (int i = 0; i < state->player_count; i++) {
-    const char *status = state->players[i].is_dead ? "DEAD" : "ALIVE";
-    const char *you = state->players[i].is_you ? " (YOU)" : "";
+  for (int i = 0; i < state_data->player_count; i++) {
+    const char *status = state_data->players[i].is_dead ? "DEAD" : "ALIVE";
+    const char *you = state_data->players[i].is_you ? " (YOU)" : "";
     mvprintw(info_y + i, info_x, "%s: Score=%d, Len=%d, %s%s",
-             state->players[i].name, state->players[i].score,
-             state->players[i].length, status, you);
+             state_data->players[i].name, state_data->players[i].score,
+             state_data->players[i].length, status, you);
   }
+
+  // 更新缓存
   memcpy(prev_snakes, new_snakes, sizeof(SnakeCache) * new_snake_count);
   prev_snake_count = new_snake_count;
-  prev_food = state->food;
+  prev_food.x = state_data->food.x;
+  prev_food.y = state_data->food.y;
   refresh();
 }
 
-/* JSON 反序列化 */
-static int deserialize_game_state_json(const char *json, GameStateData *state) {
-  cJSON *root = cJSON_Parse(json);
-  if (!root)
-    return -1;
-  cJSON *type = cJSON_GetObjectItem(root, "type");
-  if (!type || strcmp(type->valuestring, "STATE") != 0) {
-    cJSON_Delete(root);
-    return -1;
-  }
-  cJSON *data = cJSON_GetObjectItem(root, "data");
-  if (!data) {
-    cJSON_Delete(root);
-    return -1;
-  }
-  cJSON *roomId = cJSON_GetObjectItem(data, "roomId");
-  if (roomId)
-    state->room_id = roomId->valueint;
-  cJSON *food = cJSON_GetObjectItem(data, "food");
-  if (food) {
-    cJSON *x = cJSON_GetObjectItem(food, "x");
-    cJSON *y = cJSON_GetObjectItem(food, "y");
-    if (x && y) {
-      state->food.x = x->valueint;
-      state->food.y = y->valueint;
-    }
-  }
-  cJSON *obstacles = cJSON_GetObjectItem(data, "obstacles");
-  if (obstacles && cJSON_IsArray(obstacles)) {
-    state->obstacle_count = cJSON_GetArraySize(obstacles);
-    if (state->obstacle_count > OBSTACLE_COUNT)
-      state->obstacle_count = OBSTACLE_COUNT;
-    for (int i = 0; i < state->obstacle_count; i++) {
-      cJSON *obs = cJSON_GetArrayItem(obstacles, i);
-      if (obs) {
-        cJSON *ox = cJSON_GetObjectItem(obs, "x");
-        cJSON *oy = cJSON_GetObjectItem(obs, "y");
-        if (ox && oy) {
-          state->obstacles[i].x = ox->valueint;
-          state->obstacles[i].y = oy->valueint;
-        }
-      }
-    }
-  }
-  cJSON *players = cJSON_GetObjectItem(data, "players");
-  if (players && cJSON_IsArray(players)) {
-    state->player_count = cJSON_GetArraySize(players);
-    if (state->player_count > MAX_PLAYERS_PER_ROOM)
-      state->player_count = MAX_PLAYERS_PER_ROOM;
-    for (int i = 0; i < state->player_count; i++) {
-      cJSON *p = cJSON_GetArrayItem(players, i);
-      if (!p)
-        continue;
-      cJSON *name = cJSON_GetObjectItem(p, "name");
-      if (name)
-        strncpy(state->players[i].name, name->valuestring, USERNAME_LEN - 1);
-      cJSON *head = cJSON_GetObjectItem(p, "head");
-      if (head) {
-        cJSON *hx = cJSON_GetObjectItem(head, "x");
-        cJSON *hy = cJSON_GetObjectItem(head, "y");
-        if (hx && hy) {
-          state->players[i].head.x = hx->valueint;
-          state->players[i].head.y = hy->valueint;
-        }
-      }
-      cJSON *body = cJSON_GetObjectItem(p, "body");
-      if (body && cJSON_IsArray(body)) {
-        int len = cJSON_GetArraySize(body);
-        state->players[i].length =
-            (len > MAX_SNAKE_LENGTH) ? MAX_SNAKE_LENGTH : len;
-        for (int j = 0; j < state->players[i].length; j++) {
-          cJSON *seg = cJSON_GetArrayItem(body, j);
-          if (seg) {
-            cJSON *sx = cJSON_GetObjectItem(seg, "x");
-            cJSON *sy = cJSON_GetObjectItem(seg, "y");
-            if (sx && sy) {
-              state->players[i].body[j].x = sx->valueint;
-              state->players[i].body[j].y = sy->valueint;
-            }
-          }
-        }
-      }
-      cJSON *direction = cJSON_GetObjectItem(p, "direction");
-      if (direction) {
-        const char *dir_str = direction->valuestring;
-        if (strcmp(dir_str, "UP") == 0)
-          state->players[i].direction = 0;
-        else if (strcmp(dir_str, "DOWN") == 0)
-          state->players[i].direction = 1;
-        else if (strcmp(dir_str, "LEFT") == 0)
-          state->players[i].direction = 2;
-        else if (strcmp(dir_str, "RIGHT") == 0)
-          state->players[i].direction = 3;
-      }
-      cJSON *score = cJSON_GetObjectItem(p, "score");
-      if (score)
-        state->players[i].score = score->valueint;
-      cJSON *isDead = cJSON_GetObjectItem(p, "isDead");
-      if (isDead)
-        state->players[i].is_dead = isDead->valueint;
-      cJSON *isYou = cJSON_GetObjectItem(p, "isYou");
-      if (isYou)
-        state->players[i].is_you = isYou->valueint;
-    }
-  }
-  cJSON *active = cJSON_GetObjectItem(data, "activePlayers");
-  if (active)
-    state->active_players = active->valueint;
-  cJSON *total = cJSON_GetObjectItem(data, "totalPlayers");
-  if (total)
-    state->total_players = total->valueint;
-  cJSON_Delete(root);
-  return 0;
-}
-
+/* ========================== 游戏循环 ========================== */
 static int game_loop_ncurses(ClientContext *ctx) {
   nodelay(stdscr, TRUE);
+  char buffer[BUFFER_SIZE];
   fd_set read_fds;
-  int max_fd = ctx->room_conn->socket_fd;
+  int max_fd = ctx->gateway_conn->socket_fd;
   if (STDIN_FILENO > max_fd)
     max_fd = STDIN_FILENO;
   int game_active = 1;
@@ -1324,10 +1147,11 @@ static int game_loop_ncurses(ClientContext *ctx) {
   prev_snake_count = 0;
   prev_food.x = -1;
   prev_food.y = -1;
-  char recv_buf[RECV_BUFFER_SIZE];
+  int you_died = 0;
+
   while (game_active) {
     FD_ZERO(&read_fds);
-    FD_SET(ctx->room_conn->socket_fd, &read_fds);
+    FD_SET(ctx->gateway_conn->socket_fd, &read_fds);
     FD_SET(STDIN_FILENO, &read_fds);
     struct timeval tv = {0, SELECT_TIMEOUT_US};
     if (select(max_fd + 1, &read_fds, NULL, NULL, &tv) < 0) {
@@ -1335,10 +1159,11 @@ static int game_loop_ncurses(ClientContext *ctx) {
         continue;
       break;
     }
+
     if (FD_ISSET(STDIN_FILENO, &read_fds)) {
       int ch = getch();
       if (ch == 'q' || ch == 'Q' || ch == KEY_EXIT) {
-        send_message(ctx->room_conn->socket_fd, "Q");
+        send_message(ctx->gateway_conn->socket_fd, "QUIT");
         game_active = 0;
         break;
       }
@@ -1352,42 +1177,62 @@ static int game_loop_ncurses(ClientContext *ctx) {
       else if (ch == KEY_RIGHT || ch == 'd' || ch == 'D')
         dir = 'd';
       if (dir)
-        send_message(ctx->room_conn->socket_fd, (char[]){dir, '\0'});
+        send_message(ctx->gateway_conn->socket_fd, (char[]){dir, '\n', '\0'});
     }
-    if (FD_ISSET(ctx->room_conn->socket_fd, &read_fds)) {
-      int n =
-          recv_line(ctx->room_conn->socket_fd, recv_buf, sizeof(recv_buf), 0);
+
+    if (FD_ISSET(ctx->gateway_conn->socket_fd, &read_fds)) {
+      int n = receive_message(ctx->gateway_conn->socket_fd, buffer,
+                              sizeof(buffer), 0);
       if (n > 0) {
-        recv_buf[n] = '\0';
-        if (recv_buf[0] == '{') {
+        buffer[n] = '\0';
+        if (strcmp(buffer, "PING") == 0) {
+          send_message(ctx->gateway_conn->socket_fd, "PONG");
+          continue;
+        }
+        if (strstr(buffer, "\"type\":\"STATE\"") ||
+            strstr(buffer, "\"type\": \"STATE\"")) {
           GameStateData state_data;
-          if (deserialize_game_state_json(recv_buf, &state_data) == 0) {
+          if (deserialize_game_state_json(buffer, &state_data) == 0) {
             render_game_state(&state_data);
             for (int i = 0; i < state_data.player_count; i++) {
               if (state_data.players[i].is_you &&
-                  state_data.players[i].is_dead) {
+                  state_data.players[i].is_dead && !you_died) {
                 clear();
                 mvprintw(0, 0, "You died! Final Score: %d",
                          state_data.players[i].score);
                 mvprintw(1, 0, "Press Q to quit or wait for game to end.");
                 refresh();
+                you_died = 1;
               }
             }
           }
-        } else if (strstr(recv_buf, "WELCOME TO ROOM") != NULL) {
-          // welcome message, ignore
-        } else if (strcmp(recv_buf, "YOU DIED") == 0) {
+        } else if (strcmp(buffer, "YOU DIED") == 0) {
+          if (!you_died) {
+            clear();
+            mvprintw(0, 0, "You died! Game over.");
+            mvprintw(1, 0, "Press Q to quit.");
+            refresh();
+            you_died = 1;
+          }
+        } else if (strstr(buffer, "Server disconnected") ||
+                   strstr(buffer, "shutdown")) {
           clear();
-          mvprintw(0, 0, "You died!");
+          mvprintw(0, 0, "Room server closed. Returning to room list...");
           refresh();
+          napms(2000);
+          game_active = 0;
+          break;
         } else {
-          clear();
-          mvprintw(0, 0, "%s", recv_buf);
-          refresh();
+          if (strncmp(buffer, "WELCOME", 7) != 0 &&
+              strncmp(buffer, "JOIN_OK", 7) != 0) {
+            clear();
+            mvprintw(0, 0, "%s", buffer);
+            refresh();
+          }
         }
       } else if (n == 0) {
         clear();
-        mvprintw(0, 0, "Server disconnected. Returning to room list...");
+        mvprintw(0, 0, "Gateway disconnected. Returning to room list...");
         refresh();
         napms(2000);
         game_active = 0;
@@ -1402,7 +1247,51 @@ static int game_loop_ncurses(ClientContext *ctx) {
   return STATE_GAME_OVER;
 }
 
-/* ---------------------------- 初始化/清理 ---------------------------- */
+/* ========================== 认证菜单 ========================== */
+#define AUTH_MENU_COUNT 3
+static int show_auth_menu_ncurses(ClientContext *ctx) {
+  const char *options[] = {"Login", "Register", "Exit"};
+  int selected = 0;
+  while (1) {
+    clear();
+    draw_border();
+    draw_status_bar(ctx);
+    attron(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
+    mvprintw(3, (COLS - 22) / 2, "=== Snake Client ===");
+    attroff(COLOR_PAIR(COLOR_PAIR_TITLE) | A_BOLD);
+    draw_menu_options(options, AUTH_MENU_COUNT, selected, MENU_START_Y);
+    mvprintw(LINES - 3, 2, "↑/W ↓/S: Move  Enter: Select  Q: Quit");
+    refresh();
+    int ch = getch();
+    switch (ch) {
+    case KEY_UP:
+    case 'w':
+    case 'W':
+      selected = (selected - 1 + AUTH_MENU_COUNT) % AUTH_MENU_COUNT;
+      break;
+    case KEY_DOWN:
+    case 's':
+    case 'S':
+      selected = (selected + 1) % AUTH_MENU_COUNT;
+      break;
+    case '\n':
+    case KEY_ENTER:
+      if (selected == 0)
+        return auth_input_form(ctx, 0);
+      else if (selected == 1)
+        return auth_input_form(ctx, 1);
+      else
+        return STATE_EXIT;
+    case 'q':
+    case 'Q':
+      return STATE_EXIT;
+    default:
+      break;
+    }
+  }
+}
+
+/* ========================== 初始化与清理 ========================== */
 static void init_client_context(ClientContext *ctx, const char *ip, int port) {
   memset(ctx, 0, sizeof(ClientContext));
   ctx->state = STATE_AUTH;
@@ -1412,17 +1301,14 @@ static void init_client_context(ClientContext *ctx, const char *ip, int port) {
 }
 
 static void cleanup_client_context(ClientContext *ctx) {
-  if (ctx->room_conn) {
-    connection_destroy(ctx->room_conn);
-    ctx->room_conn = NULL;
-  }
   if (ctx->gateway_conn) {
+    send_message(ctx->gateway_conn->socket_fd, "QUIT");
     connection_destroy(ctx->gateway_conn);
     ctx->gateway_conn = NULL;
   }
 }
 
-/* ---------------------------- 主函数 ---------------------------- */
+/* ========================== 主函数 ========================== */
 int main(int argc, char **argv) {
   if (argc != 3) {
     fprintf(stderr, "Usage: %s <server_ip> <server_port>\n", argv[0]);
@@ -1430,14 +1316,17 @@ int main(int argc, char **argv) {
   }
   const char *server_ip = argv[1];
   int server_port = atoi(argv[2]);
+
   initscr();
   cbreak();
   noecho();
   keypad(stdscr, TRUE);
   curs_set(0);
   init_color_pairs();
+
   ClientContext ctx;
   init_client_context(&ctx, server_ip, server_port);
+
   while (ctx.state != STATE_EXIT) {
     draw_status_bar(&ctx);
     switch (ctx.state) {
@@ -1460,6 +1349,7 @@ int main(int argc, char **argv) {
       break;
     }
   }
+
   cleanup_client_context(&ctx);
   endwin();
   return EXIT_SUCCESS;

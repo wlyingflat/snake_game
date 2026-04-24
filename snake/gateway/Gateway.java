@@ -1,3 +1,4 @@
+// snake/gateway/Gateway.java
 package snake.gateway;
 
 import java.io.*;
@@ -5,17 +6,19 @@ import java.net.*;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.*;
 import snake.common.*;
+import snake.core.*;
 import snake.util.*;
 
 public class Gateway extends NioServer {
   private final ConcurrentHashMap<SocketChannel, ClientSession> sessions =
       new ConcurrentHashMap<>();
-  private RoomListBroadcaster broadcaster;
-  private ServerSocket notifyServer;
+  private final ConcurrentHashMap<String, ClientSession> usernameToSession =
+      new ConcurrentHashMap<>();
+  private RoomManager roomManager;
+  private ServerSocket adminServer; // 接收 MainServer 的创建房间命令
 
   public Gateway(int port) {
     super(port);
-    this.broadcaster = new RoomListBroadcaster(sessions);
   }
 
   @Override
@@ -33,37 +36,78 @@ public class Gateway extends NioServer {
 
   @Override
   protected void processMessage(NioSession session, String msg) {
-    ClientSession clientSession = (ClientSession) session;
+    ClientSession client = (ClientSession) session;
     long now = System.currentTimeMillis() / 1000;
-
-    clientSession.lastHeartbeat = now;
-    clientSession.pendingPong = false;
+    client.lastHeartbeat = now;
+    client.pendingPong = false;
 
     try {
       if (msg.startsWith(Protocol.USER + " ")) {
-        clientSession.username = msg.substring(5);
-        Logger.info("[Gateway] Client identified: " + clientSession.username);
-        broadcaster.sendRoomListToClient(clientSession);
+        client.username = msg.substring(5);
+        usernameToSession.put(client.username, client);
+        Logger.info("[Gateway] Client identified: " + client.username);
+        // 发送房间列表
+        String roomList = roomManager.getRoomListDataOnly();
+        client.enqueueResponse(Protocol.ROOM_LIST_UPDATE + "|" + roomList);
       } else if (msg.equals(Protocol.PING)) {
-        clientSession.enqueueResponse(Protocol.PONG);
+        client.enqueueResponse(Protocol.PONG);
       } else if (msg.equals(Protocol.PONG)) {
-        Logger.debug("[Gateway] Received PONG from " + clientSession.username);
+        // ignore
       } else if (msg.equals(Protocol.QUIT)) {
-        Logger.info("[Gateway] QUIT from " + clientSession.username);
-        closeSession(clientSession);
+        // 离开房间
+        if (client.roomId != -1) {
+          roomManager.sendToRoom(client.roomId, new LeaveRoomMsg(client.username));
+        }
+        closeSession(client);
+      } else if (msg.startsWith(Protocol.CMD_JOIN + " ")) {
+        int roomId = Integer.parseInt(msg.split(" ")[1]);
+        roomManager.sendToRoom(roomId, new JoinRoomMsg(client.username));
+      } else if (msg.startsWith(Protocol.CMD_CREATE + " ")) {
+        int roomId = Integer.parseInt(msg.split(" ")[1]);
+        if (roomManager.createRoom(roomId)) {
+          roomManager.sendToRoom(roomId, new JoinRoomMsg(client.username));
+        } else {
+          client.enqueueResponse(Protocol.RESP_ERROR + " Cannot create room");
+        }
+      } else if (msg.length() == 1 && "wasd".contains(msg.toLowerCase())) {
+        if (client.roomId != -1) {
+          Direction dir =
+              switch (msg.toLowerCase().charAt(0)) {
+                case 'w' -> Direction.UP;
+                case 's' -> Direction.DOWN;
+                case 'a' -> Direction.LEFT;
+                case 'd' -> Direction.RIGHT;
+                default -> null;
+              };
+          if (dir != null) {
+            Logger.debug("[Gateway] Forwarding direction " + dir + " to room " + client.roomId);
+            roomManager.sendToRoom(client.roomId, new InputMsg(client.username, dir));
+          }
+        } else {
+          Logger.debug("[Gateway] Ignored direction from " + client.username + " (not in room)");
+        }
       } else if (msg.equals(Protocol.CMD_ROOM_LIST)) {
-        broadcaster.sendRoomListToClient(clientSession);
+        String list = roomManager.getRoomListDataOnly();
+        client.enqueueResponse(Protocol.ROOM_LIST_UPDATE + "|" + list);
+      } else {
+        Logger.debug("[Gateway] Unhandled message: " + msg);
       }
     } catch (Exception e) {
       Logger.error("[Gateway] Error processing message: " + e.getMessage());
-      closeSession(clientSession);
+      closeSession(client);
     }
   }
 
   @Override
   protected void onSessionClosed(NioSession session) {
-    ClientSession clientSession = (ClientSession) session;
-    sessions.remove(clientSession.channel);
+    ClientSession client = (ClientSession) session;
+    if (client.username != null) {
+      usernameToSession.remove(client.username);
+    }
+    if (client.roomId != -1) {
+      roomManager.sendToRoom(client.roomId, new LeaveRoomMsg(client.username));
+    }
+    sessions.remove(client.channel);
     Logger.debug("[Gateway] Session closed, remaining sessions: " + sessions.size());
   }
 
@@ -85,43 +129,77 @@ public class Gateway extends NioServer {
     }
   }
 
-  private void startNotifyServer() {
+  // 接收 MainServer 的创建房间命令
+  private void startAdminServer() {
     new Thread(
             () -> {
-              try {
-                notifyServer = new ServerSocket(Config.GATEWAY_NOTIFY_PORT);
-                Logger.info(
-                    "[Gateway] Notify server listening on port " + Config.GATEWAY_NOTIFY_PORT);
+              try (ServerSocket server = new ServerSocket(19004)) {
+                Logger.info("Gateway admin server listening on port 19004");
                 while (running) {
-                  Socket notifyClient = notifyServer.accept();
-                  Logger.debug(
-                      "[Gateway] Notify server accepted connection from "
-                          + notifyClient.getRemoteSocketAddress());
-                  InputStream is = notifyClient.getInputStream();
-                  byte[] buf = new byte[64];
-                  int n = is.read(buf);
-                  if (n > 0) {
-                    String msg = new String(buf, 0, n).trim();
-                    Logger.info("[Gateway] Received on notify port: " + msg);
-                    if (msg.equals("REFRESH")) {
-                      Logger.info("[Gateway] REFRESH received, broadcasting room list");
-                      broadcaster.broadcastRoomList();
-                    } else {
-                      Logger.warn("[Gateway] Unknown notify message: " + msg);
-                    }
-                  }
-                  notifyClient.close();
+                  Socket client = server.accept();
+                  new Thread(() -> handleAdminCommand(client)).start();
                 }
               } catch (IOException e) {
-                if (running) Logger.error("[Gateway] Notify server error: " + e.getMessage());
+                if (running) Logger.error("Admin server error: " + e.getMessage());
               }
             })
         .start();
   }
 
+  private void handleAdminCommand(Socket socket) {
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+      String line = in.readLine();
+      if (line == null) return;
+      String[] parts = line.split(" ");
+      if (parts[0].equals("CREATE_ROOM")) {
+        int roomId = Integer.parseInt(parts[1]);
+        boolean success = roomManager.createRoom(roomId);
+        out.println(success ? "OK" : "ERROR");
+      }
+    } catch (IOException e) {
+      Logger.error("Admin command error: " + e.getMessage());
+    }
+  }
+
+  // 提供房间列表查询服务（供 MainServer 使用）
+  private void startQueryServer() {
+    new Thread(
+            () -> {
+              try (ServerSocket server = new ServerSocket(Config.ROOM_LIST_QUERY_PORT)) {
+                Logger.info(
+                    "Gateway query server listening on port " + Config.ROOM_LIST_QUERY_PORT);
+                while (running) {
+                  Socket client = server.accept();
+                  new Thread(() -> handleQuery(client)).start();
+                }
+              } catch (IOException e) {
+                if (running) Logger.error("Query server error: " + e.getMessage());
+              }
+            })
+        .start();
+  }
+
+  private void handleQuery(Socket socket) {
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+      String cmd = in.readLine();
+      if ("LIST".equals(cmd)) {
+        String data = roomManager.getRoomListDataOnly();
+        out.print(data);
+        out.flush();
+      }
+    } catch (IOException e) {
+      Logger.error("Query handler error: " + e.getMessage());
+    }
+  }
+
   @Override
   public void start() throws IOException {
-    startNotifyServer();
+    // 创建 RoomManager 时传入回调，用于广播房间列表更新
+    roomManager = new RoomManager(usernameToSession, this::broadcastRoomListToLobby);
+    startAdminServer();
+    startQueryServer();
     ScheduledExecutorService heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
     heartbeatExecutor.scheduleAtFixedRate(
         this::checkHeartbeats,
@@ -132,13 +210,20 @@ public class Gateway extends NioServer {
     heartbeatExecutor.shutdown();
   }
 
+  /** 广播房间列表给所有在大厅（未加入房间）的客户端 */
+  private void broadcastRoomListToLobby() {
+    String roomList = roomManager.getRoomListDataOnly();
+    for (ClientSession session : sessions.values()) {
+      if (session.username != null && session.roomId == -1) {
+        session.enqueueResponse(Protocol.ROOM_LIST_UPDATE + "|" + roomList);
+      }
+    }
+  }
+
   @Override
   protected void cleanup() {
     running = false;
-    try {
-      if (notifyServer != null) notifyServer.close();
-    } catch (IOException e) {
-    }
+    roomManager.shutdown();
     super.cleanup();
   }
 
