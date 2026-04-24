@@ -28,6 +28,7 @@ public class GatewayClient {
   private RoomListListener roomListListener;
   private DeathListener deathListener;
   private final ObjectMapper mapper = new ObjectMapper();
+  private final LocalGameState localGameState = new LocalGameState(); // 本地状态管理器
 
   public interface GameStateListener {
     void onGameState(String json, GameStateData data);
@@ -158,9 +159,20 @@ public class GatewayClient {
           messageQueue.offer(json);
           break;
         case "STATE":
+          // 全量状态
           GameStateData data = Serializer.deserializeGameState(json);
+          if (data != null) {
+            localGameState.applyFullState(data);
+            if (gameStateListener != null) {
+              gameStateListener.onGameState(json, localGameState.toGameStateData());
+            }
+          }
+          break;
+        case "STATE_DIFF":
+          // 增量差分
+          localGameState.applyDiff(root);
           if (gameStateListener != null) {
-            gameStateListener.onGameState(json, data);
+            gameStateListener.onGameState(json, localGameState.toGameStateData());
           }
           break;
         case "YOU_DIED":
@@ -169,7 +181,7 @@ public class GatewayClient {
           }
           messageQueue.offer(json);
           break;
-        case "LEADERBOARD": // 新增：排行榜响应
+        case "LEADERBOARD":
           messageQueue.offer(json);
           break;
         case "PING":

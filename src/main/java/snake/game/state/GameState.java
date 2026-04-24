@@ -1,11 +1,9 @@
 package snake.game.state;
 
 import java.util.*;
-import snake.base.Config;
-import snake.base.Direction;
-import snake.base.GameStateData;
-import snake.base.Logger;
-import snake.base.Position;
+import snake.base.*;
+import snake.game.event.GameStateDiff;
+import snake.game.event.PlayerDiff;
 
 public class GameState {
   private final int roomId;
@@ -18,13 +16,24 @@ public class GameState {
   private boolean initialDelayDone = false;
   private int tickCounter = 0;
 
+  // ---------- 差分计算需要的历史状态 ----------
+  private Position previousFood;
+  private final Map<String, List<Position>> previousPlayerBodies = new HashMap<>();
+  private int previousActivePlayers;
+  private Set<String> previousPlayerNames = new HashSet<>();
+  // 记录本 tick 新加入的玩家，用于发送全量快照
+  private final Set<String> newPlayersThisTick = new HashSet<>();
+
   public GameState(int roomId) {
     this.roomId = roomId;
     initWorld();
+    // 初始化 previous 状态为空，确保第一个 tick 能正确处理
+    previousFood = new Position(food.x, food.y);
+    previousActivePlayers = 0;
+    previousPlayerNames = new HashSet<>();
   }
 
   private void initWorld() {
-    // 初始化地图
     for (int y = 0; y < Config.MAP_HEIGHT; y++) {
       for (int x = 0; x < Config.MAP_WIDTH; x++) {
         map[y][x] = ' ';
@@ -39,7 +48,6 @@ public class GameState {
       map[y][Config.MAP_WIDTH - 1] = '#';
     }
 
-    // 生成障碍物
     Random rand = new Random();
     List<Position> freePositions = getFreePositions();
     int obstacleCount = Math.min(Config.OBSTACLE_COUNT, freePositions.size());
@@ -53,7 +61,6 @@ public class GameState {
       obstacles[i] = new Position(0, 0);
     }
 
-    // 生成食物
     food = findSafeFoodPosition(null);
   }
 
@@ -79,7 +86,6 @@ public class GameState {
               rand.nextInt(Config.MAP_WIDTH - 2) + 1, rand.nextInt(Config.MAP_HEIGHT - 2) + 1);
       attempts++;
       if (attempts > Config.MAX_SPAWN_ATTEMPTS) {
-        // fallback
         for (int y = 1; y < Config.MAP_HEIGHT - 1; y++) {
           for (int x = 1; x < Config.MAP_WIDTH - 1; x++) {
             if (map[y][x] != 'X' && (exclude == null || (x != exclude.x || y != exclude.y))) {
@@ -118,6 +124,9 @@ public class GameState {
     totalPlayers++;
     activePlayers++;
     initialDelayDone = true;
+
+    // 标记为新玩家，用于后续发送全量快照
+    newPlayersThisTick.add(username);
     return true;
   }
 
@@ -158,11 +167,12 @@ public class GameState {
     if (p != null) {
       totalPlayers--;
       if (!p.isDead) activePlayers--;
+      previousPlayerBodies.remove(username);
+      previousPlayerNames.remove(username);
     }
   }
 
   public void updateDirection(String username, Direction dir) {
-    // GameState.java - updateDirection 方法内
     Player p = players.get(username);
     if (p != null && !p.isDead) {
       p.direction = dir;
@@ -182,6 +192,14 @@ public class GameState {
       return;
     }
 
+    // 保存移动前状态，用于后续差分计算
+    previousFood = new Position(food.x, food.y);
+    for (Map.Entry<String, Player> entry : players.entrySet()) {
+      previousPlayerBodies.put(entry.getKey(), new ArrayList<>(entry.getValue().body));
+    }
+    previousActivePlayers = activePlayers;
+    previousPlayerNames = new HashSet<>(players.keySet());
+
     List<Player> playerList = new ArrayList<>(players.values());
     Map<Player, Position> nextHeads = new HashMap<>();
     Map<Player, Boolean> willDie = new HashMap<>();
@@ -199,6 +217,7 @@ public class GameState {
         p.isDead = true;
         activePlayers--;
         willGrow.put(p, false);
+        // 死前位置仍保留在 previous 中，但计算时忽略
       }
     }
 
@@ -221,12 +240,12 @@ public class GameState {
       food = findSafeFoodPosition(food);
     }
 
-    // 更新活跃玩家计数
     int active = 0;
     for (Player p : players.values()) {
       if (!p.isDead) active++;
     }
     activePlayers = active;
+    tickCounter++;
   }
 
   private Position calculateNextPosition(Player p) {
@@ -257,11 +276,9 @@ public class GameState {
     for (Position obs : obstacles) {
       if (obs != null && obs.x == next.x && obs.y == next.y) return true;
     }
-    // 自碰
     for (int i = 0; i < p.body.size(); i++) {
       if (next.x == p.body.get(i).x && next.y == p.body.get(i).y) return true;
     }
-    // 与其他玩家碰撞
     for (Player other : players.values()) {
       if (other == p || other.isDead) continue;
       for (Position seg : other.body) {
@@ -271,6 +288,7 @@ public class GameState {
     return false;
   }
 
+  /** 全量快照（用于新玩家或定期纠正） */
   public GameStateData snapshot(String clientUsername) {
     GameStateData data = new GameStateData();
     data.roomId = roomId;
@@ -279,12 +297,9 @@ public class GameState {
     for (int i = 0; i < Config.OBSTACLE_COUNT; i++) {
       data.obstacles[i] = obstacles[i];
     }
-
     List<Player> playerList = new ArrayList<>(players.values());
-    // 边界安全：取实际玩家数与数组长度的较小值
     int count = Math.min(playerList.size(), Config.MAX_PLAYERS_PER_ROOM);
     data.playerCount = count;
-
     for (int i = 0; i < count; i++) {
       Player p = playerList.get(i);
       GameStateData.PlayerInfo info = new GameStateData.PlayerInfo();
@@ -297,10 +312,80 @@ public class GameState {
       info.isDead = p.isDead;
       data.players[i] = info;
     }
-
     data.activePlayers = activePlayers;
     data.totalPlayers = totalPlayers;
     return data;
+  }
+
+  /** 检查是否有新玩家需要发送全量快照（调用后会自动清除标记） */
+  public boolean hasNewPlayer() {
+    boolean result = !newPlayersThisTick.isEmpty();
+    newPlayersThisTick.clear();
+    return result;
+  }
+
+  /** 计算本 tick 的差分数据 */
+  public GameStateDiff computeDiff() {
+    GameStateDiff diff = new GameStateDiff();
+    diff.roomId = roomId;
+    diff.seq = tickCounter;
+
+    // 食物变化
+    if (!food.equals(previousFood)) {
+      diff.food = new Position(food.x, food.y);
+    }
+
+    // 玩家差分
+    for (Map.Entry<String, Player> entry : players.entrySet()) {
+      String username = entry.getKey();
+      Player player = entry.getValue();
+
+      List<Position> prevBody = previousPlayerBodies.get(username);
+      if (prevBody == null) {
+        // 新加入，放入新玩家列表（全量快照由上层另外发送，这里只标记）
+        // 注意：实际发送新玩家全量由GameActor在JOIN时单独发送，此处newPlayers可选
+        // 但为了完整性，仍然可以填充，上层可忽略或使用
+        diff.newPlayers.add(snapshotPlayerInfo(player));
+        continue;
+      }
+
+      if (player.isDead) {
+        diff.died.add(username);
+        continue;
+      }
+
+      // 存活玩家差分
+      PlayerDiff pd = new PlayerDiff();
+      pd.newHead = player.body.get(0);
+
+      // 判断尾巴是否移除：如果蛇变长了则不移除，否则移除
+      boolean grew = (player.body.size() > prevBody.size());
+      // 或者根据是否吃到食物判断
+      pd.removeTail = !grew;
+      pd.length = player.length;
+      diff.players.put(username, pd);
+    }
+
+    // 已离开的玩家
+    for (String oldName : previousPlayerNames) {
+      if (!players.containsKey(oldName)) {
+        diff.removedPlayers.add(oldName);
+      }
+    }
+
+    return diff;
+  }
+
+  private GameStateData.PlayerInfo snapshotPlayerInfo(Player p) {
+    GameStateData.PlayerInfo info = new GameStateData.PlayerInfo();
+    info.name = p.username;
+    info.head = p.body.get(0);
+    info.body = p.body.toArray(new Position[0]);
+    info.length = p.length;
+    info.direction = p.direction;
+    info.score = p.score;
+    info.isDead = false;
+    return info;
   }
 
   public boolean isEmpty() {
@@ -315,17 +400,14 @@ public class GameState {
     return new ArrayList<>(players.values());
   }
 
-  /** 从快照恢复游戏状态（跳过随机生成） */
+  // --- 以下为从快照恢复的构造函数（略作调整，不影响差分逻辑）---
   public GameState(int roomId, GameStateData snapshot) {
     this.roomId = roomId;
     this.food = snapshot.food;
     this.activePlayers = snapshot.activePlayers;
     this.totalPlayers = snapshot.totalPlayers;
-    // 初始化空地图边框
     for (int y = 0; y < Config.MAP_HEIGHT; y++) {
-      for (int x = 0; x < Config.MAP_WIDTH; x++) {
-        map[y][x] = ' ';
-      }
+      for (int x = 0; x < Config.MAP_WIDTH; x++) map[y][x] = ' ';
     }
     for (int x = 0; x < Config.MAP_WIDTH; x++) {
       map[0][x] = '#';
@@ -335,14 +417,11 @@ public class GameState {
       map[y][0] = '#';
       map[y][Config.MAP_WIDTH - 1] = '#';
     }
-    // 恢复障碍物
     for (int i = 0; i < snapshot.obstacleCount; i++) {
       obstacles[i] = snapshot.obstacles[i];
       map[obstacles[i].y][obstacles[i].x] = 'X';
     }
-    // 标记食物
     map[food.y][food.x] = 'F';
-    // 恢复玩家
     for (int i = 0; i < snapshot.playerCount; i++) {
       GameStateData.PlayerInfo pi = snapshot.players[i];
       Player p = new Player();
@@ -354,7 +433,13 @@ public class GameState {
       p.isDead = pi.isDead;
       players.put(p.username, p);
     }
-    this.initialDelayDone = true; // 恢复后直接开始正常Tick
+    this.initialDelayDone = true;
+    // 初始化差分历史
+    previousFood = new Position(food.x, food.y);
+    previousPlayerNames = new HashSet<>(players.keySet());
+    for (Player p : players.values()) {
+      previousPlayerBodies.put(p.username, new ArrayList<>(p.body));
+    }
   }
 
   public static class Player {

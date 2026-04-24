@@ -3,8 +3,10 @@ snake/game/state/GameState$1.class
 snake/worker/WorkerMain.class
 snake/actor/EnhancedMessage.class
 snake/mq/MessageBus.class
+snake/client/LocalGameState.class
 snake/worker/GameWorker.class
 snake/client/GatewayClient.class
+snake/game/event/PlayerDiff.class
 snake/consumer/LeaderboardConsumer.class
 snake/auth/AuthHttpServer.class
 snake/persistence/user/MySQLUserRepository.class
@@ -15,6 +17,7 @@ snake/mq/MessageBus$1.class
 snake/client/swing/GameCanvas.class
 snake/distributed/DistributedCoordinator.class
 snake/actor/ActorNotifier.class
+snake/game/event/GameStateDiff.class
 snake/gateway/reactor/ReactorGateway.class
 snake/base/ILeaderboardRepository.class
 snake/persistence/DatabaseManager.class
@@ -57,6 +60,7 @@ snake/client/swing/LoginFrame.class
 snake/base/GameStateData$PlayerInfo.class
 snake/client/Config.class
 snake/base/ISerializer.class
+snake/client/LocalGameState$PlayerData.class
 snake/persistence/user/IUserRepository.class
 snake/network/NioSession.class
 snake/event/GameEvent.class

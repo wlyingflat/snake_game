@@ -4,17 +4,16 @@ import java.awt.*;
 import javax.swing.*;
 import snake.base.GameStateData;
 import snake.base.Position;
+import snake.client.Config;
 
 public class GameCanvas extends JPanel {
   private static final int CELL_SIZE = 20;
-  private static final int MAP_WIDTH = 40;
-  private static final int MAP_HEIGHT = 20;
 
   private GameStateData state;
   private String myName;
 
   public GameCanvas() {
-    setPreferredSize(new Dimension(MAP_WIDTH * CELL_SIZE, MAP_HEIGHT * CELL_SIZE));
+    setPreferredSize(new Dimension(Config.MAP_WIDTH * CELL_SIZE, Config.MAP_HEIGHT * CELL_SIZE));
     setBackground(Color.BLACK);
   }
 
@@ -29,20 +28,23 @@ public class GameCanvas extends JPanel {
     super.paintComponent(g);
     if (state == null) return;
 
+    int mapW = Config.MAP_WIDTH;
+    int mapH = Config.MAP_HEIGHT;
+
     // 网格
     g.setColor(Color.DARK_GRAY);
-    for (int i = 0; i <= MAP_WIDTH; i++) {
-      g.drawLine(i * CELL_SIZE, 0, i * CELL_SIZE, MAP_HEIGHT * CELL_SIZE);
+    for (int i = 0; i <= mapW; i++) {
+      g.drawLine(i * CELL_SIZE, 0, i * CELL_SIZE, mapH * CELL_SIZE);
     }
-    for (int i = 0; i <= MAP_HEIGHT; i++) {
-      g.drawLine(0, i * CELL_SIZE, MAP_WIDTH * CELL_SIZE, i * CELL_SIZE);
+    for (int i = 0; i <= mapH; i++) {
+      g.drawLine(0, i * CELL_SIZE, mapW * CELL_SIZE, i * CELL_SIZE);
     }
 
     // 墙壁
     g.setColor(Color.GRAY);
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-      for (int x = 0; x < MAP_WIDTH; x++) {
-        if (x == 0 || x == MAP_WIDTH - 1 || y == 0 || y == MAP_HEIGHT - 1) {
+    for (int y = 0; y < mapH; y++) {
+      for (int x = 0; x < mapW; x++) {
+        if (x == 0 || x == mapW - 1 || y == 0 || y == mapH - 1) {
           g.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
       }
@@ -52,11 +54,7 @@ public class GameCanvas extends JPanel {
     g.setColor(Color.YELLOW);
     for (int i = 0; i < state.obstacleCount; i++) {
       Position obs = state.obstacles[i];
-      if (obs != null
-          && obs.x > 0
-          && obs.x < MAP_WIDTH - 1
-          && obs.y > 0
-          && obs.y < MAP_HEIGHT - 1) {
+      if (obs != null && obs.x > 0 && obs.x < mapW - 1 && obs.y > 0 && obs.y < mapH - 1) {
         g.fillRect(obs.x * CELL_SIZE, obs.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
     }

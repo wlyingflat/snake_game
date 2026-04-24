@@ -11,11 +11,15 @@ import snake.base.ILogger;
 import snake.base.Logger;
 import snake.persistence.PropertiesConfigProvider;
 
-/** RabbitMQ 消息总线，替代 Redis Pub/Sub 进行 Gateway <-> Worker 指令传输。 新增 Worker → Gateway 玩家消息的持久化队列支持。 */
+/**
+ * RabbitMQ 消息总线，替代 Redis Pub/Sub 进行 Gateway <-> Worker 指令传输。 新增 Worker → Gateway
+ * 玩家消息的持久化队列支持，以及房间列表广播。
+ */
 public class MessageBus implements AutoCloseable {
 
   private static final String QUEUE_PREFIX = "worker.commands.";
   private static final String GATEWAY_EXCHANGE = "gateway.topic";
+  private static final String ROOM_LIST_EXCHANGE = "room.list.fanout"; // 新增
 
   private final Connection connection;
   private final ILogger logger = Logger.getInstance();
@@ -37,14 +41,16 @@ public class MessageBus implements AutoCloseable {
     factory.setNetworkRecoveryInterval(5000);
 
     this.connection = factory.newConnection();
-    // 声明 topic exchange（持久化）
+    // 声明 topic exchange（用于 Worker → Gateway 定向消息）
+    // 声明 fanout exchange（用于房间列表广播）
     try (Channel ch = connection.createChannel()) {
       ch.exchangeDeclare(GATEWAY_EXCHANGE, "topic", true);
+      ch.exchangeDeclare(ROOM_LIST_EXCHANGE, "fanout", true);
     }
     logger.info("MessageBus connected to RabbitMQ at " + host + ":" + port);
   }
 
-  // ==================== Worker 指令队列（原有） ====================
+  // ==================== Worker 指令队列 ====================
 
   public void startWorkerConsumer(String workerId, Consumer<String> messageHandler)
       throws IOException {
@@ -79,7 +85,7 @@ public class MessageBus implements AutoCloseable {
           queue,
           MessageProperties.PERSISTENT_TEXT_PLAIN,
           message.getBytes(StandardCharsets.UTF_8));
-    } catch (Exception e) { // 捕获 IOException 和 TimeoutException
+    } catch (Exception e) {
       logger.error("Failed to send message to worker " + workerId + ": " + e.getMessage());
     }
   }
@@ -88,15 +94,8 @@ public class MessageBus implements AutoCloseable {
     return QUEUE_PREFIX + workerId;
   }
 
-  // ==================== Worker → Gateway 玩家消息（新增） ====================
+  // ==================== Worker → Gateway 玩家定向消息 ====================
 
-  /**
-   * Worker 发送消息给指定 Gateway 上的玩家（持久化，可靠）
-   *
-   * @param gatewayId 目标网关 ID
-   * @param username 玩家名
-   * @param message 消息内容（JSON）
-   */
   public void publishToPlayer(String gatewayId, String username, String message) {
     try (Channel ch = connection.createChannel()) {
       String routingKey = String.format("gateway.%s.player.%s", gatewayId, username);
@@ -105,24 +104,16 @@ public class MessageBus implements AutoCloseable {
           routingKey,
           MessageProperties.PERSISTENT_TEXT_PLAIN,
           message.getBytes(StandardCharsets.UTF_8));
-    } catch (Exception e) { // 捕获 IOException 和 TimeoutException
+    } catch (Exception e) {
       logger.error("Failed to publish to player " + username + ": " + e.getMessage());
     }
   }
 
-  /**
-   * Gateway 订阅属于自己的所有玩家消息
-   *
-   * @param gatewayId 本 Gateway ID
-   * @param messageConsumer 回调，参数为 (routingKey, messageBody)
-   */
   public void subscribeGateway(String gatewayId, BiConsumer<String, String> messageConsumer)
       throws IOException {
     Channel channel = connection.createChannel();
-    // 持久化、非独占、非自动删除的队列（保证重启后队列存活）
     String queueName = "gateway.queue." + gatewayId;
     channel.queueDeclare(queueName, true, false, false, null);
-    // 绑定模式：gateway.{gatewayId}.player.*
     String bindingPattern = String.format("gateway.%s.player.*", gatewayId);
     channel.queueBind(queueName, GATEWAY_EXCHANGE, bindingPattern);
     channel.basicQos(1);
@@ -146,6 +137,42 @@ public class MessageBus implements AutoCloseable {
         },
         consumerTag -> {});
     logger.info("Gateway " + gatewayId + " subscribed to queue " + queueName);
+  }
+
+  // ==================== 房间列表广播（新增） ====================
+
+  /** 发布房间列表更新事件（由 Worker 在房间状态变化时调用） */
+  public void publishRoomListUpdate() {
+    try (Channel ch = connection.createChannel()) {
+      ch.basicPublish(
+          ROOM_LIST_EXCHANGE,
+          "",
+          MessageProperties.PERSISTENT_TEXT_PLAIN,
+          "UPDATE".getBytes(StandardCharsets.UTF_8));
+    } catch (Exception e) {
+      logger.error("Failed to publish room list update: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Gateway 订阅房间列表更新事件
+   *
+   * @param gatewayId 本 Gateway ID（用于创建独占队列，区分不同 Gateway）
+   * @param callback 收到事件时回调（通常触发刷新房间列表并推送给大厅玩家）
+   */
+  public void subscribeRoomListUpdates(String gatewayId, Runnable callback) throws IOException {
+    Channel channel = connection.createChannel();
+    String queueName = "roomlist.gateway." + gatewayId;
+    channel.queueDeclare(queueName, true, false, false, null);
+    channel.queueBind(queueName, ROOM_LIST_EXCHANGE, "");
+    channel.basicConsume(
+        queueName,
+        true,
+        (consumerTag, delivery) -> {
+          callback.run();
+        },
+        consumerTag -> {});
+    logger.info("Gateway " + gatewayId + " subscribed to room list updates");
   }
 
   @Override

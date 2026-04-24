@@ -68,15 +68,17 @@ public class ActorManager {
             () -> {
               GameActor a = actorRef.get();
               if (a != null && a.isRunning()) {
-                // Actor 还在运行，更新房间信息
                 updateRoomInfo(roomId, a);
               } else {
-                // Actor 已停止，清理 Redis 和本地注册
                 logger.info("Actor " + roomId + " stopped, cleaning up...");
                 removeActor(roomId);
               }
               if (onActorStatusChange != null) {
                 onActorStatusChange.run();
+              }
+              // 房间状态变化（玩家加入/离开/关闭）→ 广播房间列表更新
+              if (messageBus != null) {
+                messageBus.publishRoomListUpdate();
               }
             });
 
@@ -86,6 +88,11 @@ public class ActorManager {
     if (previous != null) {
       actor.stop();
       return previous;
+    }
+
+    // 新房间创建，广播更新
+    if (messageBus != null) {
+      messageBus.publishRoomListUpdate();
     }
 
     logger.info("Actor " + roomId + " created on worker " + workerId);
@@ -100,13 +107,15 @@ public class ActorManager {
     GameActor actor = actors.remove(roomId);
     if (actor != null) {
       logger.info("Actor " + roomId + " removed from worker " + workerId);
-      // 确保 Actor 已停止
       if (actor.isRunning()) {
         actor.stop();
       }
     }
-    // 清理 Redis
     coordinator.deleteRoom(roomId);
+    // 房间删除，广播更新
+    if (messageBus != null) {
+      messageBus.publishRoomListUpdate();
+    }
     logger.info("Room " + roomId + " deleted from Redis");
 
     if (onActorStatusChange != null) {
