@@ -1,15 +1,20 @@
-2026-04-10 14:35:48.911 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:35:48.919 [snake.server.MainServer.main()] INFO  snake.util.Logger - Gateway process started on port 19000
-2026-04-10 14:35:49.425 [snake.server.MainServer.main()] INFO  snake.util.Logger - MainServer listening on port 12345
-2026-04-10 14:35:50.097 [Thread-2] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-10 14:35:50.099 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - HeartbeatService started
-2026-04-10 14:35:50.100 [Thread-2] INFO  snake.util.Logger - Gateway admin server listening on port 19004
-2026-04-10 14:35:50.100 [Thread-3] INFO  snake.util.Logger - Gateway query server listening on port 19003
-2026-04-10 14:35:50.102 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Gateway listening on port 19000
-2026-04-10 14:36:06.532 [gateway-worker-100] INFO  snake.util.Logger - Client identified: wmh
-2026-04-10 14:36:11.710 [gateway-worker-101] INFO  snake.util.Logger - Client identified: hwc
-2026-04-10 14:36:14.393 [gateway-worker-101] INFO  snake.util.Logger - Room 1 created.
-2026-04-10 14:36:14.393 [pool-3-thread-1] INFO  snake.util.Logger - Room 1 started.
-2026-04-10 14:36:14.401 [pool-3-thread-1] INFO  snake.util.Logger - Player hwc joined room 1
-2026-04-10 14:37:13.687 [pool-3-thread-1] INFO  snake.util.Logger - Room 1 idle timeout, stopping.
-2026-04-10 14:37:13.688 [pool-3-thread-1] INFO  snake.util.Logger - Room 1 destroyed.
+2026-04-10 14:28:05.630 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 14:28:05.641 [snake.server.MainServer.main()] INFO  snake.util.Logger - Gateway process started on port 19000
+2026-04-10 14:28:06.148 [snake.server.MainServer.main()] INFO  snake.util.Logger - MainServer listening on port 12345
+2026-04-10 14:28:06.770 [Thread-2] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 14:28:06.773 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - HeartbeatService started
+2026-04-10 14:28:06.774 [Thread-2] INFO  snake.util.Logger - Gateway admin server listening on port 19004
+2026-04-10 14:28:06.774 [Thread-3] INFO  snake.util.Logger - Gateway query server listening on port 19003
+2026-04-10 14:28:06.776 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Gateway listening on port 19000
+2026-04-10 14:28:14.511 [gateway-worker-100] INFO  snake.util.Logger - Client identified: wmh
+2026-04-10 14:28:17.415 [gateway-worker-100] INFO  snake.util.Logger - Room 1 started with Disruptor.
+2026-04-10 14:28:17.415 [gateway-worker-100] INFO  snake.util.Logger - Room 1 created.
+2026-04-10 14:28:17.420 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-10 14:28:17.656 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 14:28:19.495 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
+2026-04-10 14:29:00.513 [gateway-worker-100] INFO  snake.util.Logger - Client identified: hwc
+2026-04-10 14:29:04.998 [room-1-disruptor] INFO  snake.util.Logger - Room 1 idle timeout, stopping.
+2026-04-10 14:36:14.643 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 14:38:31.489 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 14:39:00.725 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
+2026-04-10 15:19:18.785 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties

@@ -2,16 +2,12 @@ package snake.core;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import snake.common.*;
 import snake.util.ILogger;
 import snake.util.Logger;
 
 public class RoomManager implements IRoomRegistry, IRoomFactory {
   private final Map<Integer, Room> rooms = new ConcurrentHashMap<>();
-  private final ExecutorService roomPool =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
   private IGameClientNotifier notifier;
   private Runnable roomListUpdateCallback;
   private final ILogger logger = Logger.getInstance();
@@ -21,6 +17,14 @@ public class RoomManager implements IRoomRegistry, IRoomFactory {
     this.roomListUpdateCallback = updateCallback;
   }
 
+  public void setNotifier(IGameClientNotifier notifier) {
+    this.notifier = notifier;
+  }
+
+  public void setRoomListUpdateCallback(Runnable callback) {
+    this.roomListUpdateCallback = callback;
+  }
+
   @Override
   public Room createRoom(int roomId, IGameClientNotifier notifier, IRoomDestroyCallback callback) {
     IGameClientNotifier effectiveNotifier = notifier != null ? notifier : this.notifier;
@@ -28,11 +32,9 @@ public class RoomManager implements IRoomRegistry, IRoomFactory {
       logger.error("Cannot create room: notifier is null");
       return null;
     }
-    // 原有创建逻辑，但使用 effectiveNotifier
     if (rooms.containsKey(roomId)) return null;
     Room room = new Room(roomId, effectiveNotifier, callback, this::notifyRoomListUpdate);
     rooms.put(roomId, room);
-    roomPool.submit(room);
     logger.info("Room " + roomId + " created.");
     notifyRoomListUpdate();
     return room;
@@ -47,7 +49,6 @@ public class RoomManager implements IRoomRegistry, IRoomFactory {
   public boolean addRoom(Room room) {
     if (rooms.containsKey(room.getRoomId())) return false;
     rooms.put(room.getRoomId(), room);
-    roomPool.submit(room);
     notifyRoomListUpdate();
     return true;
   }
@@ -59,15 +60,6 @@ public class RoomManager implements IRoomRegistry, IRoomFactory {
       logger.info("Room " + roomId + " removed from manager.");
       notifyRoomListUpdate();
     }
-  }
-
-  // 在 RoomManager 类中添加：
-  public void setNotifier(IGameClientNotifier notifier) {
-    this.notifier = notifier;
-  }
-
-  public void setRoomListUpdateCallback(Runnable callback) {
-    this.roomListUpdateCallback = callback;
   }
 
   @Override
@@ -93,9 +85,5 @@ public class RoomManager implements IRoomRegistry, IRoomFactory {
 
   private void notifyRoomListUpdate() {
     if (roomListUpdateCallback != null) roomListUpdateCallback.run();
-  }
-
-  public void shutdown() {
-    roomPool.shutdown();
   }
 }

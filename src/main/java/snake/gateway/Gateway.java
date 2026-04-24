@@ -15,7 +15,6 @@ import snake.core.LeaveRoomMsg;
 import snake.core.Room;
 import snake.core.RoomManager;
 
-/** 重构后的 Gateway - 只负责 NIO 网络收发 + 消息路由。 所有其他职责已委托给独立组件。 */
 public class Gateway extends NioServer {
   private final MessageRouter messageRouter;
   private final SessionManager sessionManager;
@@ -75,13 +74,9 @@ public class Gateway extends NioServer {
   protected void onSessionClosed(ISession session) {
     ClientSession client = (ClientSession) session;
     client.closed = true;
-    heartbeatService.refresh(client); // 取消心跳超时任务（实际实现中 refresh 会重置，但此处应取消）
+    // 取消心跳（实际实现需要从 HeartbeatService 中移除）
     if (client.username != null) {
       sessionManager.unbindUsername(client.username);
-      // 通知领域层用户断开
-      if (roomManager instanceof RoomManager) {
-        // 可选：通过 MessageDispatcher 通知 RoomManager 清理
-      }
     }
     if (client.roomId != -1) {
       Room room = roomManager.getRoom(client.roomId);
@@ -92,11 +87,9 @@ public class Gateway extends NioServer {
 
   @Override
   public void start() throws IOException {
-    // 启动辅助服务
     adminService.start();
     queryService.start();
     heartbeatService.start();
-    // 启动网络服务
     super.start();
   }
 
@@ -119,21 +112,13 @@ public class Gateway extends NioServer {
   public static void main(String[] args) {
     int port = args.length > 0 ? Integer.parseInt(args[0]) : Config.GATEWAY_DEFAULT_PORT;
 
-    // 依赖组装（也可使用 DI 框架）
     SessionManager sessionManager = new DefaultSessionManager();
-    HeartbeatService heartbeatService =
-        new DefaultHeartbeatService(
-            session -> {
-              // 超时回调：关闭会话
-              session.close();
-            });
-    RoomManager roomManager = new RoomManager(null, null); // 暂不传递 notifier 和回调，稍后设置
+    HeartbeatService heartbeatService = new DefaultHeartbeatService(session -> session.close());
+    RoomManager roomManager = new RoomManager(null, null);
     IGameClientNotifier notifier = new SessionBasedNotifier(sessionManager);
-    // 重新设置 RoomManager 的 notifier 和回调（需要修改 RoomManager 添加 setter）
     roomManager.setNotifier(notifier);
     roomManager.setRoomListUpdateCallback(
         () -> {
-          // 广播房间列表更新到所有未加入房间的客户端
           String roomListJson = buildRoomListJson(roomManager);
           for (ClientSession s : sessionManager.getAllSessions()) {
             if (s.username != null && s.roomId == -1) {
@@ -177,7 +162,6 @@ public class Gateway extends NioServer {
   }
 
   private static String buildRoomListJson(RoomManager roomManager) {
-    // 复用 GameCommandHandler 中的逻辑，此处简化，实际可抽取工具方法
     ObjectMapper mapper = new ObjectMapper();
     var rooms = mapper.createArrayNode();
     for (var entry : roomManager.getRoomList()) {

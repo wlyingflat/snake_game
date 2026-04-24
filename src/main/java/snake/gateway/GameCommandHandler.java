@@ -9,11 +9,7 @@ import snake.common.Config;
 import snake.common.Direction;
 import snake.common.RoomListEntry;
 import snake.common.RoomStatus;
-import snake.core.InputMsg;
-import snake.core.JoinRoomMsg;
-import snake.core.LeaveRoomMsg;
-import snake.core.Room;
-import snake.core.RoomManager;
+import snake.core.*;
 import snake.util.ILogger;
 import snake.util.Logger;
 
@@ -82,7 +78,13 @@ public class GameCommandHandler {
     if (session.username == null || session.roomId == -1) return;
     Direction dir = Direction.valueOf(params.get("direction").asText());
     Room room = roomManager.getRoom(session.roomId);
-    if (room != null) room.post(new InputMsg(session.username, dir));
+    if (room != null) {
+      // 使用对象池复用 InputMsg（可选，显著减少 GC）
+      // ReusableInputMsg msg = MessagePool.borrowInputMsg(session.username, dir);
+      // room.post(msg);
+      // 如果不使用对象池，仍可 new：
+      room.post(new InputMsg(session.username, dir));
+    }
     heartbeatService.refresh(session);
   }
 

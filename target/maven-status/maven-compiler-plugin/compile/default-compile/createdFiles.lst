@@ -17,6 +17,7 @@ snake/gateway/QueryService.class
 snake/gateway/CommandDispatcher$CommandHandler.class
 snake/gateway/AdminService.class
 snake/client/swing/GameCanvas.class
+snake/core/TickMessage.class
 snake/core/GameState$Player.class
 snake/gateway/HeartbeatService.class
 snake/common/ISession.class
@@ -39,8 +40,8 @@ snake/core/IRoomFactory.class
 snake/client/GatewayClient$DeathListener.class
 snake/server/IUserRepository.class
 snake/server/MainSession.class
-snake/core/MessageDispatcher.class
 snake/client/swing/LoginFrame.class
+snake/core/MessageEvent.class
 snake/gateway/ICommandHandler.class
 snake/core/LeaveRoomMsg.class
 snake/core/RoomManager.class
@@ -56,7 +57,6 @@ snake/client/swing/GameApp.class
 snake/server/UserManager.class
 snake/gateway/CommandDispatcher.class
 snake/core/JoinRoomMsg.class
-snake/common/RoomInfo.class
 snake/client/swing/GameFrame$2.class
 snake/common/IConfigProvider.class
 snake/common/GameStateData.class
