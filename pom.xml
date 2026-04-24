@@ -33,6 +33,11 @@
             <version>2.1.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.27.2</version>
+        </dependency>
         <!-- JMH 核心 -->
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
@@ -67,6 +72,18 @@
             <artifactId>jetty-servlet</artifactId>
             <version>11.0.20</version>
         </dependency>
+        <!-- Jetty HTTP/2 核心模块 -->
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>http2-server</artifactId>
+            <version>11.0.20</version>
+        </dependency>
+        <!-- ALPN 支持（JDK 9+ 可选，Jetty 11 会自动处理） -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-alpn-java-server</artifactId>
+            <version>11.0.20</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -78,6 +95,11 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>5.0.0</version>   <!-- Jetty 10/11 用 5.0；Jetty 12 用 6.0 -->
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>4.4.3</version>
         </dependency>
     </dependencies>
     <build>

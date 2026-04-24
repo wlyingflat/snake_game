@@ -11,14 +11,24 @@ import java.util.List;
 import javax.sql.DataSource;
 import snake.auth.IAuthenticationService;
 import snake.base.User;
+import snake.distributed.DistributedCoordinator;
 import snake.persistence.BaseMySQLRepository;
 
 /** 用户仓储实现，同时提供认证服务。 */
 public class MySQLUserRepository extends BaseMySQLRepository
     implements IUserRepository, IAuthenticationService {
+  private final DistributedCoordinator coordinator;
+  private final boolean distributedMode;
+
+  public MySQLUserRepository(
+      DataSource dataSource, DistributedCoordinator coordinator, boolean distributedMode) {
+    super(dataSource);
+    this.coordinator = coordinator;
+    this.distributedMode = distributedMode;
+  }
 
   public MySQLUserRepository(DataSource dataSource) {
-    super(dataSource);
+    this(dataSource, null, false);
   }
 
   @Override
@@ -64,9 +74,18 @@ public class MySQLUserRepository extends BaseMySQLRepository
       return false;
     }
 
-    // 禁止重复登录
-    if (user.online) {
-      return false;
+    // 分布式模式：检查 Redis 在线状态
+    if (distributedMode && coordinator != null) {
+      if (coordinator.isOnline(username)) {
+        logger.warn("User " + username + " already online (Redis check)");
+        return false;
+      }
+    } else {
+      // 非分布式模式：检查数据库 online 字段
+      if (user.online) {
+        logger.warn("User " + username + " already online (DB check)");
+        return false;
+      }
     }
 
     String sql = "UPDATE users SET online = 1, last_active = ? WHERE username = ?";
@@ -88,6 +107,10 @@ public class MySQLUserRepository extends BaseMySQLRepository
 
   @Override
   public void logout(String username) {
+    // 分布式模式：标记离线
+    if (distributedMode && coordinator != null) {
+      coordinator.markOffline(username);
+    }
     String sql = "UPDATE users SET online = 0, last_active = ? WHERE username = ?";
     try (Connection conn = dataSource.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)) {

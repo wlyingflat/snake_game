@@ -1,256 +1,733 @@
-2026-04-21 13:26:46.600 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:26:46.710 [snake.server.MainServer.main()] INFO  snake.util.Logger - Users table ensured.
-2026-04-21 13:26:46.716 [snake.server.MainServer.main()] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:26:46.721 [snake.server.MainServer.main()] INFO  snake.util.Logger - Gateway process started on port 19000
-2026-04-21 13:26:47.235 [snake.server.MainServer.main()] INFO  snake.util.Logger - MainServer listening on port 12345
-2026-04-21 13:26:47.908 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:26:47.999 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Users table ensured.
-2026-04-21 13:26:48.007 [Thread-2] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:26:48.008 [Thread-2] INFO  snake.util.Logger - Gateway admin server listening on port 19004
-2026-04-21 13:26:48.008 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - HeartbeatService started
-2026-04-21 13:26:48.008 [Thread-3] INFO  snake.util.Logger - Gateway query server listening on port 19003
-2026-04-21 13:26:48.011 [snake.gateway.Gateway.main()] INFO  snake.util.Logger - Gateway listening on port 19000
-2026-04-21 13:30:48.224 [gateway-worker-103] INFO  snake.util.Logger - Client identified: test_leaderboard_user
-2026-04-21 13:34:59.520 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
-2026-04-21 13:34:59.545 [gateway-worker-104] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:35:02.860 [gateway-worker-104] INFO  snake.util.Logger - Room 2 created, destroyCallback is set
-2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room 2 started with Disruptor and independent idle checker.
-2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room 2 created.
-2026-04-21 13:35:02.883 [gateway-worker-104] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:02.884 [gateway-worker-104] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:35:02.885 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
-2026-04-21 13:35:02.886 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:02.886 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:35:03.115 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:35:04.069 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
-2026-04-21 13:35:04.070 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:04.070 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:35:05.853 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
-2026-04-21 13:35:05.854 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:05.854 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
-2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:07.468 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
-2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:22.328 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
-2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:22.668 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Player wmh joined room 2
-2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:23.928 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 2 to -1
-2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:35:55.268 [room-2-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:35:55.281 [ForkJoinPool.commonPool-worker-32] INFO  snake.util.Logger - High score updated for wmh: 4
-2026-04-21 13:36:01.689 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
-2026-04-21 13:36:32.868 [room-2-idle-check] INFO  snake.util.Logger - Room 2 idle timeout, stopping from idle check thread.
-2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room 2 is stopping...
-2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 2
-2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:36:32.869 [room-2-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 13:36:37.870 [room-2-idle-check] INFO  snake.util.Logger - Room 2 destroyed.
-2026-04-21 13:36:37.870 [room-2-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 2
-2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 2
-2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - removeRoom called for room 2
-2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room 2 removed from manager. Remaining rooms: 0
-2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:36:37.871 [room-2-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 13:37:50.301 [gateway-worker-109] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:49:04.989 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
-2026-04-21 13:49:05.008 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:49:07.535 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created, destroyCallback is set
-2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room 1 started with Disruptor and independent idle checker.
-2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created.
-2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:49:07.543 [gateway-worker-110] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:49:07.543 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-21 13:49:07.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:49:07.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:49:07.768 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
-2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:49:14.943 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:49:17.581 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
-2026-04-21 13:49:32.791 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:50:01.980 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged in: wmh
-2026-04-21 13:50:02.002 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Room 1 idle timeout, stopping from idle check thread.
-2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Room 1 is stopping...
-2026-04-21 13:50:07.543 [room-1-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 1
-2026-04-21 13:50:07.544 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:07.544 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:50:12.544 [room-1-idle-check] INFO  snake.util.Logger - Room 1 destroyed.
-2026-04-21 13:50:12.544 [room-1-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 1
-2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 1
-2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - removeRoom called for room 1
-2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room 1 removed from manager. Remaining rooms: 0
-2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:12.545 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:50:13.731 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created, destroyCallback is set
-2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room 1 started with Disruptor and independent idle checker.
-2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room 1 created.
-2026-04-21 13:50:13.732 [gateway-worker-110] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:13.733 [gateway-worker-110] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:13.733 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:50:13.962 [Thread-3] INFO  snake.util.Logger - Loaded config from config.properties
-2026-04-21 13:50:16.532 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
-2026-04-21 13:50:16.533 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:16.533 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:18.343 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
-2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:36.332 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Player wmh joined room 1
-2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:50:38.544 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 13:51:38.332 [room-1-disruptor] INFO  snake.util.Logger - User wmh left room, roomId changed from 1 to -1
-2026-04-21 13:51:38.333 [room-1-disruptor] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:51:38.333 [room-1-disruptor] INFO  snake.util.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 13:51:38.337 [ForkJoinPool.commonPool-worker-35] INFO  snake.util.Logger - High score updated for wmh: 9
-2026-04-21 13:51:42.069 [snake.server.MainServer.main()] INFO  snake.util.Logger - User logged out: wmh
-2026-04-21 13:51:47.731 [gateway-worker-110] INFO  snake.util.Logger - Client identified: wmh
-2026-04-21 13:52:13.732 [room-1-idle-check] INFO  snake.util.Logger - Room 1 idle timeout, stopping from idle check thread.
-2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room 1 is stopping...
-2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Triggering room list update via onStatusChange for room 1
-2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:52:13.733 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room 1 destroyed.
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Calling destroyCallback.onRoomDestroyed for room 1
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - onRoomDestroyed called for room 1
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - removeRoom called for room 1
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room 1 removed from manager. Remaining rooms: 0
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room list update callback invoked
-2026-04-21 13:52:18.734 [room-1-idle-check] INFO  snake.util.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 16:27:17.308 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 16:27:17.418 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 16:27:17.432 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 16:27:17.437 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 16:27:17.441 [snake.auth.MainServer.main()] INFO  snake.base.Logger - Gateway process started on port 19000
-2026-04-21 16:27:17.945 [snake.auth.MainServer.main()] INFO  snake.base.Logger - MainServer listening on port 12345
-2026-04-21 16:27:18.692 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 16:27:18.780 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 16:27:18.793 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 16:27:18.801 [Thread-2] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 16:27:18.802 [Thread-2] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 16:27:18.802 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 16:27:18.802 [Thread-3] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 16:27:18.804 [snake.gateway.Gateway.main()] INFO  snake.base.Logger - Gateway listening on port 19000
-2026-04-21 16:27:30.610 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged in: wmh
-2026-04-21 16:27:30.682 [gateway-worker-103] INFO  snake.base.Logger - Client identified: wmh
-2026-04-21 16:27:34.293 [gateway-worker-104] INFO  snake.base.Logger - Room 1 created, destroyCallback is set
-2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room 1 started with Disruptor and independent idle checker.
-2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room 1 created.
-2026-04-21 16:27:34.315 [gateway-worker-104] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:27:34.316 [gateway-worker-104] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Player wmh joined room 1
-2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:27:34.320 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 16:27:34.544 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - User wmh left room, roomId changed from 1 to -1
-2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:28:12.701 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 16:28:18.779 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged out: wmh
-2026-04-21 16:28:24.279 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged in: yhl
-2026-04-21 16:28:24.282 [gateway-worker-104] INFO  snake.base.Logger - Client identified: yhl
-2026-04-21 16:28:27.321 [room-1-disruptor] INFO  snake.base.Logger - Player yhl joined room 1
-2026-04-21 16:28:27.322 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:28:27.322 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 1 (not in lobby)
-2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - User yhl left room, roomId changed from 1 to -1
-2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:28:37.299 [room-1-disruptor] INFO  snake.base.Logger - Room list update: broadcast to 1 clients, skipped 0 (not in lobby)
-2026-04-21 16:28:37.312 [ForkJoinPool.commonPool-worker-31] INFO  snake.base.Logger - High score updated for yhl: 1
-2026-04-21 16:28:40.832 [snake.auth.MainServer.main()] INFO  snake.base.Logger - User logged out: yhl
-2026-04-21 16:28:53.880 [gateway-worker-104] INFO  snake.base.Logger - Client identified: yhl
-2026-04-21 16:29:34.299 [room-1-idle-check] INFO  snake.base.Logger - Room 1 idle timeout, stopping from idle check thread.
-2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room 1 is stopping...
-2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Triggering room list update via onStatusChange for room 1
-2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:29:34.300 [room-1-idle-check] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 16:29:39.301 [room-1-idle-check] INFO  snake.base.Logger - Room 1 destroyed.
-2026-04-21 16:29:39.301 [room-1-idle-check] INFO  snake.base.Logger - Calling destroyCallback.onRoomDestroyed for room 1
-2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - onRoomDestroyed called for room 1
-2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - removeRoom called for room 1
-2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room 1 removed from manager. Remaining rooms: 0
-2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room list update callback invoked
-2026-04-21 16:29:39.302 [room-1-idle-check] INFO  snake.base.Logger - Room list update: broadcast to 0 clients, skipped 0 (not in lobby)
-2026-04-21 18:44:14.305 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:44:14.413 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 18:44:14.420 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 18:44:14.432 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:44:14.433 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 18:44:14.433 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 18:44:14.433 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 18:44:14.436 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 18:45:55.380 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:45:55.489 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 18:45:55.503 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 18:45:55.515 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:45:55.516 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 18:45:55.516 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 18:45:55.516 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 18:46:06.177 [Thread-3] INFO  snake.base.Logger - Database connection pool closed.
-2026-04-21 18:46:08.819 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:46:08.923 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 18:46:08.936 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 18:46:08.946 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:46:08.947 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 18:46:08.947 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 18:46:08.947 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 18:46:08.949 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 18:47:55.331 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
-2026-04-21 18:54:11.473 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:54:11.578 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 18:54:11.591 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 18:54:11.601 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:54:11.602 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 18:54:11.602 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 18:54:11.602 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 18:54:11.604 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 18:55:34.946 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
-2026-04-21 18:58:43.286 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:58:43.397 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 18:58:43.439 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 18:58:43.450 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 18:58:43.451 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 18:58:43.451 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 18:58:43.451 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 18:58:43.453 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 18:59:13.959 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
-2026-04-21 19:01:01.605 [main] ERROR snake.base.Logger - Error parsing message: Invalid message length: 2065851245
-2026-04-21 19:01:20.615 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:01:20.724 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 19:01:20.738 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 19:01:20.748 [Thread-1] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:01:20.749 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 19:01:20.749 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 19:01:20.749 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 19:01:20.752 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 19:01:29.464 [main] ERROR snake.base.Logger - Error parsing message: Invalid message length: 2065851245
-2026-04-21 19:02:38.977 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
-2026-04-21 19:02:38.978 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
-2026-04-21 19:05:03.636 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:05:03.738 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 19:05:03.752 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 19:05:03.761 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:05:03.762 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 19:05:03.762 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 19:05:03.763 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 19:05:03.764 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 19:05:07.482 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
-2026-04-21 19:06:03.114 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
-2026-04-21 19:11:09.693 [main] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:11:09.798 [main] INFO  snake.base.Logger - Database connection pool initialized.
-2026-04-21 19:11:09.811 [main] INFO  snake.base.Logger - Users table ensured.
-2026-04-21 19:11:09.821 [Thread-0] INFO  snake.base.Logger - Loaded config from config.properties
-2026-04-21 19:11:09.822 [Thread-0] INFO  snake.base.Logger - Gateway admin server listening on port 19004
-2026-04-21 19:11:09.822 [Thread-1] INFO  snake.base.Logger - Gateway query server listening on port 19003
-2026-04-21 19:11:09.822 [main] INFO  snake.base.Logger - HeartbeatService started
-2026-04-21 19:11:09.824 [main] INFO  snake.base.Logger - Gateway listening on port 8080
-2026-04-21 19:11:22.978 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: REGISTER
-2026-04-21 19:11:22.980 [gateway-worker-60] WARN  snake.base.Logger - Unknown command: LOGIN
+2026-04-24 12:50:23.523 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 12:50:23.535 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 12:50:23.535 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 12:51:28.060 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:51:28.063 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:51:28.183 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 12:51:28.198 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 12:51:28.331 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 12:51:28.331 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 12:51:39.370 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 12:51:39.372 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:51:39.476 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 12:51:39.738 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 12:51:39.761 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 12:51:39.777 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 12:51:39.788 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 12:51:39.788 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 12:51:46.539 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:51:46.542 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 12:51:46.542 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:51:46.650 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 12:51:47.043 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 12:51:47.045 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 12:51:47.045 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 12:52:17.410 [qtp2082351661-90] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 12:52:17.444 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 12:52:20.467 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-1 for room 1
+2026-04-24 12:52:20.518 [worker-worker-1-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:52:20.524 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-1
+2026-04-24 12:52:20.552 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-1
+2026-04-24 12:52:20.552 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-1
+2026-04-24 12:52:20.552 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 12:52:20.558 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 12:52:20.782 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:52:21.324 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:21.885 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:22.139 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:22.336 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:22.824 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:23.047 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:23.225 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:25.683 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 12:52:26.486 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:26.732 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:26.977 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:27.131 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:27.351 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:27.490 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:27.687 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:27.910 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:28.087 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:28.287 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:28.487 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:28.669 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:28.915 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:29.070 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:29.292 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:29.493 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:29.671 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:29.955 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:30.204 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:30.516 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:30.848 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:31.071 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:31.293 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:31.515 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:31.826 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:31.960 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:32.204 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:32.559 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:36.784 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 12:52:38.331 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:38.591 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:38.781 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:39.004 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - Error processing message: Cannot invoke "com.fasterxml.jackson.databind.JsonNode.asInt()" because the return value of "com.fasterxml.jackson.databind.JsonNode.get(String)" is null
+2026-04-24 12:52:48.471 [qtp2082351661-57] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 12:53:20.532 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 12:53:20.533 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 12:53:25.536 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 12:54:56.340 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:54:56.342 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 12:54:56.342 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:54:56.441 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 12:54:56.848 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 12:54:56.850 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 12:54:56.850 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 12:55:36.766 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 12:55:36.768 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 12:55:36.871 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 12:55:37.107 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 12:55:37.129 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 12:55:37.143 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 12:55:37.154 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 12:55:37.154 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:01:00.494 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 13:01:00.506 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:01:00.506 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 13:01:06.214 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:06.216 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:06.361 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:01:06.376 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:01:06.476 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 13:01:06.477 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 13:01:10.947 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:10.950 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:01:10.950 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:11.049 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:01:11.613 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:01:11.613 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:01:11.614 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:01:12.250 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:01:12.261 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:01:12.262 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:01:12.276 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:01:13.771 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:01:13.773 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:13.878 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:01:14.131 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:01:14.164 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:01:14.180 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:01:14.190 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:01:14.190 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:01:15.913 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:01:15.919 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:01:15.919 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:01:15.933 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:01:45.617 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:45.620 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:01:45.620 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:01:45.715 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:01:46.090 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:01:46.091 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:01:46.092 [main] ERROR snake.base.Logger - Failed to start gateway: 地址已在使用
+2026-04-24 13:02:10.083 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:02:10.094 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:02:10.094 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:02:10.197 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:02:10.617 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:02:10.618 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:02:10.619 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:02:15.678 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:02:15.687 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:02:15.782 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:02:16.021 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:02:16.048 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:02:16.063 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:02:16.072 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:02:16.072 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:02:21.382 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 13:02:21.390 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 13:02:21.391 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 13:02:21.395 [redisson-netty-1-3] ERROR io.netty.util.concurrent.DefaultPromise.rejectedExecution - Failed to submit a listener notification task. Event loop shut down?
+java.util.concurrent.RejectedExecutionException: event executor terminated
+	at io.netty.util.concurrent.SingleThreadEventExecutor.reject(SingleThreadEventExecutor.java:934) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.offerTask(SingleThreadEventExecutor.java:351) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.addTask(SingleThreadEventExecutor.java:344) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:836) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute0(SingleThreadEventExecutor.java:827) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:817) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.safeExecute(DefaultPromise.java:862) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:500) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess(DefaultPromise.java:97) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture.setSuccess0(DefaultChannelGroupFuture.java:200) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture.access$400(DefaultChannelGroupFuture.java:41) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:75) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:48) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:557) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.trySuccess(DefaultPromise.java:105) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.DefaultChannelPromise.trySuccess(DefaultChannelPromise.java:84) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.safeSetSuccess(AbstractChannel.java:990) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.doClose0(AbstractChannel.java:756) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:731) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:620) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.close(DefaultChannelPipeline.java:1352) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext.invokeClose(AbstractChannelHandlerContext.java:755) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext.access$1200(AbstractChannelHandlerContext.java:61) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext$11.run(AbstractChannelHandlerContext.java:738) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1516) [?:?]
+2026-04-24 13:02:21.413 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:02:27.171 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 13:02:27.173 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:02:27.269 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:02:27.532 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:02:27.557 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:02:27.571 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 13:02:27.581 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 13:02:27.581 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:02:39.880 [qtp2082351661-90] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:02:39.915 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:02:42.691 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:02:42.735 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:02:42.743 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:02:42.770 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:02:42.771 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:02:42.771 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 13:02:42.777 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:02:43.035 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:03:38.911 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:03:42.604 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:04:42.751 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:04:42.752 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:04:47.755 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:04:49.124 [qtp2082351661-56] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 13:04:49.150 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 13:05:15.662 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:05:24.758 [gateway-gateway-2-worker-1] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:05:45.012 [qtp2082351661-57] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:05:46.709 [qtp2082351661-58] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 13:05:51.648 [qtp2082351661-55] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:05:51.657 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:05:57.686 [qtp2082351661-92] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 13:05:57.694 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 13:06:00.647 [gateway-gateway-1-worker-1] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:06:08.242 [qtp2082351661-57] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:06:10.130 [gateway-gateway-2-worker-1] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:06:22.507 [qtp2082351661-55] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 13:06:29.294 [qtp2082351661-57] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:06:29.300 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:07:02.111 [qtp2082351661-59] WARN  snake.base.Logger - Username already exists: wmh
+2026-04-24 13:07:17.618 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 13:07:17.629 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 13:07:17.629 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 13:07:17.645 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:07:20.495 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 13:07:20.497 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:20.601 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:07:20.833 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:07:20.856 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:07:20.871 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 13:07:20.885 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 13:07:20.885 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:07:24.553 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:24.556 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:07:24.556 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:24.653 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:07:25.026 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:07:25.027 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:07:25.027 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:07:28.565 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:28.568 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:07:28.568 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:28.664 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:07:29.047 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:07:29.048 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:07:29.048 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:07:30.197 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:07:30.206 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:07:30.206 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:07:30.227 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:07:32.032 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:07:32.041 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:07:32.134 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:07:32.533 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:07:32.557 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:07:32.573 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:07:32.583 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:07:32.584 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:08:16.974 [qtp2082351661-55] WARN  snake.base.Logger - Username already exists: yhl
+2026-04-24 13:08:21.577 [qtp2082351661-55] WARN  snake.base.Logger - User wmh already online (DB check)
+2026-04-24 13:08:29.149 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 13:08:29.157 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 13:08:29.157 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 13:08:29.170 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:08:33.011 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 13:08:33.025 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:08:33.025 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 13:08:38.633 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:08:38.640 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:08:38.640 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:08:38.650 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:08:44.088 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:44.091 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:44.263 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:08:44.277 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:08:44.379 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 13:08:44.379 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 13:08:46.934 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:08:46.937 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:47.042 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:08:47.442 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:08:47.464 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:08:47.478 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:08:47.488 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:08:47.488 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:08:54.153 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 13:08:54.155 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:54.251 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:08:54.511 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:08:54.535 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:08:54.550 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 13:08:54.559 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 13:08:54.559 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:08:58.703 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:58.714 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:08:58.714 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:08:58.809 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:08:59.190 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:08:59.191 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:08:59.192 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:09:03.706 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:09:03.709 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:09:03.709 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:09:03.803 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:09:04.168 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:09:04.170 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:09:04.170 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:09:23.512 [qtp2082351661-90] WARN  snake.base.Logger - User wmh already online (DB check)
+2026-04-24 13:10:02.025 [qtp2082351661-56] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:10:02.048 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:10:06.608 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:10:06.660 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:10:06.667 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:10:06.693 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:10:06.694 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:10:06.694 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 13:10:06.700 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:10:06.936 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:10:24.317 [qtp2082351661-57] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:10:24.346 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:10:27.940 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:10:28.176 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:10:34.279 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:10:36.919 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:10:43.483 [qtp2082351661-58] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:10:44.838 [qtp2082351661-92] INFO  snake.base.Logger - User logged out: lyz
+2026-04-24 13:11:36.675 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:11:36.675 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:11:41.678 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:27:31.471 [qtp2082351661-94] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:27:31.484 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:27:43.080 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - CREATE routed to worker worker-1 for room 2
+2026-04-24 13:27:43.123 [worker-worker-1-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:27:43.131 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 2 registered in Redis by node worker-1
+2026-04-24 13:27:43.181 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 2 started on worker worker-1
+2026-04-24 13:27:43.181 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 2 created on worker worker-1
+2026-04-24 13:27:43.181 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 2 created by wmh
+2026-04-24 13:27:43.189 [actor-2] INFO  snake.base.Logger - Player wmh joined actor 2
+2026-04-24 13:27:52.349 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - Room 1 exists, auto-joining
+2026-04-24 13:27:55.998 [actor-2] INFO  snake.base.Logger - Player wmh joined actor 2
+2026-04-24 13:28:43.146 [actor-2-idle] INFO  snake.base.Logger - Actor 2 idle timeout, stopping.
+2026-04-24 13:28:43.146 [actor-2-idle] INFO  snake.base.Logger - Actor 2 is stopping...
+2026-04-24 13:28:48.299 [actor-2-idle] INFO  snake.base.Logger - Actor 2 destroyed.
+2026-04-24 13:35:24.304 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:35:24.306 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 13:36:07.017 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 2
+2026-04-24 13:36:07.023 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 2 registered in Redis by node worker-2
+2026-04-24 13:36:07.025 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 2 started on worker worker-2
+2026-04-24 13:36:07.025 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 2 created on worker worker-2
+2026-04-24 13:36:07.025 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 2 created by wmh
+2026-04-24 13:36:07.028 [actor-2] INFO  snake.base.Logger - Player wmh joined actor 2
+2026-04-24 13:36:25.757 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - CREATE routed to worker worker-1 for room 1
+2026-04-24 13:36:25.763 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-1
+2026-04-24 13:36:25.767 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-1
+2026-04-24 13:36:25.767 [worker-worker-1-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-1
+2026-04-24 13:36:25.767 [worker-worker-1-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 13:36:25.772 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:37:07.025 [actor-2-idle] INFO  snake.base.Logger - Actor 2 idle timeout, stopping.
+2026-04-24 13:37:07.025 [actor-2-idle] INFO  snake.base.Logger - Actor 2 is stopping...
+2026-04-24 13:37:12.028 [actor-2-idle] INFO  snake.base.Logger - Actor 2 destroyed.
+2026-04-24 13:37:19.479 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:37:27.373 [qtp2082351661-97] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:37:55.767 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:37:55.767 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:38:00.771 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:38:45.146 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 13:38:45.159 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:38:45.159 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 13:38:56.046 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:38:56.048 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:38:56.172 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:38:56.186 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:38:56.302 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 13:38:56.303 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 13:39:00.405 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:39:00.412 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:39:00.413 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:39:00.421 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:39:03.707 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 13:39:03.716 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 13:39:03.716 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 13:39:03.726 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:39:13.266 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:39:13.277 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:13.386 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:39:13.610 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:39:13.635 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:39:13.649 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:39:13.659 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:39:13.659 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:39:20.159 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 13:39:20.161 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:20.282 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:39:20.521 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:39:20.545 [main] INFO  snake.base.Logger - Loaded 3 records from MySQL to Redis
+2026-04-24 13:39:20.560 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 13:39:20.570 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 13:39:20.570 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:39:22.074 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:22.077 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:39:22.077 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:22.198 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:39:22.589 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:39:22.590 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:39:22.591 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:39:26.252 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:26.255 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:39:26.403 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:26.498 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:39:26.907 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:39:26.908 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:39:26.909 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:39:38.010 [qtp2082351661-90] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:39:38.054 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:39:58.132 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:39:58.186 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:39:58.192 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:39:58.218 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:39:58.218 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:39:58.218 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-24 13:39:58.225 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:39:58.461 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:41:28.199 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:41:28.200 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:41:28.200 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 13:41:28.200 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 13:41:28.201 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 13:41:28.201 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 13:41:33.204 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:42:10.200 [qtp2082351661-90] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:42:15.478 [qtp2082351661-56] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:42:15.486 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:42:19.401 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:42:19.406 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:42:19.408 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:42:19.408 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:42:19.408 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by lyz
+2026-04-24 13:42:19.411 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:42:46.025 [qtp2082351661-57] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:42:46.059 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:42:51.931 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:42:52.282 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:42:58.702 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:43:22.182 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-24 13:43:28.536 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:43:40.267 [actor-1] INFO  snake.base.Logger - Player lyz left actor 1
+2026-04-24 13:43:42.938 [qtp2082351661-58] INFO  snake.base.Logger - User logged out: lyz
+2026-04-24 13:44:19.408 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:44:19.408 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:44:19.408 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 13:44:19.408 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 13:44:19.409 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 13:44:19.409 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 13:44:24.412 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:44:29.450 [qtp2082351661-59] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:44:48.827 [qtp2082351661-93] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:44:48.835 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - User logged in: lyz
+2026-04-24 13:45:00.296 [gateway-gateway-1-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:45:00.301 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:45:00.303 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:45:00.304 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:45:00.304 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by lyz
+2026-04-24 13:45:00.308 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:45:04.883 [actor-1] INFO  snake.base.Logger - Player lyz joined actor 1
+2026-04-24 13:45:46.819 [qtp2082351661-60] INFO  snake.base.Logger - User logged out: lyz
+2026-04-24 13:46:30.303 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:46:30.304 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:46:30.304 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 13:46:30.304 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 13:46:30.305 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 13:46:30.305 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 13:46:35.308 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 13:50:33.407 [qtp2082351661-96] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:50:33.415 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:51:48.744 [gateway-gateway-2-worker-3] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:52:01.946 [qtp2082351661-63] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:52:07.815 [qtp2082351661-96] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:52:07.822 [gateway-gateway-2-worker-3] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:52:10.134 [gateway-gateway-2-worker-3] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:52:21.826 [qtp2082351661-97] INFO  snake.base.Logger - User logged out: wmh
+2026-04-24 13:52:48.893 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:52:48.896 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:52:48.896 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:52:48.991 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:52:49.376 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:52:49.377 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:52:49.378 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:52:54.266 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:52:54.269 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:52:54.269 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:52:54.365 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:52:54.766 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:52:54.767 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:52:54.767 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:53:00.826 [qtp2082351661-96] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:53:00.850 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-24 13:53:06.974 [gateway-gateway-2-worker-1] ERROR snake.base.Logger - No active workers available
+2026-04-24 13:53:16.361 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 13:53:16.371 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 13:53:16.371 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 13:53:16.386 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:53:21.226 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 13:53:21.310 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 13:53:21.311 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 13:53:21.323 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:53:25.360 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 13:53:25.374 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 13:53:25.374 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 13:53:26.818 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:26.820 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:26.944 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:53:26.958 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:53:27.060 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 13:53:27.060 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 13:53:31.880 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 13:53:31.882 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:31.989 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:53:32.219 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:53:32.236 [main] INFO  snake.base.Logger - Loaded 0 records from MySQL to Redis
+2026-04-24 13:53:32.258 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 13:53:32.269 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 13:53:32.269 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 13:53:35.728 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 13:53:35.730 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:35.828 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:53:36.200 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 13:53:36.214 [main] INFO  snake.base.Logger - Loaded 0 records from MySQL to Redis
+2026-04-24 13:53:36.233 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 13:53:36.243 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 13:53:36.243 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 13:53:37.997 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:38.000 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 13:53:38.001 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:38.094 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:53:38.463 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 13:53:38.465 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:53:38.465 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 13:53:41.770 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:41.773 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 13:53:41.774 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:53:41.872 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 13:53:42.263 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 13:53:42.263 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 13:53:42.264 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 13:54:04.469 [qtp2082351661-90] INFO  snake.base.Logger - User logged in: hwc
+2026-04-24 13:54:04.511 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: hwc
+2026-04-24 13:54:07.320 [gateway-gateway-2-worker-2] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 13:54:07.368 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 13:54:07.375 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 13:54:07.411 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 13:54:07.411 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 13:54:07.412 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by hwc
+2026-04-24 13:54:07.417 [actor-1] INFO  snake.base.Logger - Player hwc joined actor 1
+2026-04-24 13:54:25.632 [qtp2082351661-54] INFO  snake.base.Logger - User logged out: hwc
+2026-04-24 13:55:04.529 [pool-2-thread-1] WARN  snake.base.Logger - Client hwc heartbeat timeout, closing session
+2026-04-24 13:55:07.388 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 13:55:07.388 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 13:55:07.388 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 13:55:07.388 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 13:55:07.389 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 13:55:07.390 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 13:55:12.393 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 14:15:53.259 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 14:15:53.266 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 14:15:53.266 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 14:15:53.278 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 14:15:57.641 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 14:15:57.648 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 14:15:57.648 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 14:15:57.659 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 14:15:59.634 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 14:15:59.647 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 14:15:59.648 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 14:29:37.311 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:37.313 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:37.440 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 14:29:37.453 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 14:29:37.578 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-24 14:29:37.578 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-24 14:29:39.944 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 14:29:39.952 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:40.051 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 14:29:40.279 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 14:29:40.294 [main] INFO  snake.base.Logger - Loaded 0 records from MySQL to Redis
+2026-04-24 14:29:40.314 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 14:29:40.325 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 14:29:40.325 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 14:29:41.942 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:41.946 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 14:29:41.946 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:42.044 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 14:29:42.446 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 14:29:42.447 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 14:29:42.447 [main] INFO  snake.base.Logger - ReactorGateway-gateway-2 listening on port 9002
+2026-04-24 14:29:44.336 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:44.339 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 14:29:44.339 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:44.440 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 14:29:44.818 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 14:29:44.819 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 14:29:44.820 [main] INFO  snake.base.Logger - ReactorGateway-gateway-1 listening on port 9001
+2026-04-24 14:29:46.600 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 14:29:46.602 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:29:46.856 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 14:29:47.081 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 14:29:47.095 [main] INFO  snake.base.Logger - Loaded 0 records from MySQL to Redis
+2026-04-24 14:29:47.115 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 14:29:47.124 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 14:29:47.124 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 14:30:03.788 [qtp2082351661-90] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 14:30:03.817 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - User logged in: yhl
+2026-04-24 14:30:06.497 [gateway-gateway-2-worker-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-24 14:30:06.545 [worker-worker-2-dispatch] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:30:06.552 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-24 14:30:06.579 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-24 14:30:06.579 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-24 14:30:06.579 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by yhl
+2026-04-24 14:30:06.584 [actor-1] INFO  snake.base.Logger - Player yhl joined actor 1
+2026-04-24 14:30:06.817 [Thread-5] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 14:30:11.976 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - High score updated for yhl: 1
+2026-04-24 14:30:11.976 [ForkJoinPool.commonPool-worker-1] INFO  snake.base.Logger - MySQL updated: yhl -> 1
+2026-04-24 14:31:06.560 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-24 14:31:06.561 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-24 14:31:06.561 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-24 14:31:06.561 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-24 14:31:06.562 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-24 14:31:06.562 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-24 14:31:11.565 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-24 14:48:31.994 [qtp2082351661-94] INFO  snake.base.Logger - User logged out: yhl
+2026-04-24 15:00:28.301 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.305 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.454 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-24 15:00:28.457 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.465 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:00:28.481 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:00:28.525 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.537 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-1 on port 9001
+2026-04-24 15:00:28.537 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.572 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.578 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-2 on port 9002
+2026-04-24 15:00:28.579 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.593 [main] ERROR snake.base.Logger - Failed to start auth service: Failed to bind to 0.0.0.0/0.0.0.0:19001
+2026-04-24 15:00:28.598 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-24 15:00:28.602 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 15:00:28.634 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:00:28.675 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:00:28.752 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:00:28.768 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-24 15:00:28.981 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:00:29.017 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 15:00:29.036 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-24 15:00:29.049 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages
+2026-04-24 15:00:29.050 [main] INFO  snake.base.Logger - Worker worker-2 started
+2026-04-24 15:00:29.061 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-24 15:00:29.087 [main] INFO  snake.base.Logger - Loaded 2 records from MySQL to Redis
+2026-04-24 15:00:29.107 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-24 15:00:29.122 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages
+2026-04-24 15:00:29.122 [main] INFO  snake.base.Logger - Worker worker-1 started
+2026-04-24 15:00:29.266 [main] INFO  snake.base.Logger - Gateway registered: gateway-1
+2026-04-24 15:00:29.267 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 15:00:29.267 [main] ERROR snake.base.Logger - Failed to start gateway: 地址已在使用
+2026-04-24 15:00:29.292 [main] INFO  snake.base.Logger - Gateway registered: gateway-2
+2026-04-24 15:00:29.292 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-24 15:00:29.293 [main] ERROR snake.base.Logger - Failed to start gateway: 地址已在使用
+2026-04-24 15:31:39.933 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-24 15:31:39.941 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 15:31:39.942 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-24 15:34:44.553 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-24 15:34:44.560 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-24 15:34:44.560 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-24 15:34:44.564 [redisson-netty-1-9] ERROR io.netty.util.concurrent.DefaultPromise.rejectedExecution - Failed to submit a listener notification task. Event loop shut down?
+java.util.concurrent.RejectedExecutionException: event executor terminated
+	at io.netty.util.concurrent.SingleThreadEventExecutor.reject(SingleThreadEventExecutor.java:934) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.offerTask(SingleThreadEventExecutor.java:351) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.addTask(SingleThreadEventExecutor.java:344) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:836) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute0(SingleThreadEventExecutor.java:827) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.execute(SingleThreadEventExecutor.java:817) ~[netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.safeExecute(DefaultPromise.java:862) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:500) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess(DefaultPromise.java:97) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture.setSuccess0(DefaultChannelGroupFuture.java:200) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture.access$400(DefaultChannelGroupFuture.java:41) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:75) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.group.DefaultChannelGroupFuture$1.operationComplete(DefaultChannelGroupFuture.java:48) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:557) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.setSuccess0(DefaultPromise.java:625) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.DefaultPromise.trySuccess(DefaultPromise.java:105) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.DefaultChannelPromise.trySuccess(DefaultChannelPromise.java:84) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.safeSetSuccess(AbstractChannel.java:990) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.doClose0(AbstractChannel.java:756) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:731) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.close(AbstractChannel.java:620) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.close(DefaultChannelPipeline.java:1352) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext.invokeClose(AbstractChannelHandlerContext.java:755) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext.access$1200(AbstractChannelHandlerContext.java:61) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.channel.AbstractChannelHandlerContext$11.run(AbstractChannelHandlerContext.java:738) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569) [netty-transport-4.1.107.Final.jar:4.1.107.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) [netty-common-4.1.100.Final.jar:4.1.100.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1516) [?:?]
+2026-04-24 15:34:44.573 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 15:35:01.780 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-24 15:35:01.788 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-24 15:35:01.788 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-24 15:35:01.798 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-24 15:35:37.850 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:23:12.871 [Thread-5] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:29:49.399 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:38:36.991 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 17:50:16.574 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-24 19:26:28.970 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties

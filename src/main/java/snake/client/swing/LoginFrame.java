@@ -2,9 +2,10 @@ package snake.client.swing;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
-import snake.client.MainServerClient;
+import snake.client.GatewayClient;
 
 public class LoginFrame extends JFrame {
   private final GameApp app;
@@ -61,39 +62,7 @@ public class LoginFrame extends JFrame {
       JOptionPane.showMessageDialog(this, "Username and password required");
       return;
     }
-    new Thread(
-            () -> {
-              try (MainServerClient client =
-                  new MainServerClient(app.getServerHost(), app.getServerPort())) {
-                String response = client.login(user, pass);
-                if (response.startsWith("OK")) {
-                  String[] lines = response.split("\n");
-                  if (lines.length >= 2 && lines[1].startsWith("GATEWAY")) {
-                    String[] parts = lines[1].split(" ");
-                    if (parts.length == 3) {
-                      String gatewayHost = parts[1];
-                      int gatewayPort = Integer.parseInt(parts[2]);
-                      SwingUtilities.invokeLater(
-                          () -> {
-                            dispose();
-                            app.onLoginSuccess(user, gatewayHost, gatewayPort);
-                          });
-                      return;
-                    }
-                  }
-                }
-                SwingUtilities.invokeLater(
-                    () ->
-                        JOptionPane.showMessageDialog(
-                            LoginFrame.this, "Login failed: " + response));
-              } catch (IOException ex) {
-                SwingUtilities.invokeLater(
-                    () ->
-                        JOptionPane.showMessageDialog(
-                            LoginFrame.this, "Server connection error: " + ex.getMessage()));
-              }
-            })
-        .start();
+    authenticate(user, pass, "LOGIN");
   }
 
   private void doRegister(ActionEvent e) {
@@ -103,25 +72,77 @@ public class LoginFrame extends JFrame {
       JOptionPane.showMessageDialog(this, "Username and password required");
       return;
     }
+    authenticate(user, pass, "REGISTER");
+  }
+
+  private void authenticate(String username, String password, String cmd) {
+    // 禁用按钮防止重复点击
+    loginBtn.setEnabled(false);
+    registerBtn.setEnabled(false);
+
     new Thread(
             () -> {
-              try (MainServerClient client =
-                  new MainServerClient(app.getServerHost(), app.getServerPort())) {
-                String response = client.register(user, pass);
-                if (response.startsWith("OK")) {
-                  // 注册成功后自动登录
-                  doLogin(e);
-                } else {
-                  SwingUtilities.invokeLater(
-                      () ->
-                          JOptionPane.showMessageDialog(
-                              LoginFrame.this, "Register failed: " + response));
-                }
-              } catch (IOException ex) {
+              GatewayClient gateway = new GatewayClient(app.getServerHost(), app.getServerPort());
+              if (!gateway.connect()) {
                 SwingUtilities.invokeLater(
-                    () ->
-                        JOptionPane.showMessageDialog(
-                            LoginFrame.this, "Server connection error: " + ex.getMessage()));
+                    () -> {
+                      JOptionPane.showMessageDialog(
+                          LoginFrame.this, "Failed to connect to gateway");
+                      loginBtn.setEnabled(true);
+                      registerBtn.setEnabled(true);
+                    });
+                return;
+              }
+
+              Map<String, Object> msg = new HashMap<>();
+              msg.put("cmd", cmd);
+              msg.put("username", username);
+              msg.put("password", password);
+              gateway.sendJson(msg);
+              gateway.startMessageReceiver();
+
+              long start = System.currentTimeMillis();
+              boolean success = false;
+              String errorMsg = "Unknown error";
+
+              while (System.currentTimeMillis() - start < 5000) {
+                String resp = gateway.pollMessage();
+                if (resp != null) {
+                  if (resp.contains("\"cmd\":\"LOGIN_OK\"")) {
+                    success = true;
+                    break;
+                  } else if (resp.contains("\"cmd\":\"REGISTER_OK\"")) {
+                    // 注册成功，自动转为登录
+                    success = true;
+                    break;
+                  } else if (resp.contains("\"cmd\":\"ERROR\"")) {
+                    errorMsg = resp;
+                    break;
+                  }
+                }
+                try {
+                  Thread.sleep(100);
+                } catch (InterruptedException ignored) {
+                }
+              }
+
+              if (success) {
+                SwingUtilities.invokeLater(
+                    () -> {
+                      app.setGatewayClient(gateway);
+                      dispose();
+                      app.onLoginSuccess(username);
+                    });
+              } else {
+                final String finalError = errorMsg;
+                SwingUtilities.invokeLater(
+                    () -> {
+                      JOptionPane.showMessageDialog(
+                          LoginFrame.this, "Authentication failed: " + finalError);
+                      gateway.close();
+                      loginBtn.setEnabled(true);
+                      registerBtn.setEnabled(true);
+                    });
               }
             })
         .start();

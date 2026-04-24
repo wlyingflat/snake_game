@@ -137,10 +137,11 @@ public class GameFrame extends JFrame {
         new WindowAdapter() {
           @Override
           public void windowClosing(WindowEvent e) {
-            gateway.sendCommand("QUIT");
+            // 只清理监听器，不发送 QUIT（让 Gateway 保持连接）
             gateway.setGameStateListener(null);
             gateway.setDeathListener(null);
             running = false;
+            dispose();
             app.showRoomList();
           }
         });

@@ -7,21 +7,23 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import snake.base.Config;
+import snake.base.ILogger;
+import snake.base.Logger;
 
 public class NioSession implements ISession {
   public final SocketChannel channel;
   public final ByteBuffer readBuffer;
   public final Queue<String> writeQueue;
-  public final ByteBuffer writeBuffer; // 保留供未来优化，当前版本未使用
+  public final ByteBuffer writeBuffer;
   protected NioServer server;
 
-  // 用于保存未发送完的 ByteBuffer（大消息或部分发送的消息）
   private ByteBuffer pendingBuffer = null;
-
   private int expectedLength = -1;
   private final ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
   private ByteBuffer messageBuffer = null;
   private final String sessionId;
+
+  private static final ILogger logger = Logger.getInstance();
 
   public NioSession(SocketChannel channel, NioServer server) {
     this.channel = channel;
@@ -34,6 +36,9 @@ public class NioSession implements ISession {
 
   @Override
   public void sendMessage(String message) {
+    if (Config.DEBUG_MESSAGE_LOGGING) {
+      logger.debug("[SEND] session=" + sessionId + ", msg=" + message);
+    }
     writeQueue.add(message);
     if (server != null) {
       server.scheduleWrite(this);
@@ -93,6 +98,9 @@ public class NioSession implements ISession {
           byte[] body = new byte[messageBuffer.remaining()];
           messageBuffer.get(body);
           String json = new String(body, java.nio.charset.StandardCharsets.UTF_8);
+          if (Config.DEBUG_MESSAGE_LOGGING) {
+            logger.debug("[RECV] session=" + sessionId + ", msg=" + json);
+          }
           messages.add(json);
           expectedLength = -1;
           messageBuffer = null;

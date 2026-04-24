@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import snake.base.Config;
 import snake.base.ILogger;
 import snake.base.Logger;
+import snake.distributed.DistributedCoordinator;
 import snake.gateway.session.ClientSession;
 
 public class DefaultHeartbeatService implements HeartbeatService {
@@ -18,11 +19,19 @@ public class DefaultHeartbeatService implements HeartbeatService {
       new ConcurrentHashMap<>();
   private final ILogger logger = Logger.getInstance();
   private final Consumer<ClientSession> onTimeoutCallback;
+  private final DistributedCoordinator coordinator; // 新增
   private ScheduledExecutorService pingSender;
   private volatile boolean running = true;
 
-  public DefaultHeartbeatService(Consumer<ClientSession> onTimeoutCallback) {
+  public DefaultHeartbeatService(
+      Consumer<ClientSession> onTimeoutCallback, DistributedCoordinator coordinator) {
     this.onTimeoutCallback = onTimeoutCallback;
+    this.coordinator = coordinator;
+  }
+
+  // 兼容旧构造
+  public DefaultHeartbeatService(Consumer<ClientSession> onTimeoutCallback) {
+    this(onTimeoutCallback, null);
   }
 
   @Override
@@ -65,10 +74,26 @@ public class DefaultHeartbeatService implements HeartbeatService {
 
     Timeout newTimeout =
         timer.newTimeout(
-            timeout -> onTimeoutCallback.accept(session),
+            timeout -> {
+              logger.warn("Client " + session.username + " heartbeat timeout, closing session");
+              // 心跳超时，清理 Redis 在线状态
+              if (coordinator != null && session.username != null) {
+                coordinator.markOffline(session.username);
+                coordinator.removePlayerLocation(session.username);
+              }
+              if (onTimeoutCallback != null) {
+                onTimeoutCallback.accept(session);
+              }
+            },
             Config.HEARTBEAT_TIMEOUT,
             TimeUnit.SECONDS);
     sessionTimeouts.put(session, newTimeout);
+
+    // 续约 Redis 在线状态
+    if (coordinator != null && session.username != null) {
+      coordinator.refreshOnline(session.username);
+      coordinator.refreshPlayerLocation(session.username);
+    }
   }
 
   @Override
@@ -86,6 +111,12 @@ public class DefaultHeartbeatService implements HeartbeatService {
       timeout.cancel();
     }
     logger.debug("Removed heartbeat tracking for session: " + session.getSessionId());
+
+    // 清理 Redis 在线状态
+    if (coordinator != null && session.username != null) {
+      coordinator.markOffline(session.username);
+      coordinator.removePlayerLocation(session.username);
+    }
   }
 
   private void sendPings() {
@@ -101,6 +132,12 @@ public class DefaultHeartbeatService implements HeartbeatService {
         session.lastPingSent = nowSec;
         // 刷新超时计时器（延长下次超时时间）
         refresh(session);
+      }
+
+      // 即使不发送 PING，也续约 Redis 状态
+      if (coordinator != null && session.username != null) {
+        coordinator.refreshOnline(session.username);
+        coordinator.refreshPlayerLocation(session.username);
       }
     }
   }

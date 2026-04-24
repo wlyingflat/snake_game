@@ -1,23 +1,20 @@
-// snake/client/swing/RoomListFrame.java
 package snake.client.swing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import snake.client.GatewayClient;
-import snake.client.MainServerClient;
 
 public class RoomListFrame extends JFrame {
   private final GameApp app;
   private JList<String> roomList;
   private DefaultListModel<String> listModel;
-  private JButton refreshBtn, createBtn, joinBtn, logoutBtn;
+  private JButton refreshBtn, createBtn, joinBtn, logoutBtn, leaderboardBtn;
   private List<RoomEntry> rooms = new ArrayList<>();
 
   public RoomListFrame(GameApp app) {
@@ -33,14 +30,16 @@ public class RoomListFrame extends JFrame {
     roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     add(new JScrollPane(roomList), BorderLayout.CENTER);
 
-    JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 0));
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
     refreshBtn = new JButton("Refresh");
     createBtn = new JButton("Create Room");
     joinBtn = new JButton("Join Selected");
+    leaderboardBtn = new JButton("Leaderboard");
     logoutBtn = new JButton("Logout");
     buttonPanel.add(refreshBtn);
     buttonPanel.add(createBtn);
     buttonPanel.add(joinBtn);
+    buttonPanel.add(leaderboardBtn);
     buttonPanel.add(logoutBtn);
     add(buttonPanel, BorderLayout.SOUTH);
 
@@ -51,6 +50,7 @@ public class RoomListFrame extends JFrame {
     refreshBtn.addActionListener(e -> gateway.sendCommand("ROOM_LIST"));
     createBtn.addActionListener(e -> createRoom());
     joinBtn.addActionListener(e -> joinSelectedRoom());
+    leaderboardBtn.addActionListener(e -> showLeaderboard());
     logoutBtn.addActionListener(e -> logout());
 
     addWindowListener(
@@ -74,7 +74,6 @@ public class RoomListFrame extends JFrame {
               String status = r.get("status").asText();
               int players = r.get("players").asInt();
               int maxPlayers = r.get("maxPlayers").asInt();
-              // 只显示房间ID、状态、玩家数
               String line = String.format("%-3d %-7s %2d/%-4d", id, status, players, maxPlayers);
               rooms.add(new RoomEntry(id, line));
             }
@@ -133,14 +132,12 @@ public class RoomListFrame extends JFrame {
     }
   }
 
-  // snake/client/swing/RoomListFrame.java
   private boolean waitForJoinOk() {
     GatewayClient gateway = app.getGatewayClient();
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() - start < 5000) {
       String msg = gateway.pollMessage();
       if (msg != null) {
-        // 接受 CREATE_OK 或 JOIN_OK
         if (msg.contains("\"cmd\":\"CREATE_OK\"") || msg.contains("\"cmd\":\"JOIN_OK\"")) {
           return true;
         }
@@ -161,17 +158,19 @@ public class RoomListFrame extends JFrame {
   }
 
   private void logout() {
-    try (MainServerClient main = new MainServerClient(app.getServerHost(), app.getServerPort())) {
-      main.logout(app.getUsername());
-    } catch (IOException e) {
-      // ignore
-    }
     GatewayClient gateway = app.getGatewayClient();
-    gateway.sendCommand("QUIT");
+    gateway.sendCommand("LOGOUT");
     gateway.stopMessageReceiver();
     gateway.close();
     dispose();
     new LoginFrame(app).setVisible(true);
+  }
+
+  private void showLeaderboard() {
+    GatewayClient gateway = app.getGatewayClient();
+    if (gateway == null) return;
+    LeaderboardDialog dialog = new LeaderboardDialog(this, gateway);
+    dialog.setVisible(true);
   }
 
   static class RoomEntry {

@@ -77,13 +77,6 @@ public class GatewayClient {
     sendJson(msg);
   }
 
-  // 旧接口，向后兼容（逐步废弃）
-  public void send(String message) {
-    Map<String, Object> msg = new HashMap<>();
-    msg.put("cmd", message);
-    sendJson(msg);
-  }
-
   public synchronized void startMessageReceiver() {
     if (receiverStarted) return;
     receiverStarted = true;
@@ -160,6 +153,8 @@ public class GatewayClient {
         case "JOIN_OK":
         case "JOIN_FAIL":
         case "ERROR":
+        case "REGISTER_OK":
+        case "LOGIN_OK":
           messageQueue.offer(json);
           break;
         case "STATE":
@@ -172,6 +167,9 @@ public class GatewayClient {
           if (deathListener != null) {
             deathListener.onDeath();
           }
+          messageQueue.offer(json);
+          break;
+        case "LEADERBOARD": // 新增：排行榜响应
           messageQueue.offer(json);
           break;
         case "PING":
