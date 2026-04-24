@@ -1,3 +1,4 @@
+// snake/client/swing/RoomListFrame.java
 package snake.client.swing;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +24,7 @@ public class RoomListFrame extends JFrame {
     this.app = app;
     setTitle("Snake Game - Room List");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(600, 400);
+    setSize(500, 400);
     setLocationRelativeTo(null);
     setLayout(new BorderLayout());
 
@@ -63,7 +64,6 @@ public class RoomListFrame extends JFrame {
   }
 
   private void onRoomListUpdate(JsonNode root) {
-    System.out.println("[Client] Received room list: " + root.toString());
     SwingUtilities.invokeLater(
         () -> {
           rooms.clear();
@@ -74,12 +74,8 @@ public class RoomListFrame extends JFrame {
               String status = r.get("status").asText();
               int players = r.get("players").asInt();
               int maxPlayers = r.get("maxPlayers").asInt();
-              int port = r.get("port").asInt();
-              String createdAt = r.get("createdAt").asText();
-              String line =
-                  String.format(
-                      "%-3d %-7s %2d/%-4d %-7d %-10s",
-                      id, status, players, maxPlayers, port, createdAt);
+              // 只显示房间ID、状态、玩家数
+              String line = String.format("%-3d %-7s %2d/%-4d", id, status, players, maxPlayers);
               rooms.add(new RoomEntry(id, line));
             }
           }

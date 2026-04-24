@@ -6,54 +6,59 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import snake.common.*;
-import snake.util.*;
+import snake.common.User;
+import snake.util.Logger;
 
 public class UserManager {
-  private ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
-  private String filename;
+  private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
+  private final String filename;
   private final ReentrantReadWriteLock fileLock = new ReentrantReadWriteLock();
 
   public UserManager(String filename) {
     this.filename = filename;
     load();
-    // 注册 JVM shutdown hook，确保退出时保存
     Runtime.getRuntime().addShutdownHook(new Thread(this::save));
   }
 
-  public synchronized boolean register(String username, String password) {
-    if (users.containsKey(username)) return false;
-    User user = new User();
-    user.name = username;
-    user.salt = (int) (Math.random() * 0xFFFFFFFFL);
-    user.passwordHash = hashPassword(password, user.salt);
-    user.online = true;
-    user.lastActive = System.currentTimeMillis() / 1000;
-    users.put(username, user);
-    // 注册成功后立即保存
-    save();
+  public boolean register(String username, String password) {
+    User newUser = new User();
+    newUser.name = username;
+    newUser.salt = (int) (Math.random() * 0xFFFFFFFFL);
+    newUser.passwordHash = hashPassword(password, newUser.salt);
+    newUser.online = true;
+    newUser.lastActive = System.currentTimeMillis() / 1000;
+
+    User existing = users.putIfAbsent(username, newUser);
+    if (existing != null) {
+      return false; // 用户名已存在
+    }
+    save(); // 持久化
     return true;
   }
 
-  public synchronized boolean login(String username, String password) {
+  public boolean login(String username, String password) {
     User user = users.get(username);
     if (user == null) return false;
-    if (user.online) return false;
-    byte[] hash = hashPassword(password, user.salt);
-    if (!Arrays.equals(hash, user.passwordHash)) return false;
-    user.online = true;
-    user.lastActive = System.currentTimeMillis() / 1000;
-    // 登录状态变化可选保存，但为性能可暂不保存，退出时统一保存
-    // 但为了可靠性，也可以调用 save() 或异步保存
+
+    synchronized (user) {
+      if (user.online) return false;
+      byte[] hash = hashPassword(password, user.salt);
+      if (!Arrays.equals(hash, user.passwordHash)) return false;
+      user.online = true;
+      user.lastActive = System.currentTimeMillis() / 1000;
+    }
     return true;
   }
 
-  public synchronized boolean logout(String username) {
+  public boolean logout(String username) {
     User user = users.get(username);
     if (user == null) return false;
-    user.online = false;
-    user.lastActive = System.currentTimeMillis() / 1000;
-    // 同上，退出时保存即可
+
+    synchronized (user) {
+      if (!user.online) return false;
+      user.online = false;
+      user.lastActive = System.currentTimeMillis() / 1000;
+    }
     return true;
   }
 
@@ -70,7 +75,6 @@ public class UserManager {
   private void load() {
     File file = new File(filename);
     if (!file.exists()) {
-      // 文件不存在，创建空文件，避免后续操作异常
       try {
         file.createNewFile();
       } catch (IOException e) {
@@ -78,19 +82,22 @@ public class UserManager {
       }
       return;
     }
-    fileLock.writeLock().lock();
+
+    fileLock.readLock().lock();
     try (BufferedReader br = new BufferedReader(new FileReader(file))) {
       String line;
       while ((line = br.readLine()) != null) {
         if (line.isEmpty() || line.startsWith("#")) continue;
         String[] parts = line.split(" ");
         if (parts.length < 5) continue;
+
         String username = parts[0];
         int salt = (int) Long.parseLong(parts[1], 16);
         String hashHex = parts[2];
         byte[] hash = hexToBytes(hashHex);
         boolean online = Integer.parseInt(parts[3]) != 0;
         long lastActive = Long.parseLong(parts[4]);
+
         User user = new User();
         user.name = username;
         user.salt = salt;
@@ -102,17 +109,17 @@ public class UserManager {
     } catch (IOException e) {
       Logger.error("Load users error: " + e.getMessage());
     } finally {
-      fileLock.writeLock().unlock();
+      fileLock.readLock().unlock();
     }
   }
 
-  /** 原子保存用户数据到文件（先写临时文件，再 rename 覆盖原文件） */
   public void save() {
-    // 创建临时文件
+    // 创建快照，避免在写文件过程中 users 被修改
+    List<User> snapshot = new ArrayList<>(users.values());
     File tempFile = new File(filename + ".tmp");
     fileLock.writeLock().lock();
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
-      for (User user : users.values()) {
+      for (User user : snapshot) {
         bw.write(
             String.format(
                 "%s %08x %s %d %d\n",
@@ -123,7 +130,7 @@ public class UserManager {
                 user.lastActive));
       }
       bw.flush();
-      // 原子替换
+
       File target = new File(filename);
       if (target.exists() && !target.delete()) {
         Logger.error("Failed to delete old user file");

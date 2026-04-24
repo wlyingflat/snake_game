@@ -53,6 +53,7 @@ public class Config {
   public static final int BASE_ROOM_PORT = getInt("base.room.port", 20000);
   public static final int ROOM_IDLE_TIMEOUT = getInt("room.idle.timeout", 30);
   public static final int ROOM_INIT_DELAY_TICKS = getInt("room.init.delay.ticks", 5);
+  public static final int ROOM_QUEUE_CAPACITY = getInt("room.queue.capacity", 1024); // 新增：房间消息队列容量
 
   // 游戏
   public static final int MAP_WIDTH = getInt("map.width", 40);
@@ -69,7 +70,7 @@ public class Config {
   public static final int HEARTBEAT_TIMEOUT = getInt("heartbeat.timeout", 60);
   public static final int GATEWAY_NOTIFY_PORT = getInt("gateway.notify.port", 19001);
   public static final int ROOM_LIST_QUERY_PORT = getInt("room.list.query.port", 19003);
-  public static final int GATEWAY_ADMIN_PORT = getInt("gateway.admin.port", 19004); // 新增
+  public static final int GATEWAY_ADMIN_PORT = getInt("gateway.admin.port", 19004);
 
   // 房间服务器注册端口
   public static final int ROOM_REGISTER_PORT = getInt("room.register.port", 19002);

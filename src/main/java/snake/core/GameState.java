@@ -19,13 +19,6 @@ public class GameState {
   public GameState(int roomId) {
     this.roomId = roomId;
     initWorld();
-    Logger.info(
-        "[GameState] Room "
-            + roomId
-            + " initialized, obstacles="
-            + Config.OBSTACLE_COUNT
-            + ", food="
-            + food);
   }
 
   private void initWorld() {

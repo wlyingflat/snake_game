@@ -1,6 +1,5 @@
 package snake.common;
 
-
 public class User {
   public String name;
   public int salt; // 32-bit salt

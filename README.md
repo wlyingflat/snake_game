@@ -1,5 +1,6 @@
-Config.java 硬编码配置改用 .properties
-ByteBuffer改用健康DirectByteBuffer
-使用更标准的协议通信
-广播机制优化
-java客户端
+Gateway重构
+心跳机制完善
+解耦合RoomManager与网关
+错误处理 & 日志
+心跳机制时间轮
+房间列表快照减轻
