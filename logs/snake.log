@@ -6879,3 +6879,78 @@ java.util.concurrent.RejectedExecutionException: event executor terminated
 2026-04-25 15:47:03.546 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
 2026-04-25 15:47:03.546 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
 2026-04-25 15:50:17.373 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Resetting the last seen epoch of partition game.player.score-0 to 2 since the associated topicId changed from null to q_FdLKBnTMOMWIHXUKKsSg
+2026-04-25 15:54:15.401 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 15:54:17.613 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 16:16:29.517 [Thread-0] INFO  snake.base.Logger - Shutting down gateway gateway-8080-5785093f...
+2026-04-25 16:16:29.532 [Thread-0] INFO  snake.base.Logger - HeartbeatService stopped
+2026-04-25 16:16:31.541 [Thread-0] INFO  snake.base.Logger - Gateway unregistered: gateway-8080-5785093f
+2026-04-25 16:16:31.552 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 16:16:31.553 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 16:16:31.553 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 16:16:33.043 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:33.046 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-8080-c6301bc4 on port 8080
+2026-04-25 16:16:33.046 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:33.090 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 16:16:33.189 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@623e088f
+2026-04-25 16:16:33.190 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 16:16:33.190 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 16:16:33.257 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 16:16:33.348 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 16:16:33.383 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 16:16:33.395 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:33.425 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 16:16:33.560 [main] INFO  snake.base.Logger - Gateway gateway-8080-c6301bc4 subscribed to room list updates
+2026-04-25 16:16:33.560 [main] INFO  snake.base.Logger - Gateway subscribed to room list updates via RabbitMQ
+2026-04-25 16:16:33.568 [main] INFO  snake.base.Logger - Gateway gateway-8080-c6301bc4 subscribed to queue gateway.queue.gateway-8080-c6301bc4
+2026-04-25 16:16:33.587 [main] INFO  snake.base.Logger - Gateway registered: gateway-8080-c6301bc4
+2026-04-25 16:16:33.587 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-25 16:16:33.616 [main] INFO  snake.base.Logger - GatewayServer started on port 8080
+2026-04-25 16:16:33.616 [main] INFO  snake.base.Logger - Gateway gateway-8080-c6301bc4 started on port 8080
+2026-04-25 16:16:34.300 [Thread-0] INFO  snake.base.Logger - Shutting down gateway gateway-8081-6738406c...
+2026-04-25 16:16:34.317 [Thread-0] INFO  snake.base.Logger - HeartbeatService stopped
+2026-04-25 16:16:36.324 [Thread-0] INFO  snake.base.Logger - Gateway unregistered: gateway-8081-6738406c
+2026-04-25 16:16:36.334 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 16:16:36.336 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 16:16:36.336 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 16:16:37.811 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:37.814 [main] INFO  snake.base.Logger - Starting Reactor Gateway gateway-8081-8ebc9515 on port 8081
+2026-04-25 16:16:37.814 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:37.838 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 16:16:37.920 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@623e088f
+2026-04-25 16:16:37.920 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 16:16:37.921 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 16:16:37.987 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 16:16:38.077 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 16:16:38.111 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 16:16:38.123 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:16:38.153 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 16:16:38.283 [main] INFO  snake.base.Logger - Gateway gateway-8081-8ebc9515 subscribed to room list updates
+2026-04-25 16:16:38.283 [main] INFO  snake.base.Logger - Gateway subscribed to room list updates via RabbitMQ
+2026-04-25 16:16:38.290 [main] INFO  snake.base.Logger - Gateway gateway-8081-8ebc9515 subscribed to queue gateway.queue.gateway-8081-8ebc9515
+2026-04-25 16:16:38.308 [main] INFO  snake.base.Logger - Gateway registered: gateway-8081-8ebc9515
+2026-04-25 16:16:38.309 [main] INFO  snake.base.Logger - HeartbeatService started
+2026-04-25 16:16:38.348 [main] INFO  snake.base.Logger - GatewayServer started on port 8081
+2026-04-25 16:16:38.348 [main] INFO  snake.base.Logger - Gateway gateway-8081-8ebc9515 started on port 8081
+2026-04-25 16:16:38.440 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 16:16:43.172 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 16:16:47.303 [qtp1155769010-103] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 16:16:47.328 [defaultEventExecutorGroup-5-1] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 16:16:50.655 [defaultEventExecutorGroup-5-1] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-25 16:16:50.660 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-25 16:16:50.663 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-25 16:16:50.670 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-25 16:16:50.671 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-25 16:16:50.679 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-25 16:16:50.914 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 16:17:02.543 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-25 16:17:12.363 [qtp1155769010-60] INFO  snake.base.Logger - User logged out: wmh
+2026-04-25 16:17:50.663 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-25 16:17:50.663 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-25 16:17:50.663 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-25 16:17:50.663 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-25 16:17:50.664 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-25 16:17:50.666 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-25 16:17:55.667 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
+2026-04-25 16:17:55.668 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-25 16:19:17.729 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Resetting the last seen epoch of partition game.player.score-0 to 2 since the associated topicId changed from null to q_FdLKBnTMOMWIHXUKKsSg
+2026-04-25 16:20:48.549 [pool-2-thread-1] INFO  snake.base.Logger - Loaded 4 records from MySQL to Redis

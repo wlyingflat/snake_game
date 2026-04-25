@@ -5,7 +5,6 @@ import org.redisson.api.RedissonClient;
 import snake.base.*;
 import snake.distributed.DistributedCoordinator;
 import snake.gateway.auth.GatewayAuthClient;
-import snake.gateway.dispatcher.MessageDispatcher;
 import snake.gateway.heartbeat.DefaultHeartbeatService;
 import snake.gateway.heartbeat.HeartbeatService;
 import snake.gateway.reactor.ReactorGateway;
@@ -61,18 +60,10 @@ public class GatewayMain {
             coordinator);
 
     GatewayAuthClient authClient = new GatewayAuthClient(authServiceUrl);
-    MessageDispatcher dispatcher = new MessageDispatcher(coordinator, messageBus, gatewayId);
 
     ReactorGateway gateway =
         new ReactorGateway(
-            port,
-            sessionManager,
-            heartbeatService,
-            dispatcher,
-            authClient,
-            coordinator,
-            messageBus,
-            gatewayId);
+            port, sessionManager, heartbeatService, authClient, coordinator, messageBus, gatewayId);
 
     // 房间列表更新广播（RabbitMQ）
     if (messageBus != null) {
