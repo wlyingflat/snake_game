@@ -2,7 +2,7 @@ package snake.application.actor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 import snake.common.Config;
 import snake.common.ILogger;
 import snake.common.Logger;
@@ -35,11 +35,13 @@ public class ActorManager {
   }
 
   public GameActor getOrCreateActor(int roomId) {
+    // 快速本地检查
     GameActor existing = actors.get(roomId);
     if (existing != null) {
       return existing;
     }
 
+    // 分布式协调（Redis），保证跨节点唯一
     if (coordinator.roomExists(roomId)) {
       String existingWorker = coordinator.getRoomWorker(roomId);
       if (existingWorker != null && !existingWorker.equals(workerId)) {
@@ -56,45 +58,48 @@ public class ActorManager {
 
     coordinator.assignRoomToWorker(roomId, workerId);
 
-    final AtomicReference<GameActor> actorRef = new AtomicReference<>();
+    // 原子创建本地 Actor，避免重复构造资源
+    AtomicBoolean created = new AtomicBoolean(false);
     GameActor actor =
-        new GameActor(
+        actors.computeIfAbsent(
             roomId,
-            coordinator,
-            workerId,
-            eventProducer,
-            messageBus,
-            () -> {
-              GameActor a = actorRef.get();
-              if (a != null && a.isRunning()) {
-                updateRoomInfo(roomId, a);
-              } else {
-                logger.info("Actor " + roomId + " stopped, cleaning up...");
-                removeActor(roomId);
-              }
-              if (onActorStatusChange != null) {
-                onActorStatusChange.run();
-              }
-              // 房间状态变化（玩家加入/离开/关闭）→ 广播房间列表更新
-              if (messageBus != null) {
-                messageBus.publishRoomListUpdate();
-              }
+            id -> {
+              GameActor newActor =
+                  new GameActor(
+                      id,
+                      coordinator,
+                      workerId,
+                      eventProducer,
+                      messageBus,
+                      () -> {
+                        // 状态变化回调：更新房间信息或清理
+                        GameActor a = actors.get(id);
+                        if (a != null && a.isRunning()) {
+                          updateRoomInfo(id, a);
+                        } else {
+                          logger.info("Actor " + id + " stopped, cleaning up...");
+                          removeActor(id);
+                        }
+                        if (onActorStatusChange != null) {
+                          onActorStatusChange.run();
+                        }
+                        // 房间状态变化（玩家加入/离开/关闭）→ 广播房间列表更新
+                        if (messageBus != null) {
+                          messageBus.publishRoomListUpdate();
+                        }
+                      });
+              newActor.start(); // 在原子插入前启动
+              created.set(true);
+              return newActor;
             });
 
-    actorRef.set(actor);
-
-    GameActor previous = actors.putIfAbsent(roomId, actor);
-    if (previous != null) {
-      actor.stop();
-      return previous;
+    if (created.get()) {
+      // 新房间创建，广播更新
+      if (messageBus != null) {
+        messageBus.publishRoomListUpdate();
+      }
+      logger.info("Actor " + roomId + " created on worker " + workerId);
     }
-
-    // 新房间创建，广播更新
-    if (messageBus != null) {
-      messageBus.publishRoomListUpdate();
-    }
-
-    logger.info("Actor " + roomId + " created on worker " + workerId);
     return actor;
   }
 
@@ -111,7 +116,6 @@ public class ActorManager {
       }
     }
     coordinator.deleteRoom(roomId);
-    // 房间删除，广播更新
     if (messageBus != null) {
       messageBus.publishRoomListUpdate();
     }

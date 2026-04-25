@@ -3,7 +3,6 @@ package snake.domain.game;
 import java.util.*;
 import snake.common.Position;
 
-/** 负责记录 GameState 的“前一帧”快照，并在需要时比较当前帧生成差分。 由 GameTickProcessor 在 tick 前后调用。 */
 public class GameStateDiffer {
 
   private final GameState state;
@@ -35,11 +34,7 @@ public class GameStateDiffer {
   /** 在 state.update() 之后调用，生成 GameStateDiff */
   public GameStateDiff computeDiff() {
     GameStateDiff diff = new GameStateDiff();
-    diff.roomId = state.snapshot(null).roomId; // 简单地获取 roomId，也可从 state 直接引入
-    // 实际 roomId 可以从外部传入，这里简单通过快照
-    // 更好的方式：GameState 暴露 getRoomId()，我们使用 state 内部属性（但 state 不暴露 roomId，可加一个 getter）
-    // 为了简洁，这里用一个临时变量：实际 GameState 应该有个 getRoomId()，在下方修正
-    diff.roomId = getRoomId(); // 调用下面的私有方法
+    diff.roomId = state.getRoomId(); // 修复：直接使用 getter
 
     // 食物变化
     if (!state.getFood().equals(previousFood)) {
@@ -65,7 +60,6 @@ public class GameStateDiffer {
       // 存活玩家，构造 PlayerDiff
       PlayerDiff pd = new PlayerDiff();
       pd.newHead = player.body.get(0);
-      // 简单判断尾巴是否移除：如果蛇身长度增加，不移除尾巴
       boolean grew = (player.body.size() > prevBody.size());
       pd.removeTail = !grew;
       pd.length = player.length;
@@ -80,11 +74,5 @@ public class GameStateDiffer {
     }
 
     return diff;
-  }
-
-  // 临时方法，理想情况应在 GameState 中添加 getRoomId()
-  private int getRoomId() {
-    // 通过快照获取 roomId（不够优雅，但可工作）
-    return state.snapshot(null).roomId;
   }
 }

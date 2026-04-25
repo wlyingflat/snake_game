@@ -22,6 +22,10 @@ public class GameState {
     initWorld();
   }
 
+  public int getRoomId() {
+    return roomId;
+  }
+
   private void initWorld() {
     for (int y = 0; y < Config.MAP_HEIGHT; y++) {
       for (int x = 0; x < Config.MAP_WIDTH; x++) {

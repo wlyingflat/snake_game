@@ -70,6 +70,7 @@ public class LeaderboardConsumer implements Runnable {
   public void stop() {
     running = false;
     consumer.wakeup();
+    eventHandler.shutdown();
   }
 
   // main 方法保持不变，但内部改用新的构造函数

@@ -1,6 +1,7 @@
 package snake.application.actor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import snake.common.*;
 import snake.distributed.DistributedCoordinator;
 import snake.domain.game.GameState;
@@ -11,6 +12,7 @@ import snake.infrastructure.messaging.MessageBus;
 /**
  * 重构后的 GameActor 仅负责： - 组合各个组件（ActorEventLoop, ActorScheduler, GameMessageHandler,
  * GameTickProcessor） - 提供外部 API（postMessage, getSnapshot, stop, isRunning） - 协调组件间的交互
+ * 构造与启动分离：构造后需调用 start() 才能真正运行。
  */
 public class GameActor {
   private final int roomId;
@@ -21,10 +23,11 @@ public class GameActor {
   private final GameMessageHandler messageHandler;
   private final ActorNotifier notifier;
   private final DistributedCoordinator coordinator;
-  private final GameState state; // 暴露给外部获取玩家列表等
+  private final GameState state;
   private final Runnable onStatusChange;
   private final AtomicBoolean running = new AtomicBoolean(true);
-  private volatile long lastActiveTime = System.currentTimeMillis();
+  private final AtomicBoolean started = new AtomicBoolean(false); // 启动状态
+  private final AtomicLong lastActiveTime = new AtomicLong(System.currentTimeMillis());
   private final ILogger logger = Logger.getInstance();
 
   public GameActor(
@@ -56,7 +59,7 @@ public class GameActor {
               public void onTick() {
                 // 每次 tick 更新时间戳
                 if (!state.isEmpty()) {
-                  lastActiveTime = System.currentTimeMillis();
+                  lastActiveTime.set(System.currentTimeMillis());
                 }
                 tickProcessor.processTick();
               }
@@ -72,11 +75,17 @@ public class GameActor {
         new ActorScheduler(
             roomId, () -> eventLoop.publishEvent(new TickMessage()), this::checkIdleAndStop);
 
-    // 启动 Disruptor 和调度器
-    eventLoop.start();
-    scheduler.start();
+    // 注意：不再在这里启动 Disruptor 和调度器，由 start() 统一管理
+    logger.info("Actor " + roomId + " constructed on worker " + this.workerId);
+  }
 
-    logger.info("Actor " + roomId + " started on worker " + this.workerId);
+  /** 启动事件循环和调度器（幂等） */
+  public void start() {
+    if (started.compareAndSet(false, true)) {
+      eventLoop.start();
+      scheduler.start();
+      logger.info("Actor " + roomId + " started on worker " + this.workerId);
+    }
   }
 
   public void postMessage(EnhancedMessage msg) {
@@ -113,6 +122,7 @@ public class GameActor {
       }
     }
 
+    // 停止调度器与事件循环（即使未 start 也可安全调用）
     scheduler.stop();
     eventLoop.shutdown();
     logger.info("Actor " + roomId + " destroyed.");
@@ -121,7 +131,7 @@ public class GameActor {
   private void checkIdleAndStop() {
     if (!running.get()) return;
     if (state.isEmpty()) {
-      long idleMillis = System.currentTimeMillis() - lastActiveTime;
+      long idleMillis = System.currentTimeMillis() - lastActiveTime.get();
       if (idleMillis > Config.ROOM_IDLE_TIMEOUT * 1000L) {
         logger.info("Actor " + roomId + " idle timeout, stopping.");
         stop();

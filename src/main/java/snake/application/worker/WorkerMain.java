@@ -2,6 +2,7 @@ package snake.application.worker;
 
 import java.util.UUID;
 import org.redisson.api.RedissonClient;
+import snake.application.actor.ActorScheduler;
 import snake.common.IConfigProvider;
 import snake.common.ILogger;
 import snake.common.Logger;
@@ -71,6 +72,7 @@ public class WorkerMain {
                 () -> {
                   logger.info("Shutting down worker " + workerId + "...");
                   worker.stop();
+                  ActorScheduler.shutdownGlobal();
                   if (finalMessageBus != null) {
                     finalMessageBus.close();
                   }
