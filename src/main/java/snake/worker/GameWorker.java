@@ -83,8 +83,9 @@ public class GameWorker {
   }
 
   private void dispatchToActor(String rawMsg) {
+    EnhancedMessage msg = null;
     try {
-      EnhancedMessage msg = EnhancedMessage.fromJson(rawMsg);
+      msg = EnhancedMessage.fromJson(rawMsg);
       if (msg == null) return;
 
       int roomId = msg.getRoomId();
@@ -104,9 +105,17 @@ public class GameWorker {
         return;
       }
 
-      actor.postMessage(msg);
+      actor.postMessage(msg); // 将池化对象移交给 Disruptor，由它负责回收
+      // 注意：不要在这里 msg.recycle()，因为已经 post 给 Disruptor 异步处理
+      // 将 msg 置 null，避免 finally 中重复回收
+      EnhancedMessage toRecycle = msg;
+      msg = null;
+      // 正常路径下不在这里回收，但如果在 post 之前异常，msg 需要回收
     } catch (Exception e) {
       logger.error("Failed to dispatch message: " + e.getMessage());
+      if (msg != null) {
+        msg.recycle();
+      }
     }
   }
 
@@ -115,9 +124,13 @@ public class GameWorker {
 
     if (coordinator.roomExists(roomId)) {
       EnhancedMessage joinMsg =
-          new EnhancedMessage(
-              "JOIN", msg.getUsername(), roomId, msg.getGatewayId(), msg.getRawMessage());
-      dispatchToActor(joinMsg.toJson());
+          EnhancedMessage.newInstance()
+              .init("JOIN", msg.getUsername(), roomId, msg.getGatewayId(), msg.getRawMessage());
+      try {
+        dispatchToActor(joinMsg.toJson());
+      } finally {
+        joinMsg.recycle();
+      }
       return;
     }
 
@@ -131,9 +144,17 @@ public class GameWorker {
     }
 
     EnhancedMessage joinMsg =
-        new EnhancedMessage(
-            "JOIN", msg.getUsername(), roomId, msg.getGatewayId(), msg.getRawMessage());
-    actor.postMessage(joinMsg);
+        EnhancedMessage.newInstance()
+            .init("JOIN", msg.getUsername(), roomId, msg.getGatewayId(), msg.getRawMessage());
+    try {
+      actor.postMessage(joinMsg);
+      // 已提交到 Disruptor，由它负责回收，这里不能 recycle
+      joinMsg = null; // 防止 finally 中回收
+    } finally {
+      if (joinMsg != null) {
+        joinMsg.recycle();
+      }
+    }
     logger.info("Room " + roomId + " created by " + msg.getUsername());
   }
 

@@ -1,24 +1,53 @@
 package snake.event;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.UUID;
+import io.netty.util.Recycler;
 import snake.base.JsonUtils;
 
 public class ScoreChangedEvent implements GameEvent {
-  public final String eventId;
-  public final long timestamp;
-  public final String username;
-  public final int roomId;
-  public final int newScore;
-  public final int delta;
 
-  public ScoreChangedEvent(String username, int roomId, int newScore, int delta) {
-    this.eventId = UUID.randomUUID().toString();
+  private static final Recycler<ScoreChangedEvent> RECYCLER =
+      new Recycler<ScoreChangedEvent>() {
+        @Override
+        protected ScoreChangedEvent newObject(Handle<ScoreChangedEvent> handle) {
+          return new ScoreChangedEvent(handle);
+        }
+      };
+
+  private final Recycler.Handle<ScoreChangedEvent> handle;
+
+  public static ScoreChangedEvent newInstance() {
+    return RECYCLER.get();
+  }
+
+  private ScoreChangedEvent(Recycler.Handle<ScoreChangedEvent> handle) {
+    this.handle = handle;
+  }
+
+  public String eventId;
+  public long timestamp;
+  public String username;
+  public int roomId;
+  public int newScore;
+  public int delta;
+
+  public ScoreChangedEvent init(String username, int roomId, int newScore, int delta) {
+    this.eventId = java.util.UUID.randomUUID().toString();
     this.timestamp = System.currentTimeMillis();
     this.username = username;
     this.roomId = roomId;
     this.newScore = newScore;
     this.delta = delta;
+    return this;
+  }
+
+  private void clear() {
+    this.username = null;
+  }
+
+  public void recycle() {
+    clear();
+    handle.recycle(this);
   }
 
   @Override

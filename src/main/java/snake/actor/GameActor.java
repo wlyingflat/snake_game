@@ -32,9 +32,8 @@ public class GameActor {
   private long lastActiveTime;
   private final ILogger logger = Logger.getInstance();
 
-  // 定期全量纠正间隔（tick 次数）
   private int tickSinceLastFullState = 0;
-  private static final int FULL_STATE_INTERVAL_TICKS = 100; // 可根据 Config 调整
+  private static final int FULL_STATE_INTERVAL_TICKS = 100;
 
   public GameActor(
       int roomId,
@@ -70,7 +69,12 @@ public class GameActor {
           if (msg instanceof TickMessage) {
             doGameTick();
           } else if (msg instanceof EnhancedMessage) {
-            handleEnhancedMessage((EnhancedMessage) msg);
+            EnhancedMessage enhanced = (EnhancedMessage) msg;
+            try {
+              handleEnhancedMessage(enhanced);
+            } finally {
+              enhanced.recycle(); // 处理完毕后回收池化对象
+            }
           }
           event.clear();
         });
@@ -112,16 +116,10 @@ public class GameActor {
     logger.info("Actor " + roomId + " started on worker " + this.workerId);
   }
 
-  // ==================== 外部接口 ====================
   public void postMessage(EnhancedMessage msg) {
     if (!running.get()) return;
     publishEvent(msg);
   }
-
-  // public void post(Message msg) {
-  //   if (!running.get()) return;
-  //   publishEvent(msg);
-  // }
 
   public int getRoomId() {
     return roomId;
@@ -135,7 +133,6 @@ public class GameActor {
     return cachedSnapshot;
   }
 
-  // ==================== 消息处理 ====================
   private void handleEnhancedMessage(EnhancedMessage msg) {
     switch (msg.getCommand()) {
       case "CREATE":
@@ -161,7 +158,6 @@ public class GameActor {
       if (gatewayId != null) {
         coordinator.setPlayerLocation(username, gatewayId, roomId);
       }
-      // 向新玩家发送全量快照
       sendFullStateTo(username, gatewayId);
       logger.info("Player " + username + " joined actor " + roomId);
       if (onStatusChange != null) onStatusChange.run();
@@ -170,7 +166,6 @@ public class GameActor {
       notifier.sendToPlayer(username, gatewayId, joinFail);
       logger.warn("Player " + username + " failed to join actor " + roomId);
     }
-    // 加入后也需要更新其他玩家的差分/全量，由下一 tick 处理
   }
 
   private void handleInput(EnhancedMessage msg) {
@@ -193,7 +188,6 @@ public class GameActor {
     updateCachedSnapshotAndBroadcast();
   }
 
-  // ==================== 游戏逻辑 ====================
   private void doGameTick() {
     if (!state.isEmpty()) {
       lastActiveTime = System.currentTimeMillis();
@@ -239,7 +233,6 @@ public class GameActor {
       notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");
     }
 
-    // 决定发送全量还是增量
     tickSinceLastFullState++;
     boolean forceFull =
         (tickSinceLastFullState >= FULL_STATE_INTERVAL_TICKS) || state.hasNewPlayer();
@@ -255,7 +248,6 @@ public class GameActor {
     }
   }
 
-  /** 全量广播 - 原有逻辑 */
   private void updateCachedSnapshotAndBroadcast() {
     cachedSnapshot = state.snapshot(null);
     if (cachedSnapshot == null) return;
@@ -268,12 +260,10 @@ public class GameActor {
     }
   }
 
-  /** 只更新缓存的快照（不广播） */
   private void updateCachedSnapshot() {
     cachedSnapshot = state.snapshot(null);
   }
 
-  /** 增量广播 */
   private void broadcastDiff() {
     GameStateDiff diff = state.computeDiff();
     if (diff == null) return;
@@ -286,7 +276,6 @@ public class GameActor {
     }
   }
 
-  /** 向指定玩家发送全量快照（用于新玩家加入） */
   private void sendFullStateTo(String username, String gatewayId) {
     if (cachedSnapshot == null) {
       cachedSnapshot = state.snapshot(username);
@@ -333,7 +322,6 @@ public class GameActor {
     logger.info("Actor " + roomId + " destroyed.");
   }
 
-  // ==================== 辅助方法 ====================
   private void publishEvent(Message msg) {
     try {
       long sequence = ringBuffer.tryNext();
@@ -342,6 +330,10 @@ public class GameActor {
       ringBuffer.publish(sequence);
     } catch (InsufficientCapacityException e) {
       logger.warn("Actor " + roomId + " ring buffer full");
+      // 如果提交失败，需要回收 EnhancedMessage
+      if (msg instanceof EnhancedMessage) {
+        ((EnhancedMessage) msg).recycle();
+      }
     }
   }
 

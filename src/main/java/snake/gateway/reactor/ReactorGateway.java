@@ -1,10 +1,23 @@
 package snake.gateway.reactor;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.io.IOException;
-import java.nio.channels.SocketChannel;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.*;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.AttributeKey;
+import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 import java.util.concurrent.TimeUnit;
 import snake.actor.EnhancedMessage;
 import snake.base.*;
@@ -15,18 +28,26 @@ import snake.gateway.heartbeat.HeartbeatService;
 import snake.gateway.session.ClientSession;
 import snake.gateway.session.SessionManager;
 import snake.mq.MessageBus;
-import snake.network.ISession;
-import snake.network.NioServer;
+import snake.network.IServer;
 
-public class ReactorGateway extends NioServer {
+public class ReactorGateway implements IServer {
+  private static final AttributeKey<ClientSession> SESSION_KEY = AttributeKey.valueOf("session");
+
+  private final int port;
   private final SessionManager sessionManager;
   private final HeartbeatService heartbeatService;
   private final MessageDispatcher dispatcher;
   private final GatewayAuthClient authClient;
   private final DistributedCoordinator coordinator;
   private final String gatewayId;
-  private final ExecutorService workerPool;
+  private final EventExecutorGroup bizGroup;
   private final MessageBus messageBus;
+
+  private EventLoopGroup bossGroup;
+  private EventLoopGroup workerGroup;
+  private Channel serverChannel;
+
+  private final ILogger logger = Logger.getInstance();
 
   public ReactorGateway(
       int port,
@@ -37,7 +58,7 @@ public class ReactorGateway extends NioServer {
       DistributedCoordinator coordinator,
       MessageBus messageBus,
       String gatewayId) {
-    super(port);
+    this.port = port;
     this.sessionManager = sessionManager;
     this.heartbeatService = heartbeatService;
     this.dispatcher = dispatcher;
@@ -46,16 +67,7 @@ public class ReactorGateway extends NioServer {
     this.messageBus = messageBus;
     this.gatewayId = gatewayId;
 
-    final java.util.concurrent.atomic.AtomicLong counter =
-        new java.util.concurrent.atomic.AtomicLong(0);
-    this.workerPool =
-        Executors.newCachedThreadPool(
-            r -> {
-              Thread t =
-                  new Thread(r, "gateway-" + gatewayId + "-worker-" + counter.incrementAndGet());
-              t.setDaemon(true);
-              return t;
-            });
+    this.bizGroup = new DefaultEventExecutorGroup(16);
   }
 
   public String getGatewayId() {
@@ -63,68 +75,195 @@ public class ReactorGateway extends NioServer {
   }
 
   @Override
-  protected String getServerName() {
-    return "ReactorGateway-" + gatewayId;
+  public void start() throws Exception {
+    if (coordinator != null) coordinator.registerGateway(gatewayId);
+    heartbeatService.start();
+
+    if (Epoll.isAvailable()) {
+      bossGroup = new EpollEventLoopGroup(1);
+      workerGroup = new EpollEventLoopGroup();
+    } else {
+      bossGroup = new NioEventLoopGroup(1);
+      workerGroup = new NioEventLoopGroup();
+    }
+
+    ServerBootstrap bootstrap = new ServerBootstrap();
+    bootstrap
+        .group(bossGroup, workerGroup)
+        .channel(
+            Epoll.isAvailable() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+        .childHandler(
+            new ChannelInitializer<SocketChannel>() {
+              @Override
+              protected void initChannel(SocketChannel ch) {
+                ChannelPipeline pipeline = ch.pipeline();
+                // 编解码器
+                pipeline.addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 4));
+                pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
+                pipeline.addLast(new LengthFieldPrepender(4));
+                pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
+                // 快速路径：PING/PONG 在 I/O 线程
+                pipeline.addLast(new PingPongHandler());
+                // 业务处理器：在 bizGroup 中执行
+                pipeline.addLast(bizGroup, new GatewayHandler());
+              }
+            })
+        .option(ChannelOption.SO_BACKLOG, 128)
+        .childOption(ChannelOption.SO_KEEPALIVE, true)
+        .childOption(ChannelOption.TCP_NODELAY, true)
+        .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+
+    serverChannel = bootstrap.bind(port).sync().channel();
+    logger.info("ReactorGateway " + gatewayId + " started on port " + port);
   }
 
   @Override
-  protected ISession createSession(SocketChannel channel) {
-    ClientSession session = new ClientSession(channel, this);
-    sessionManager.registerSession(session);
-    heartbeatService.refresh(session);
-    return session;
+  public void stop() {
+    if (serverChannel != null) {
+      serverChannel.close();
+    }
+    if (bossGroup != null) {
+      bossGroup.shutdownGracefully();
+    }
+    if (workerGroup != null) {
+      workerGroup.shutdownGracefully();
+    }
+    heartbeatService.stop();
+    if (bizGroup != null) {
+      bizGroup.shutdownGracefully();
+      try {
+        bizGroup.awaitTermination(5, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    if (coordinator != null) coordinator.unregisterGateway(gatewayId);
   }
 
-  @Override
-  protected void processMessage(ISession session, String jsonMsg) {
-    workerPool.submit(
-        () -> {
-          try {
-            ClientSession client = (ClientSession) session;
-            JsonNode root = JsonUtils.MAPPER.readTree(jsonMsg);
-            String cmd = root.get("cmd").asText();
+  // ---------- 快速路径 Handler：PING/PONG ----------
+  private class PingPongHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+      String jsonMsg = (String) msg;
+      JsonNode root;
+      try {
+        root = JsonUtils.MAPPER.readTree(jsonMsg);
+      } catch (Exception e) {
+        logger.error("PingPong parse error: " + e.getMessage());
+        return;
+      }
+      String cmd = root.get("cmd").asText();
 
-            switch (cmd) {
-              case "REGISTER":
-                handleRegister(client, root);
-                break;
-              case "LOGIN":
-              case "USER":
-                handleLogin(client, root);
-                break;
-              case "LOGOUT":
-                handleLogout(client, root);
-                break;
-              case "ROOM_LIST":
-                handleRoomList(client);
-                break;
-              case "LEADERBOARD":
-                handleLeaderboard(client, root);
-                break;
-              case "CREATE":
-              case "JOIN":
-              case "INPUT":
-              case "LEAVE":
-              case "QUIT":
-                handleGameCommand(client, root);
-                break;
-              case "PING":
-                client.sendMessage("{\"cmd\":\"PONG\"}");
-                heartbeatService.refresh(client);
-                break;
-              case "PONG":
-                client.pendingPong = false;
-                client.lastHeartbeat = System.currentTimeMillis() / 1000;
-                heartbeatService.refresh(client);
-                break;
-              default:
-                client.sendMessage("{\"cmd\":\"ERROR\",\"message\":\"Unknown command\"}");
+      if ("PING".equals(cmd)) {
+        ClientSession session = ctx.channel().attr(SESSION_KEY).get();
+        ctx.writeAndFlush("{\"cmd\":\"PONG\"}");
+        if (session != null) {
+          heartbeatService.refresh(session);
+        }
+        return;
+      }
+      if ("PONG".equals(cmd)) {
+        ClientSession session = ctx.channel().attr(SESSION_KEY).get();
+        if (session != null) {
+          session.pendingPong = false;
+          session.lastHeartbeat = System.currentTimeMillis() / 1000;
+          heartbeatService.refresh(session);
+        }
+        return;
+      }
+      // 其他消息交给下一个 Handler
+      ctx.fireChannelRead(msg);
+    }
+  }
+
+  // ---------- 业务 Handler：运行在 bizGroup ----------
+  private class GatewayHandler extends ChannelInboundHandlerAdapter {
+    private ClientSession session;
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+      session = new ClientSession(ctx.channel());
+      ctx.channel().attr(SESSION_KEY).set(session);
+      sessionManager.registerSession(session);
+      heartbeatService.refresh(session);
+      logger.debug("New connection: " + session.getSessionId());
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+      String jsonMsg = (String) msg;
+      try {
+        JsonNode root = JsonUtils.MAPPER.readTree(jsonMsg);
+        String cmd = root.get("cmd").asText();
+
+        switch (cmd) {
+          case "REGISTER":
+            handleRegister(session, root);
+            break;
+          case "LOGIN":
+          case "USER":
+            handleLogin(session, root);
+            break;
+          case "LOGOUT":
+            handleLogout(session, root);
+            break;
+          case "ROOM_LIST":
+            handleRoomList(session);
+            break;
+          case "LEADERBOARD":
+            handleLeaderboard(session, root);
+            break;
+          case "CREATE":
+          case "JOIN":
+          case "INPUT":
+          case "LEAVE":
+          case "QUIT":
+            handleGameCommand(session, root);
+            break;
+          default:
+            session.sendMessage("{\"cmd\":\"ERROR\",\"message\":\"Unknown command\"}");
+        }
+      } catch (Exception e) {
+        logger.error("Error processing message: " + e.getMessage());
+      }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+      session.close();
+      heartbeatService.remove(session);
+      if (session.username != null) {
+        if (session.roomId != -1 && coordinator != null && messageBus != null) {
+          String workerId = coordinator.getRoomWorker(session.roomId);
+          if (workerId != null) {
+            EnhancedMessage leaveMsg =
+                EnhancedMessage.newInstance()
+                    .init("LEAVE", session.username, session.roomId, gatewayId, "{}");
+            try {
+              messageBus.sendToWorker(workerId, leaveMsg.toJson());
+            } finally {
+              leaveMsg.recycle();
             }
-          } catch (Exception e) {
-            logger.error("Error processing message: " + e.getMessage());
           }
-        });
+        }
+        sessionManager.unbindUsername(session.username);
+        if (coordinator != null) {
+          coordinator.markOffline(session.username);
+          coordinator.removePlayerLocation(session.username);
+        }
+      }
+      sessionManager.removeSession(session.getSessionId());
+      ctx.channel().attr(SESSION_KEY).set(null);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+      logger.error("Exception in gateway connection: " + cause.getMessage());
+      ctx.close();
+    }
   }
+
+  // ======================== 业务方法（保持不变） ========================
 
   private void handleRegister(ClientSession session, JsonNode params) {
     String username = params.get("username").asText();
@@ -143,12 +282,10 @@ public class ReactorGateway extends NioServer {
   private void handleLogin(ClientSession session, JsonNode params) {
     String username = params.get("username").asText();
     String password = params.get("password").asText();
-
     if (coordinator != null && coordinator.isOnline(username)) {
       session.sendMessage("{\"cmd\":\"ERROR\",\"message\":\"User already online\"}");
       return;
     }
-
     GatewayAuthClient.AuthResult result = authClient.login(username, password);
     if (result.success) {
       session.username = username;
@@ -217,7 +354,7 @@ public class ReactorGateway extends NioServer {
     try {
       String roomListJson = buildRoomListJson();
       for (ClientSession s : sessionManager.getAllSessions()) {
-        if (s != null && !s.closed && s.username != null && s.roomId == -1) {
+        if (s != null && s.isActive() && s.username != null && s.roomId == -1) {
           s.sendMessage(roomListJson);
         }
       }
@@ -281,53 +418,5 @@ public class ReactorGateway extends NioServer {
     }
     dispatcher.routeToWorker(session.username, params);
     heartbeatService.refresh(session);
-  }
-
-  @Override
-  protected void onSessionClosed(ISession session) {
-    ClientSession client = (ClientSession) session;
-    client.closed = true;
-    heartbeatService.remove(client);
-    if (client.username != null) {
-      if (client.roomId != -1 && coordinator != null && messageBus != null) {
-        String workerId = coordinator.getRoomWorker(client.roomId);
-        if (workerId != null) {
-          EnhancedMessage leaveMsg =
-              new EnhancedMessage("LEAVE", client.username, client.roomId, gatewayId, "{}");
-          messageBus.sendToWorker(workerId, leaveMsg.toJson());
-          logger.info(
-              "Sent LEAVE for "
-                  + client.username
-                  + " from disconnected session to worker "
-                  + workerId);
-        }
-      }
-      sessionManager.unbindUsername(client.username);
-      if (coordinator != null) {
-        coordinator.markOffline(client.username);
-        coordinator.removePlayerLocation(client.username);
-      }
-    }
-    sessionManager.removeSession(session.getSessionId());
-  }
-
-  @Override
-  public void start() throws IOException {
-    if (coordinator != null) coordinator.registerGateway(gatewayId);
-    heartbeatService.start();
-    super.start();
-  }
-
-  @Override
-  public void stop() {
-    super.stop();
-    heartbeatService.stop();
-    workerPool.shutdown();
-    try {
-      workerPool.awaitTermination(5, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      workerPool.shutdownNow();
-    }
-    if (coordinator != null) coordinator.unregisterGateway(gatewayId);
   }
 }

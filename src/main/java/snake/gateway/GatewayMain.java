@@ -56,7 +56,7 @@ public class GatewayMain {
         new DefaultHeartbeatService(
             session -> {
               ClientSession client = (ClientSession) session;
-              if (client != null && !client.closed) client.close();
+              if (client != null && client.isActive()) client.close();
             },
             coordinator);
 
@@ -94,7 +94,7 @@ public class GatewayMain {
               String username = (parts.length >= 4) ? parts[3] : null;
               if (username == null) return;
               ClientSession session = sessionManager.getSessionByUsername(username);
-              if (session != null && !session.closed) {
+              if (session != null && session.isActive()) {
                 session.sendMessage(message);
               } else {
                 logger.warn("Player " + username + " not online, discarding message");

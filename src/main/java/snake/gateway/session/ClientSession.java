@@ -1,27 +1,50 @@
 package snake.gateway.session;
 
-import java.nio.channels.SocketChannel;
-import snake.network.NioServer;
-import snake.network.NioSession;
+import io.netty.channel.Channel;
+import snake.network.ISession;
 
-public class ClientSession extends NioSession {
+public class ClientSession implements ISession {
   public String username;
   public volatile int roomId = -1;
   public volatile long lastHeartbeat;
   public volatile long lastPingSent;
   public volatile boolean pendingPong;
-  public volatile boolean closed = false;
 
-  public ClientSession(SocketChannel channel, NioServer server) {
-    super(channel, server);
+  private final Channel channel;
+  private final String sessionId;
+
+  public ClientSession(Channel channel) {
+    this.channel = channel;
+    this.sessionId = channel.id().asShortText();
     this.lastHeartbeat = System.currentTimeMillis() / 1000;
     this.lastPingSent = 0;
     this.pendingPong = false;
   }
 
   @Override
-  public void sendMessage(String response) {
-    if (closed) return;
-    super.sendMessage(response);
+  public void sendMessage(String message) {
+    if (!isActive()) return;
+    // 直接发送字符串，由 Netty 的 LengthFieldPrepender + StringEncoder 自动添加长度头
+    channel.writeAndFlush(message);
+  }
+
+  @Override
+  public void close() {
+    if (channel.isOpen()) {
+      channel.close();
+    }
+  }
+
+  @Override
+  public String getSessionId() {
+    return sessionId;
+  }
+
+  public boolean isActive() {
+    return channel.isActive();
+  }
+
+  public Channel getChannel() {
+    return channel;
   }
 }

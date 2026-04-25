@@ -49,8 +49,6 @@
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/mq/MessageBus.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/network/IServer.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/network/ISession.java
-/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/network/NioServer.java
-/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/network/NioSession.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/network/Serializer.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/persistence/BaseMySQLRepository.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/persistence/DatabaseManager.java

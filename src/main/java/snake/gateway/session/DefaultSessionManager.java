@@ -38,7 +38,7 @@ public class DefaultSessionManager implements SessionManager {
   @Override
   public void sendToUser(String username, String message) {
     ClientSession session = usernameMap.get(username);
-    if (session != null && !session.closed) {
+    if (session != null && session.isActive()) {
       session.sendMessage(message);
     }
   }

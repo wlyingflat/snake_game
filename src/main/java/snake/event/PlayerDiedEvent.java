@@ -1,27 +1,59 @@
 package snake.event;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.UUID;
+import io.netty.util.Recycler;
 import snake.base.JsonUtils;
 
 public class PlayerDiedEvent implements GameEvent {
-  public final String eventId;
-  public final long timestamp;
-  public final String username;
-  public final int roomId;
-  public final int finalScore;
-  public final int finalLength;
-  public final String cause;
 
-  public PlayerDiedEvent(
+  // ---------- 对象池 ----------
+  private static final Recycler<PlayerDiedEvent> RECYCLER =
+      new Recycler<PlayerDiedEvent>() {
+        @Override
+        protected PlayerDiedEvent newObject(Handle<PlayerDiedEvent> handle) {
+          return new PlayerDiedEvent(handle);
+        }
+      };
+
+  private final Recycler.Handle<PlayerDiedEvent> handle;
+
+  public static PlayerDiedEvent newInstance() {
+    return RECYCLER.get();
+  }
+
+  private PlayerDiedEvent(Recycler.Handle<PlayerDiedEvent> handle) {
+    this.handle = handle;
+  }
+
+  // 可复用字段（不再是 final，通过 init 赋值）
+  public String eventId;
+  public long timestamp;
+  public String username;
+  public int roomId;
+  public int finalScore;
+  public int finalLength;
+  public String cause;
+
+  public PlayerDiedEvent init(
       String username, int roomId, int finalScore, int finalLength, String cause) {
-    this.eventId = UUID.randomUUID().toString();
+    this.eventId = java.util.UUID.randomUUID().toString();
     this.timestamp = System.currentTimeMillis();
     this.username = username;
     this.roomId = roomId;
     this.finalScore = finalScore;
     this.finalLength = finalLength;
     this.cause = cause;
+    return this;
+  }
+
+  private void clear() {
+    this.username = null;
+    this.cause = null;
+  }
+
+  public void recycle() {
+    clear();
+    handle.recycle(this);
   }
 
   @Override

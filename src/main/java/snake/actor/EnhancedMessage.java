@@ -2,24 +2,44 @@ package snake.actor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.netty.util.Recycler;
 import snake.base.JsonUtils;
 import snake.game.event.Message;
 
-/** Worker → Actor 的标准消息格式 包含了消息路由所需的元数据 */
 public class EnhancedMessage implements Message {
-  private final String command; // 原始命令: JOIN, INPUT, LEAVE
-  private final String username; // 玩家名
-  private final int roomId; // 房间ID
-  private final String gatewayId; // 玩家所在的 Gateway ID
-  private final String rawMessage; // 原始 JSON 消息
 
-  public EnhancedMessage(
+  private static final Recycler<EnhancedMessage> RECYCLER =
+      new Recycler<EnhancedMessage>() {
+        @Override
+        protected EnhancedMessage newObject(Handle<EnhancedMessage> handle) {
+          return new EnhancedMessage(handle);
+        }
+      };
+
+  private final Recycler.Handle<EnhancedMessage> handle;
+
+  public static EnhancedMessage newInstance() {
+    return RECYCLER.get();
+  }
+
+  private EnhancedMessage(Recycler.Handle<EnhancedMessage> handle) {
+    this.handle = handle;
+  }
+
+  private String command;
+  private String username;
+  private int roomId;
+  private String gatewayId;
+  private String rawMessage;
+
+  public EnhancedMessage init(
       String command, String username, int roomId, String gatewayId, String rawMessage) {
     this.command = command;
     this.username = username;
     this.roomId = roomId;
     this.gatewayId = gatewayId;
     this.rawMessage = rawMessage;
+    return this;
   }
 
   @Override
@@ -47,7 +67,14 @@ public class EnhancedMessage implements Message {
     return rawMessage;
   }
 
-  /** 序列化为 JSON */
+  public void recycle() {
+    this.command = null;
+    this.username = null;
+    this.gatewayId = null;
+    this.rawMessage = null;
+    handle.recycle(this);
+  }
+
   public String toJson() {
     ObjectNode node = JsonUtils.MAPPER.createObjectNode();
     node.put("command", command);
@@ -62,16 +89,17 @@ public class EnhancedMessage implements Message {
     }
   }
 
-  /** 从 JSON 反序列化 */
   public static EnhancedMessage fromJson(String json) {
     try {
       JsonNode node = JsonUtils.MAPPER.readTree(json);
-      return new EnhancedMessage(
+      EnhancedMessage msg = newInstance();
+      msg.init(
           node.get("command").asText(),
           node.get("username").asText(),
           node.get("roomId").asInt(),
           node.get("gatewayId").asText(),
           node.get("rawMessage").asText());
+      return msg;
     } catch (Exception e) {
       return null;
     }

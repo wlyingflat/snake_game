@@ -34,8 +34,7 @@ public class DefaultHeartbeatService implements HeartbeatService {
     pingSender =
         Executors.newSingleThreadScheduledExecutor(
             r -> {
-              Thread t = new Thread(r);
-              t.setName("heartbeat-ping-sender");
+              Thread t = new Thread(r, "heartbeat-ping-sender");
               t.setDaemon(true);
               return t;
             });
@@ -60,8 +59,7 @@ public class DefaultHeartbeatService implements HeartbeatService {
 
   @Override
   public void refresh(ClientSession session) {
-    if (session == null || session.closed) return;
-
+    if (session == null || !session.isActive()) return;
     Timeout old = sessionTimeouts.remove(session);
     if (old != null) old.cancel();
 
@@ -89,7 +87,7 @@ public class DefaultHeartbeatService implements HeartbeatService {
 
   @Override
   public void onHeartbeatTimeout(ClientSession session) {
-    if (session == null || session.closed) return;
+    if (session == null || !session.isActive()) return;
     logger.warn("Client " + session.username + " heartbeat timeout, closing session");
     if (onTimeoutCallback != null) onTimeoutCallback.accept(session);
   }
@@ -98,9 +96,7 @@ public class DefaultHeartbeatService implements HeartbeatService {
   public void remove(ClientSession session) {
     if (session == null) return;
     Timeout timeout = sessionTimeouts.remove(session);
-    if (timeout != null) {
-      timeout.cancel();
-    }
+    if (timeout != null) timeout.cancel();
     logger.debug("Removed heartbeat tracking for session: " + session.getSessionId());
 
     if (coordinator != null && session.username != null) {
@@ -113,15 +109,13 @@ public class DefaultHeartbeatService implements HeartbeatService {
     if (!running) return;
     long nowSec = System.currentTimeMillis() / 1000;
     for (ClientSession session : sessionTimeouts.keySet()) {
-      if (session == null || session.closed || session.username == null) continue;
-
+      if (session == null || !session.isActive() || session.username == null) continue;
       if (!session.pendingPong && (nowSec - session.lastHeartbeat) >= Config.HEARTBEAT_INTERVAL) {
         session.sendMessage("{\"cmd\":\"PING\"}");
         session.pendingPong = true;
         session.lastPingSent = nowSec;
         refresh(session);
       }
-
       if (coordinator != null && session.username != null) {
         coordinator.refreshOnline(session.username);
         coordinator.refreshPlayerLocation(session.username);

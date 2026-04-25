@@ -47,17 +47,24 @@ public class ActorNotifier {
 
   public void publishPlayerDied(
       String username, int roomId, int finalScore, int finalLength, String cause) {
-    if (eventProducer != null) {
-      eventProducer.send(
-          "game.player.died",
-          new PlayerDiedEvent(username, roomId, finalScore, finalLength, cause));
+    if (eventProducer == null) return;
+    PlayerDiedEvent event =
+        PlayerDiedEvent.newInstance().init(username, roomId, finalScore, finalLength, cause);
+    try {
+      eventProducer.send("game.player.died", event);
+    } finally {
+      event.recycle(); // toJson 已在 send 内同步调用，可以立即回收
     }
   }
 
   public void publishScoreChanged(String username, int roomId, int newScore, int delta) {
-    if (eventProducer != null) {
-      eventProducer.send(
-          "game.player.score", new ScoreChangedEvent(username, roomId, newScore, delta));
+    if (eventProducer == null) return;
+    ScoreChangedEvent event =
+        ScoreChangedEvent.newInstance().init(username, roomId, newScore, delta);
+    try {
+      eventProducer.send("game.player.score", event);
+    } finally {
+      event.recycle();
     }
   }
 }
