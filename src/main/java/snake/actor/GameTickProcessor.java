@@ -4,12 +4,14 @@ import java.util.*;
 import snake.base.*;
 import snake.game.event.GameStateDiff;
 import snake.game.state.GameState;
+import snake.game.state.GameStateDiffer;
 import snake.network.Serializer;
 
 /** 负责游戏状态的一次更新（tick），包括： - 状态推进 - 分数事件和死亡事件发布 - 差分或全量广播策略 不处理客户端消息，不管理线程。 */
 public class GameTickProcessor {
   private final int roomId;
   private final GameState state;
+  private final GameStateDiffer differ;
   private final ActorNotifier notifier;
   private final Runnable onStatusChange;
   private final ILogger logger = Logger.getInstance();
@@ -24,6 +26,9 @@ public class GameTickProcessor {
     this.state = state;
     this.notifier = notifier;
     this.onStatusChange = onStatusChange;
+    this.differ = new GameStateDiffer(state); // 创建差分器
+    // 在游戏开始时立即捕获一次基线
+    differ.captureBeforeTick();
     updateCachedSnapshot();
   }
 
@@ -41,6 +46,7 @@ public class GameTickProcessor {
       wasAlive.put(p.username, !p.isDead);
     }
 
+    differ.captureBeforeTick();
     // 执行状态更新
     state.update();
 
@@ -81,7 +87,15 @@ public class GameTickProcessor {
       updateCachedSnapshotAndBroadcast();
       tickSinceLastFullState = 0;
     } else {
-      broadcastDiff();
+      GameStateDiff diff = differ.computeDiff();
+      String json = new Serializer().serializeDiff(diff);
+      if (json != null) {
+        for (GameState.Player p : state.getPlayers()) {
+          if (!p.isDead) {
+            notifier.sendToPlayer(p.username, null, json);
+          }
+        }
+      }
     }
 
     if (!diedPlayers.isEmpty() && onStatusChange != null) {
@@ -97,18 +111,6 @@ public class GameTickProcessor {
     cachedSnapshot = state.snapshot(null);
     if (cachedSnapshot == null) return;
     String json = new Serializer().serialize(cachedSnapshot);
-    if (json == null) return;
-    for (GameState.Player p : state.getPlayers()) {
-      if (!p.isDead) {
-        notifier.sendToPlayer(p.username, null, json);
-      }
-    }
-  }
-
-  private void broadcastDiff() {
-    GameStateDiff diff = state.computeDiff();
-    if (diff == null) return;
-    String json = new Serializer().serializeDiff(diff);
     if (json == null) return;
     for (GameState.Player p : state.getPlayers()) {
       if (!p.isDead) {

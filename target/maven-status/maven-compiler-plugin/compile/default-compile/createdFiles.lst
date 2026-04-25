@@ -98,6 +98,7 @@ snake/auth/AuthenticationService.class
 snake/base/ISerializer.class
 snake/gateway/handler/CommandDispatcher.class
 snake/client/LocalGameState$PlayerData.class
+snake/game/state/GameStateDiffer.class
 snake/gateway/server/PingPongHandler.class
 snake/gateway/handler/RoomListHandler.class
 snake/distributed/DistributedCoordinator$RoomEntry.class

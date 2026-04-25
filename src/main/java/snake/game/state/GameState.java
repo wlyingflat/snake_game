@@ -2,8 +2,6 @@ package snake.game.state;
 
 import java.util.*;
 import snake.base.*;
-import snake.game.event.GameStateDiff;
-import snake.game.event.PlayerDiff;
 
 public class GameState {
   private final int roomId;
@@ -16,19 +14,12 @@ public class GameState {
   private boolean initialDelayDone = false;
   private int tickCounter = 0;
 
-  // ---------- 差分计算需要的历史状态 ----------
-  private Position previousFood;
-  private final Map<String, List<Position>> previousPlayerBodies = new HashMap<>();
-  private Set<String> previousPlayerNames = new HashSet<>();
-  // 记录本 tick 新加入的玩家，用于发送全量快照
+  // 仅用于触发全量广播的标识，由 addPlayer 设置
   private final Set<String> newPlayersThisTick = new HashSet<>();
 
   public GameState(int roomId) {
     this.roomId = roomId;
     initWorld();
-    // 初始化 previous 状态为空，确保第一个 tick 能正确处理
-    previousFood = new Position(food.x, food.y);
-    previousPlayerNames = new HashSet<>();
   }
 
   private void initWorld() {
@@ -123,7 +114,7 @@ public class GameState {
     activePlayers++;
     initialDelayDone = true;
 
-    // 标记为新玩家，用于后续发送全量快照
+    // 标记为新玩家，用于触发全量快照
     newPlayersThisTick.add(username);
     return true;
   }
@@ -165,8 +156,6 @@ public class GameState {
     if (p != null) {
       totalPlayers--;
       if (!p.isDead) activePlayers--;
-      previousPlayerBodies.remove(username);
-      previousPlayerNames.remove(username);
     }
   }
 
@@ -182,6 +171,7 @@ public class GameState {
     }
   }
 
+  /** 推进一帧，处理所有蛇的移动、吃食物、碰撞死亡 */
   public void update() {
     if (!initialDelayDone) {
       if (++tickCounter >= Config.ROOM_INIT_DELAY_TICKS) {
@@ -189,13 +179,6 @@ public class GameState {
       }
       return;
     }
-
-    // 保存移动前状态，用于后续差分计算
-    previousFood = new Position(food.x, food.y);
-    for (Map.Entry<String, Player> entry : players.entrySet()) {
-      previousPlayerBodies.put(entry.getKey(), new ArrayList<>(entry.getValue().body));
-    }
-    previousPlayerNames = new HashSet<>(players.keySet());
 
     List<Player> playerList = new ArrayList<>(players.values());
     Map<Player, Position> nextHeads = new HashMap<>();
@@ -214,7 +197,6 @@ public class GameState {
         p.isDead = true;
         activePlayers--;
         willGrow.put(p, false);
-        // 死前位置仍保留在 previous 中，但计算时忽略
       }
     }
 
@@ -285,7 +267,7 @@ public class GameState {
     return false;
   }
 
-  /** 全量快照（用于新玩家或定期纠正） */
+  /** 全量快照 */
   public GameStateData snapshot(String clientUsername) {
     GameStateData data = new GameStateData();
     data.roomId = roomId;
@@ -299,81 +281,15 @@ public class GameState {
     data.playerCount = count;
     for (int i = 0; i < count; i++) {
       Player p = playerList.get(i);
-      GameStateData.PlayerInfo info = new GameStateData.PlayerInfo();
-      info.name = p.username;
-      info.head = p.body.get(0);
-      info.body = p.body.toArray(new Position[0]);
-      info.length = p.length;
-      info.direction = p.direction;
-      info.score = p.score;
-      info.isDead = p.isDead;
-      data.players[i] = info;
+      data.players[i] = snapshotPlayerInfo(p);
     }
     data.activePlayers = activePlayers;
     data.totalPlayers = totalPlayers;
     return data;
   }
 
-  /** 检查是否有新玩家需要发送全量快照（调用后会自动清除标记） */
-  public boolean hasNewPlayer() {
-    boolean result = !newPlayersThisTick.isEmpty();
-    newPlayersThisTick.clear();
-    return result;
-  }
-
-  /** 计算本 tick 的差分数据 */
-  public GameStateDiff computeDiff() {
-    GameStateDiff diff = new GameStateDiff();
-    diff.roomId = roomId;
-    diff.seq = tickCounter;
-
-    // 食物变化
-    if (!food.equals(previousFood)) {
-      diff.food = new Position(food.x, food.y);
-    }
-
-    // 玩家差分
-    for (Map.Entry<String, Player> entry : players.entrySet()) {
-      String username = entry.getKey();
-      Player player = entry.getValue();
-
-      List<Position> prevBody = previousPlayerBodies.get(username);
-      if (prevBody == null) {
-        // 新加入，放入新玩家列表（全量快照由上层另外发送，这里只标记）
-        // 注意：实际发送新玩家全量由GameActor在JOIN时单独发送，此处newPlayers可选
-        // 但为了完整性，仍然可以填充，上层可忽略或使用
-        diff.newPlayers.add(snapshotPlayerInfo(player));
-        continue;
-      }
-
-      if (player.isDead) {
-        diff.died.add(username);
-        continue;
-      }
-
-      // 存活玩家差分
-      PlayerDiff pd = new PlayerDiff();
-      pd.newHead = player.body.get(0);
-
-      // 判断尾巴是否移除：如果蛇变长了则不移除，否则移除
-      boolean grew = (player.body.size() > prevBody.size());
-      // 或者根据是否吃到食物判断
-      pd.removeTail = !grew;
-      pd.length = player.length;
-      diff.players.put(username, pd);
-    }
-
-    // 已离开的玩家
-    for (String oldName : previousPlayerNames) {
-      if (!players.containsKey(oldName)) {
-        diff.removedPlayers.add(oldName);
-      }
-    }
-
-    return diff;
-  }
-
-  private GameStateData.PlayerInfo snapshotPlayerInfo(Player p) {
+  /** 提取单个玩家信息（供全量快照或新玩家差分使用） */
+  public GameStateData.PlayerInfo snapshotPlayerInfo(Player p) {
     GameStateData.PlayerInfo info = new GameStateData.PlayerInfo();
     info.name = p.username;
     info.head = p.body.get(0);
@@ -383,6 +299,13 @@ public class GameState {
     info.score = p.score;
     info.isDead = false;
     return info;
+  }
+
+  /** 检查是否有新玩家需要全量快照（调用后自动清除标记） */
+  public boolean hasNewPlayer() {
+    boolean result = !newPlayersThisTick.isEmpty();
+    newPlayersThisTick.clear();
+    return result;
   }
 
   public boolean isEmpty() {
@@ -397,12 +320,17 @@ public class GameState {
     return new ArrayList<>(players.values());
   }
 
-  // --- 以下为从快照恢复的构造函数（略作调整，不影响差分逻辑）---
+  public Position getFood() {
+    return food;
+  }
+
+  // ---------- 从快照恢复的构造函数 ----------
   public GameState(int roomId, GameStateData snapshot) {
     this.roomId = roomId;
     this.food = snapshot.food;
     this.activePlayers = snapshot.activePlayers;
     this.totalPlayers = snapshot.totalPlayers;
+
     for (int y = 0; y < Config.MAP_HEIGHT; y++) {
       for (int x = 0; x < Config.MAP_WIDTH; x++) map[y][x] = ' ';
     }
@@ -431,14 +359,9 @@ public class GameState {
       players.put(p.username, p);
     }
     this.initialDelayDone = true;
-    // 初始化差分历史
-    previousFood = new Position(food.x, food.y);
-    previousPlayerNames = new HashSet<>(players.keySet());
-    for (Player p : players.values()) {
-      previousPlayerBodies.put(p.username, new ArrayList<>(p.body));
-    }
   }
 
+  // ---------- Player 类 ----------
   public static class Player {
     public String username;
     public List<Position> body;

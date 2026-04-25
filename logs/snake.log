@@ -8598,3 +8598,982 @@ java.util.concurrent.RejectedExecutionException: event executor terminated
 2026-04-25 16:55:48.244 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
 2026-04-25 16:55:48.245 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
 2026-04-25 16:56:19.577 [qtp1711185459-92] INFO  snake.base.Logger - User logged out: wmh
+2026-04-25 17:03:26.998 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 17:03:28.941 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 17:03:30.660 [leaderboard-consumer] INFO  org.apache.kafka.clients.NetworkClient - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Node -1 disconnected.
+2026-04-25 17:08:39.682 [leaderboard-consumer] ERROR snake.base.Logger - Consumer loop error: null
+2026-04-25 17:08:39.685 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Revoke previously assigned partitions game.player.died-0
+2026-04-25 17:08:39.685 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Member consumer-leaderboard-updater-1-9474619d-1229-4918-a348-bebd559d7194 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer is being closed
+2026-04-25 17:08:39.686 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-04-25 17:08:39.686 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Request joining group due to: consumer pro-actively leaving the group
+2026-04-25 17:08:39.690 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:08:39.696 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:08:39.696 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:08:41.192 [ShutdownHook] INFO  snake.base.Logger - Shutting down auth service...
+2026-04-25 17:08:41.192 [ShutdownHook] INFO  org.eclipse.jetty.server.Server - Stopped Server@5df417a7{STOPPING}[11.0.20,sto=0]
+2026-04-25 17:08:41.197 [ShutdownHook] INFO  org.eclipse.jetty.server.AbstractConnector - Stopped ServerConnector@47c4ecdc{HTTP/1.1, (http/1.1)}{0.0.0.0:19001}
+2026-04-25 17:08:41.199 [ShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler - Stopped o.e.j.s.ServletContextHandler@3d6300e8{/,null,STOPPED}
+2026-04-25 17:08:41.202 [ShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:08:41.208 [ShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:08:41.208 [ShutdownHook] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:08:41.208 [ShutdownHook] INFO  snake.base.Logger - Auth service stopped.
+2026-04-25 17:08:42.153 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-25 17:08:42.156 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-25 17:08:42.157 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:08:42.160 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:08:42.161 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:08:42.161 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:08:42.161 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:08:42.161 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:08:42.161 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-25 17:08:42.176 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:08:42.182 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:08:42.182 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:08:42.183 [Thread-0] INFO  snake.base.Logger - Worker worker-1 shut down complete
+2026-04-25 17:08:42.821 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-25 17:08:42.824 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-25 17:08:42.825 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:08:42.827 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:08:42.828 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:08:42.828 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:08:42.828 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:08:42.828 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:08:42.828 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-25 17:08:42.836 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:08:42.843 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:08:42.843 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:08:42.843 [Thread-0] INFO  snake.base.Logger - Worker worker-2 shut down complete
+2026-04-25 17:08:44.880 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:44.882 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:44.907 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:08:44.994 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@222eb8aa
+2026-04-25 17:08:44.995 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:08:44.995 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:08:45.001 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-25 17:08:45.066 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.20; built: 2024-01-29T21:04:22.394Z; git: 922f8dc188f7011e60d0361de585fd4ac4d63064; jvm 26.0.1
+2026-04-25 17:08:45.092 [main] INFO  org.eclipse.jetty.server.session.DefaultSessionIdManager - Session workerName=node0
+2026-04-25 17:08:45.098 [main] INFO  org.eclipse.jetty.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@3d6300e8{/,null,AVAILABLE}
+2026-04-25 17:08:45.109 [main] INFO  org.eclipse.jetty.server.AbstractConnector - Started ServerConnector@47c4ecdc{HTTP/1.1, (http/1.1)}{0.0.0.0:19001}
+2026-04-25 17:08:45.110 [main] INFO  org.eclipse.jetty.server.Server - Started Server@5df417a7{STARTING}[11.0.20,sto=0] @601ms
+2026-04-25 17:08:45.111 [main] INFO  snake.base.Logger - Auth HTTP server started on port 19001
+2026-04-25 17:08:45.111 [main] INFO  snake.base.Logger - Auth service started successfully on port 19001
+2026-04-25 17:08:46.550 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:46.576 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:08:46.672 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7a1a3478
+2026-04-25 17:08:46.673 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:08:46.673 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:08:46.680 [main] INFO  snake.base.Logger - Users table ensured.
+2026-04-25 17:08:46.759 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:08:46.850 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:46.884 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:46.897 [main] INFO  snake.base.Logger - Connected to Redis for leaderboard consumer
+2026-04-25 17:08:46.898 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:46.907 [main] INFO  org.apache.kafka.clients.consumer.ConsumerConfig - ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-leaderboard-updater-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = leaderboard-updater
+	group.instance.id = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+2026-04-25 17:08:46.944 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:08:46.944 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:08:46.944 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777108126943
+2026-04-25 17:08:46.945 [main] INFO  org.apache.kafka.clients.consumer.KafkaConsumer - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Subscribed to topic(s): game.player.died
+2026-04-25 17:08:46.966 [leaderboard-consumer] INFO  snake.base.Logger - Loaded 4 records from MySQL to Redis
+2026-04-25 17:08:46.966 [leaderboard-consumer] INFO  snake.base.Logger - LeaderboardConsumer started, listening to game.player.died
+2026-04-25 17:08:47.089 [leaderboard-consumer] INFO  org.apache.kafka.clients.Metadata - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:08:47.090 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-04-25 17:08:47.097 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] (Re-)joining group
+2026-04-25 17:08:47.111 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Request joining group due to: need to re-join with the given member-id: consumer-leaderboard-updater-1-67041544-a644-4fd1-998c-68b996480e49
+2026-04-25 17:08:47.111 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Request joining group due to: rebalance failed due to 'The group member needs to have a valid member id before actually entering a consumer group.' (MemberIdRequiredException)
+2026-04-25 17:08:47.111 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] (Re-)joining group
+2026-04-25 17:08:50.113 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Successfully joined group with generation Generation{generationId=43, memberId='consumer-leaderboard-updater-1-67041544-a644-4fd1-998c-68b996480e49', protocol='range'}
+2026-04-25 17:08:50.119 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Finished assignment for group at generation 43: {consumer-leaderboard-updater-1-67041544-a644-4fd1-998c-68b996480e49=Assignment(partitions=[game.player.died-0])}
+2026-04-25 17:08:50.122 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Successfully synced group in generation Generation{generationId=43, memberId='consumer-leaderboard-updater-1-67041544-a644-4fd1-998c-68b996480e49', protocol='range'}
+2026-04-25 17:08:50.122 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Notifying assignor about the new Assignment(partitions=[game.player.died-0])
+2026-04-25 17:08:50.123 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Adding newly assigned partitions: game.player.died-0
+2026-04-25 17:08:50.127 [leaderboard-consumer] INFO  org.apache.kafka.clients.consumer.internals.ConsumerCoordinator - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Setting offset for partition game.player.died-0 to the committed offset FetchPosition{offset=89, offsetEpoch=Optional[2], currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}
+2026-04-25 17:08:51.929 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-25 17:08:51.932 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:51.944 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:08:51.956 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:08:52.040 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:08:52.041 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:08:52.041 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:08:52.128 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:08:52.226 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:52.264 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:52.276 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:52.309 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:08:52.309 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:08:52.310 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:52.319 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:08:52.320 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:08:52.346 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:08:52.346 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:08:52.346 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777108132345
+2026-04-25 17:08:52.347 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:08:52.379 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-25 17:08:52.383 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-25 17:08:52.384 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-25 17:08:52.384 [main] INFO  snake.base.Logger - Worker worker-2 started successfully
+2026-04-25 17:08:52.478 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:08:54.915 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-25 17:08:54.917 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:54.939 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:08:55.023 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:08:55.024 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:08:55.024 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:08:55.103 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:08:55.201 [redisson-netty-1-6] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:55.237 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:08:55.249 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:55.282 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:08:55.282 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:08:55.283 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:08:55.293 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:08:55.294 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:08:55.321 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:08:55.321 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:08:55.321 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777108135320
+2026-04-25 17:08:55.322 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:08:55.350 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-25 17:08:55.356 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-25 17:08:55.356 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-25 17:08:55.356 [main] INFO  snake.base.Logger - Worker worker-1 started successfully
+2026-04-25 17:08:55.441 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:08:57.320 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:09:00.295 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:09:03.182 [qtp1711185459-90] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:09:03.197 [defaultEventExecutorGroup-5-2] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:09:05.785 [defaultEventExecutorGroup-5-2] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-25 17:09:05.828 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-25 17:09:05.845 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-25 17:09:05.851 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-25 17:09:05.851 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-25 17:09:05.887 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-25 17:09:06.184 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:09:26.337 [qtp1711185459-54] INFO  snake.base.Logger - User logged out: wmh
+2026-04-25 17:10:05.845 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-25 17:10:05.845 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-25 17:10:05.845 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-25 17:10:05.845 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-25 17:10:05.847 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-25 17:10:05.849 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-25 17:10:10.852 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
+2026-04-25 17:10:10.852 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-25 17:13:52.483 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Resetting the last seen epoch of partition game.player.score-0 to 2 since the associated topicId changed from null to q_FdLKBnTMOMWIHXUKKsSg
+2026-04-25 17:17:47.205 [leaderboard-consumer] INFO  org.apache.kafka.clients.NetworkClient - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Node -1 disconnected.
+2026-04-25 17:17:52.659 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 17:17:55.635 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-25 17:25:34.069 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-25 17:25:34.072 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-25 17:25:34.074 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:25:34.076 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:25:34.077 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:25:34.077 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:25:34.077 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:25:34.077 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:25:34.078 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-25 17:25:34.086 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:25:34.091 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:25:34.091 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:25:34.091 [Thread-0] INFO  snake.base.Logger - Worker worker-1 shut down complete
+2026-04-25 17:25:36.079 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-25 17:25:36.081 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:36.112 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:25:36.207 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:25:36.208 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:25:36.208 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:25:36.282 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:25:36.372 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:25:36.406 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:25:36.418 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:36.449 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:25:36.449 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:25:36.449 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:36.459 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:25:36.459 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:25:36.487 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:25:36.487 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:25:36.487 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777109136486
+2026-04-25 17:25:36.488 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:25:36.518 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-25 17:25:36.524 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-25 17:25:36.524 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-25 17:25:36.525 [main] INFO  snake.base.Logger - Worker worker-1 started successfully
+2026-04-25 17:25:36.620 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:25:36.780 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-25 17:25:36.784 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-25 17:25:36.785 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:25:36.788 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:25:36.788 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:25:36.788 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:25:36.788 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:25:36.789 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:25:36.789 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-25 17:25:36.799 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:25:36.805 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:25:36.805 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:25:36.805 [Thread-0] INFO  snake.base.Logger - Worker worker-2 shut down complete
+2026-04-25 17:25:38.076 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-25 17:25:38.078 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:38.118 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:25:38.231 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:25:38.231 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:25:38.232 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:25:38.306 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:25:38.395 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:25:38.429 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:25:38.441 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:38.473 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:25:38.473 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:25:38.474 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:25:38.483 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:25:38.483 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:25:38.508 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:25:38.509 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:25:38.509 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777109138508
+2026-04-25 17:25:38.509 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:25:38.539 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-25 17:25:38.544 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-25 17:25:38.544 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-25 17:25:38.544 [main] INFO  snake.base.Logger - Worker worker-2 started successfully
+2026-04-25 17:25:38.627 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:25:41.466 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:25:43.489 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:25:48.710 [qtp1711185459-94] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:25:48.718 [defaultEventExecutorGroup-5-3] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:25:51.518 [defaultEventExecutorGroup-5-3] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-25 17:25:51.563 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-25 17:25:51.572 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-25 17:25:51.576 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-25 17:25:51.576 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-25 17:25:51.620 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-25 17:25:51.861 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:26:49.047 [actor-1] INFO  snake.base.Logger - Player wmh left actor 1
+2026-04-25 17:26:50.182 [qtp1711185459-56] INFO  snake.base.Logger - User logged out: wmh
+2026-04-25 17:27:21.572 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-25 17:27:21.572 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-25 17:27:21.572 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-25 17:27:21.572 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-25 17:27:21.573 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-25 17:27:21.576 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-25 17:27:26.578 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
+2026-04-25 17:27:26.579 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.
+2026-04-25 17:28:34.580 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-2...
+2026-04-25 17:28:34.583 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-2
+2026-04-25 17:28:34.584 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:28:34.588 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:28:34.588 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:28:34.588 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:28:34.589 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:28:34.589 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:28:34.589 [Thread-0] INFO  snake.base.Logger - Worker worker-2 stopped
+2026-04-25 17:28:34.601 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:28:34.608 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:28:34.608 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:28:34.608 [Thread-0] INFO  snake.base.Logger - Worker worker-2 shut down complete
+2026-04-25 17:28:35.883 [main] INFO  snake.base.Logger - Starting Game Worker worker-2
+2026-04-25 17:28:35.885 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:35.910 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:28:35.993 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:28:35.994 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:28:35.994 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:28:36.063 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:28:36.163 [redisson-netty-1-6] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:28:36.194 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:28:36.207 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:36.241 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:28:36.241 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:28:36.241 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:36.251 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:28:36.252 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:28:36.279 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:28:36.279 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:28:36.279 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777109316278
+2026-04-25 17:28:36.280 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:28:36.310 [main] INFO  snake.base.Logger - Worker registered: worker-2
+2026-04-25 17:28:36.315 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-2
+2026-04-25 17:28:36.316 [main] INFO  snake.base.Logger - Worker worker-2 started, listening for messages via RabbitMQ
+2026-04-25 17:28:36.316 [main] INFO  snake.base.Logger - Worker worker-2 started successfully
+2026-04-25 17:28:36.411 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:28:37.154 [Thread-0] INFO  snake.base.Logger - Shutting down worker worker-1...
+2026-04-25 17:28:37.158 [Thread-0] INFO  snake.base.Logger - Worker unregistered: worker-1
+2026-04-25 17:28:37.159 [Thread-0] INFO  org.apache.kafka.clients.producer.KafkaProducer - [Producer clientId=producer-1] Closing the Kafka producer with timeoutMillis = 9223372036854775807 ms.
+2026-04-25 17:28:37.161 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics scheduler closed
+2026-04-25 17:28:37.162 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-04-25 17:28:37.162 [Thread-0] INFO  org.apache.kafka.common.metrics.Metrics - Metrics reporters closed
+2026-04-25 17:28:37.162 [Thread-0] INFO  org.apache.kafka.common.utils.AppInfoParser - App info kafka.producer for producer-1 unregistered
+2026-04-25 17:28:37.162 [Thread-0] INFO  snake.base.Logger - Kafka producer closed
+2026-04-25 17:28:37.162 [Thread-0] INFO  snake.base.Logger - Worker worker-1 stopped
+2026-04-25 17:28:37.172 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-25 17:28:37.177 [Thread-0] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-25 17:28:37.178 [Thread-0] INFO  snake.base.Logger - Database connection pool closed.
+2026-04-25 17:28:37.178 [Thread-0] INFO  snake.base.Logger - Worker worker-1 shut down complete
+2026-04-25 17:28:38.199 [main] INFO  snake.base.Logger - Starting Game Worker worker-1
+2026-04-25 17:28:38.201 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:38.239 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-25 17:28:38.344 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@495b0487
+2026-04-25 17:28:38.345 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-25 17:28:38.345 [main] INFO  snake.base.Logger - Database connection pool initialized.
+2026-04-25 17:28:38.419 [main] WARN  org.redisson.connection.SequentialDnsAddressResolverFactory - DNS TCP fallback on UDP query timeout disabled. Upgrade Netty to 4.1.105 or higher.
+2026-04-25 17:28:38.506 [redisson-netty-1-5] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:28:38.539 [redisson-netty-1-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-04-25 17:28:38.552 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:38.586 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ at localhost:5672
+2026-04-25 17:28:38.586 [main] INFO  snake.base.Logger - MessageBus connected to RabbitMQ
+2026-04-25 17:28:38.586 [main] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:28:38.596 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - Idempotence will be disabled because acks is set to 1, not set to 'all'.
+2026-04-25 17:28:38.596 [main] INFO  org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = 1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = producer-1
+	compression.type = none
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = false
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 5
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 3
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+2026-04-25 17:28:38.623 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka version: 3.6.0
+2026-04-25 17:28:38.623 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka commitId: 60e845626d8a465a
+2026-04-25 17:28:38.623 [main] INFO  org.apache.kafka.common.utils.AppInfoParser - Kafka startTimeMs: 1777109318622
+2026-04-25 17:28:38.624 [main] INFO  snake.base.Logger - Kafka event producer initialized, servers=localhost:9092
+2026-04-25 17:28:38.652 [main] INFO  snake.base.Logger - Worker registered: worker-1
+2026-04-25 17:28:38.658 [main] INFO  snake.base.Logger - Worker consumer started on queue: worker.commands.worker-1
+2026-04-25 17:28:38.658 [main] INFO  snake.base.Logger - Worker worker-1 started, listening for messages via RabbitMQ
+2026-04-25 17:28:38.658 [main] INFO  snake.base.Logger - Worker worker-1 started successfully
+2026-04-25 17:28:38.759 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Cluster ID: WykZPWWNTx2FvWPhNwawVA
+2026-04-25 17:28:41.250 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:28:43.601 [redisson-netty-1-26] INFO  org.redisson.connection.DNSMonitor - Try Redisson PRO with Proxy mode to use all ip addresses: [redis://127.0.0.1:6379, redis://0:0:0:0:0:0:0:1:6379]
+2026-04-25 17:28:45.954 [qtp1711185459-55] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:28:45.961 [defaultEventExecutorGroup-5-4] INFO  snake.base.Logger - User logged in: wmh
+2026-04-25 17:28:48.204 [defaultEventExecutorGroup-5-4] INFO  snake.base.Logger - CREATE routed to worker worker-2 for room 1
+2026-04-25 17:28:48.245 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 registered in Redis by node worker-2
+2026-04-25 17:28:48.265 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 started on worker worker-2
+2026-04-25 17:28:48.268 [worker-worker-2-dispatch] INFO  snake.base.Logger - Actor 1 created on worker worker-2
+2026-04-25 17:28:48.269 [worker-worker-2-dispatch] INFO  snake.base.Logger - Room 1 created by wmh
+2026-04-25 17:28:48.303 [actor-1] INFO  snake.base.Logger - Player wmh joined actor 1
+2026-04-25 17:28:48.543 [Thread-3] INFO  snake.base.Logger - Loaded config from config.properties
+2026-04-25 17:29:03.384 [actor-1] INFO  snake.base.Logger - Player wmh left actor 1
+2026-04-25 17:29:05.184 [qtp1711185459-57] INFO  snake.base.Logger - User logged out: wmh
+2026-04-25 17:29:48.265 [actor-1-idle] INFO  snake.base.Logger - Actor 1 idle timeout, stopping.
+2026-04-25 17:29:48.266 [actor-1-idle] INFO  snake.base.Logger - Actor 1 is stopping...
+2026-04-25 17:29:48.266 [actor-1-idle] INFO  snake.base.Logger - Actor 1 stopped, cleaning up...
+2026-04-25 17:29:48.266 [actor-1-idle] INFO  snake.base.Logger - Actor 1 removed from worker worker-2
+2026-04-25 17:29:48.267 [actor-1-idle] INFO  snake.base.Logger - Room 1 removed from Redis
+2026-04-25 17:29:48.269 [actor-1-idle] INFO  snake.base.Logger - Room 1 deleted from Redis
+2026-04-25 17:29:53.272 [actor-1-idle] INFO  snake.base.Logger - Disruptor for room 1 shut down
+2026-04-25 17:29:53.273 [actor-1-idle] INFO  snake.base.Logger - Actor 1 destroyed.

@@ -48,6 +48,7 @@
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/game/event/PlayerDiff.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/game/event/TickMessage.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/game/state/GameState.java
+/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/game/state/GameStateDiffer.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/gateway/GatewayMain.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/gateway/auth/GatewayAuthClient.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/gateway/dispatcher/MessageDispatcher.java
