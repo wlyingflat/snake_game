@@ -6,123 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
-import snake.auth.IAuthenticationService;
 import snake.base.User;
-import snake.distributed.DistributedCoordinator;
 import snake.persistence.BaseMySQLRepository;
 
-/** 用户仓储实现，同时提供认证服务。 */
-public class MySQLUserRepository extends BaseMySQLRepository
-    implements IUserRepository, IAuthenticationService {
-  private final DistributedCoordinator coordinator;
-  private final boolean distributedMode;
-
-  public MySQLUserRepository(
-      DataSource dataSource, DistributedCoordinator coordinator, boolean distributedMode) {
-    super(dataSource);
-    this.coordinator = coordinator;
-    this.distributedMode = distributedMode;
-  }
+/** 用户仓储实现，只负责 CRUD，不包含任何业务逻辑。 保留 BaseMySQLRepository 的建表能力和 DataSource 引用。 */
+public class MySQLUserRepository extends BaseMySQLRepository implements IUserRepository {
 
   public MySQLUserRepository(DataSource dataSource) {
-    this(dataSource, null, false);
-  }
-
-  @Override
-  public boolean register(String username, String password) {
-    User user = new User();
-    user.name = username;
-    user.salt = (int) (Math.random() * 0xFFFFFFFFL);
-    user.passwordHash = hashPassword(password, user.salt);
-    user.online = false;
-    user.lastActive = System.currentTimeMillis() / 1000;
-
-    String sql =
-        "INSERT INTO users (username, salt, password_hash, online, last_active) VALUES (?, ?, ?, ?,"
-            + " ?)";
-    try (Connection conn = dataSource.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-      ps.setString(1, username);
-      ps.setInt(2, user.salt);
-      ps.setBytes(3, user.passwordHash);
-      ps.setBoolean(4, user.online);
-      ps.setLong(5, user.lastActive);
-      ps.executeUpdate();
-      logger.info("User registered: " + username);
-      return true;
-    } catch (SQLIntegrityConstraintViolationException e) {
-      logger.warn("Username already exists: " + username);
-      return false;
-    } catch (SQLException e) {
-      logger.error("Registration error: " + e.getMessage());
-      return false;
-    }
-  }
-
-  @Override
-  public boolean login(String username, String password) {
-    User user = findByName(username);
-    if (user == null) {
-      return false;
-    }
-
-    byte[] hash = hashPassword(password, user.salt);
-    if (!Arrays.equals(hash, user.passwordHash)) {
-      return false;
-    }
-
-    // 分布式模式：检查 Redis 在线状态
-    if (distributedMode && coordinator != null) {
-      if (coordinator.isOnline(username)) {
-        logger.warn("User " + username + " already online (Redis check)");
-        return false;
-      }
-    } else {
-      // 非分布式模式：检查数据库 online 字段
-      if (user.online) {
-        logger.warn("User " + username + " already online (DB check)");
-        return false;
-      }
-    }
-
-    String sql = "UPDATE users SET online = 1, last_active = ? WHERE username = ?";
-    try (Connection conn = dataSource.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-      long now = System.currentTimeMillis() / 1000;
-      ps.setLong(1, now);
-      ps.setString(2, username);
-      ps.executeUpdate();
-      user.online = true;
-      user.lastActive = now;
-      logger.info("User logged in: " + username);
-      return true;
-    } catch (SQLException e) {
-      logger.error("Login update error: " + e.getMessage());
-      return false;
-    }
-  }
-
-  @Override
-  public void logout(String username) {
-    // 分布式模式：标记离线
-    if (distributedMode && coordinator != null) {
-      coordinator.markOffline(username);
-    }
-    String sql = "UPDATE users SET online = 0, last_active = ? WHERE username = ?";
-    try (Connection conn = dataSource.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-      ps.setLong(1, System.currentTimeMillis() / 1000);
-      ps.setString(2, username);
-      int updated = ps.executeUpdate();
-      if (updated > 0) {
-        logger.info("User logged out: " + username);
-      }
-    } catch (SQLException e) {
-      logger.error("Logout error: " + e.getMessage());
-    }
+    super(dataSource);
   }
 
   @Override
@@ -199,5 +92,52 @@ public class MySQLUserRepository extends BaseMySQLRepository
       logger.error("Find all users error: " + e.getMessage());
     }
     return list;
+  }
+
+  /**
+   * 创建一个新用户（用于注册）。
+   *
+   * @param user 用户名、盐、哈希必须已设置；online 和 last_active 由本方法强制置为 false 和当前时间。
+   * @return true 如果插入成功，false 表示用户名已存在。
+   */
+  @Override
+  public boolean createUser(User user) {
+    String sql =
+        "INSERT INTO users (username, salt, password_hash, online, last_active) VALUES (?, ?, ?, 0,"
+            + " ?)";
+    try (Connection conn = dataSource.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)) {
+      ps.setString(1, user.name);
+      ps.setInt(2, user.salt);
+      ps.setBytes(3, user.passwordHash);
+      ps.setLong(4, System.currentTimeMillis() / 1000);
+      ps.executeUpdate();
+      logger.info("User created: " + user.name);
+      return true;
+    } catch (SQLIntegrityConstraintViolationException e) {
+      logger.warn("Username already exists: " + user.name);
+      return false;
+    } catch (SQLException e) {
+      logger.error("Create user error: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /** 更新登录/登出状态 */
+  @Override
+  public void updateOnlineStatus(String username, boolean online, long lastActive) {
+    String sql = "UPDATE users SET online = ?, last_active = ? WHERE username = ?";
+    try (Connection conn = dataSource.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)) {
+      ps.setBoolean(1, online);
+      ps.setLong(2, lastActive);
+      ps.setString(3, username);
+      int rows = ps.executeUpdate();
+      if (rows > 0) {
+        logger.debug("Online status updated for " + username + ": " + online);
+      }
+    } catch (SQLException e) {
+      logger.error("Update online status error: " + e.getMessage());
+    }
   }
 }

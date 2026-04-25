@@ -10,5 +10,11 @@ public interface IUserRepository {
 
   void delete(String username);
 
-  List<User> findAll(); // 用于快照
+  List<User> findAll();
+
+  /** 创建新用户，成功返回 true（如用户名已存在返回 false） */
+  boolean createUser(User user);
+
+  /** 更新用户的在线状态和最后活跃时间 */
+  void updateOnlineStatus(String username, boolean online, long lastActive);
 }

@@ -5,13 +5,11 @@ import snake.base.Config;
 import snake.base.IConfigProvider;
 import snake.base.ILogger;
 import snake.base.Logger;
+import snake.distributed.DistributedCoordinator;
 import snake.persistence.DatabaseManager;
 import snake.persistence.PropertiesConfigProvider;
 import snake.persistence.user.MySQLUserRepository;
 
-/**
- * 认证服务主入口，启动内嵌 HTTP 服务器，提供用户注册、登录、登出 REST API。 使用方式: java snake.auth.MainServer [port] 默认端口: 9000
- */
 public class MainServer {
   private static final ILogger logger = Logger.getInstance();
 
@@ -26,13 +24,26 @@ public class MainServer {
     }
 
     try {
-      // 加载配置
       IConfigProvider config = new PropertiesConfigProvider("config.properties");
       DatabaseManager dbManager = DatabaseManager.getInstance(config);
       DataSource dataSource = dbManager.getDataSource();
 
-      // 认证服务实现（基于 MySQL）
-      IAuthenticationService authService = new MySQLUserRepository(dataSource);
+      // 创建用户仓储（纯 CRUD）
+      MySQLUserRepository userRepo = new MySQLUserRepository(dataSource);
+
+      // 根据分布式模式决定是否创建 Coordinator
+      boolean distributedMode =
+          Boolean.parseBoolean(System.getProperty("distributed.mode", "false"));
+      DistributedCoordinator coordinator = null;
+      if (distributedMode) {
+        // 需要 Redisson 连接，这里简化处理，实际应创建 RedissonClient 等
+        // 此处仅为示例，假设已经具备相关基础设施
+        // coordinator = new DistributedCoordinator(redisson, "auth-server");
+        logger.warn("Distributed mode requested but Redisson not configured for auth service");
+      }
+
+      // 创建认证服务
+      IAuthenticationService authService = new AuthenticationService(userRepo, coordinator);
 
       // 启动 HTTP 服务器
       AuthHttpServer httpServer = new AuthHttpServer(port, authService);
@@ -57,12 +68,11 @@ public class MainServer {
                   },
                   "ShutdownHook"));
 
-      // 阻塞主线程（Jetty 已使用非守护线程）
       Thread.currentThread().join();
 
     } catch (Exception e) {
       logger.error("Failed to start auth service: " + e.getMessage());
-      e.printStackTrace(); // 可选，输出完整堆栈到标准错误
+      e.printStackTrace();
       System.exit(1);
     }
   }

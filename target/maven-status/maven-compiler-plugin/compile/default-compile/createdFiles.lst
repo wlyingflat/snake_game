@@ -9,6 +9,7 @@ snake/client/swing/GameCanvas.class
 snake/distributed/DistributedCoordinator.class
 snake/actor/GameActor$1.class
 snake/gateway/reactor/ReactorGateway.class
+snake/auth/PasswordUtils.class
 snake/distributed/DistributedCoordinator$UserRank.class
 snake/auth/MainServer.class
 snake/distributed/PlayerLocationRepository.class
@@ -93,6 +94,7 @@ snake/persistence/leaderboard/MySQLLeaderboardRepository.class
 snake/persistence/PropertiesConfigProvider.class
 snake/event/ScoreChangedEvent.class
 snake/base/GameStateData$PlayerInfo.class
+snake/auth/AuthenticationService.class
 snake/base/ISerializer.class
 snake/gateway/handler/CommandDispatcher.class
 snake/client/LocalGameState$PlayerData.class
