@@ -3,7 +3,8 @@ package snake.distributed;
 import java.util.concurrent.TimeUnit;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import snake.base.Config;
+import snake.common.Config;
+import snake.infrastructure.persistence.RedisKeys;
 
 /** 负责玩家与 Gateway/房间的位置映射。 */
 public class PlayerLocationRepository {

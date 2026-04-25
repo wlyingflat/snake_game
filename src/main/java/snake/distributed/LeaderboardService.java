@@ -6,6 +6,7 @@ import java.util.List;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
+import snake.infrastructure.persistence.RedisKeys;
 
 /** 负责排行榜（从 Redis Sorted Set）查询。 */
 public class LeaderboardService {

@@ -2,9 +2,9 @@ package snake.client.swing;
 
 import java.awt.*;
 import javax.swing.*;
-import snake.base.GameStateData;
-import snake.base.Position;
 import snake.client.Config;
+import snake.common.GameStateData;
+import snake.common.Position;
 
 public class GameCanvas extends JPanel {
   private static final int CELL_SIZE = 20;

@@ -4,8 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
-import snake.base.ILogger;
-import snake.base.Logger;
+import snake.common.ILogger;
+import snake.common.Logger;
+import snake.infrastructure.persistence.RedisKeys;
 
 /** 负责 Worker 和 Gateway 节点的注册与注销。 */
 public class NodeRepository {

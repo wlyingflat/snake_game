@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import snake.base.ILogger;
-import snake.base.Logger;
+import snake.common.ILogger;
+import snake.common.Logger;
+import snake.infrastructure.persistence.RedisKeys;
 
 /** 负责房间在 Redis 中的创建、更新、删除、查询，以及 Worker 分配。 */
 public class RoomRepository {

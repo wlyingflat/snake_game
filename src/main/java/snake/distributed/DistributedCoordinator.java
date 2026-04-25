@@ -2,7 +2,6 @@ package snake.distributed;
 
 import java.util.*;
 import org.redisson.api.RedissonClient;
-import snake.base.*;
 
 /** 分布式协调器门面，组合各个领域服务，提供与原有完全相同的 API。 所有方法直接委托给对应的领域服务。 */
 public class DistributedCoordinator {

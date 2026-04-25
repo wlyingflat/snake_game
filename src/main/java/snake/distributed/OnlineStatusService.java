@@ -3,9 +3,10 @@ package snake.distributed;
 import java.util.concurrent.TimeUnit;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import snake.base.Config;
-import snake.base.ILogger;
-import snake.base.Logger;
+import snake.common.Config;
+import snake.common.ILogger;
+import snake.common.Logger;
+import snake.infrastructure.persistence.RedisKeys;
 
 /** 负责在线状态管理，包含超时检查和心跳刷新。 */
 public class OnlineStatusService {

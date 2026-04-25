@@ -2,9 +2,9 @@ package snake.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.*;
-import snake.base.Direction;
-import snake.base.GameStateData;
-import snake.base.Position;
+import snake.common.Direction;
+import snake.common.GameStateData;
+import snake.common.Position;
 
 public class LocalGameState {
 

@@ -3,32 +3,31 @@ package snake.consumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.apache.kafka.clients.consumer.*;
-import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
-import org.redisson.client.codec.StringCodec;
-import snake.base.*;
-import snake.persistence.DatabaseManager;
-import snake.persistence.PropertiesConfigProvider;
-import snake.persistence.leaderboard.MySQLLeaderboardRepository;
-import snake.persistence.redis.RedissonManager;
+import snake.common.Config;
+import snake.common.IConfigProvider;
+import snake.common.ILogger;
+import snake.common.JsonUtils;
+import snake.common.Logger;
+import snake.infrastructure.persistence.DatabaseManager;
+import snake.infrastructure.persistence.PropertiesConfigProvider;
+import snake.infrastructure.persistence.RedissonManager;
+import snake.infrastructure.persistence.leaderboard.ILeaderboardRepository;
+import snake.infrastructure.persistence.leaderboard.MySQLLeaderboardRepository;
 
 public class LeaderboardConsumer implements Runnable {
-  private final ILeaderboardRepository leaderboardRepo; // MySQL 实现
-  private final RedissonClient redisson;
+  private final LeaderboardEventHandler eventHandler;
+  private final LeaderboardSynchronizer synchronizer;
   private final KafkaConsumer<String, String> consumer;
   private final ILogger logger = Logger.getInstance();
   private volatile boolean running = true;
-  private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
   public LeaderboardConsumer(ILeaderboardRepository leaderboardRepo, RedissonClient redisson) {
-    this.leaderboardRepo = leaderboardRepo;
-    this.redisson = redisson;
+    this.eventHandler = new LeaderboardEventHandler(leaderboardRepo, redisson);
+    this.synchronizer = new LeaderboardSynchronizer(leaderboardRepo, redisson);
+
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Config.KAFKA_BOOTSTRAP_SERVERS);
     props.put(ConsumerConfig.GROUP_ID_CONFIG, "leaderboard-updater");
@@ -44,80 +43,26 @@ public class LeaderboardConsumer implements Runnable {
     consumer.subscribe(Collections.singletonList("game.player.died"));
   }
 
-  /** 全量加载 MySQL 排行榜到 Redis（覆盖） */
-  private void loadAllScoresToRedis() {
-    if (redisson == null || redisson.isShutdown()) return;
-    try {
-      // 从 MySQL 获取所有高分（getLeaderboard(Integer.MAX_VALUE)）
-      List<ILeaderboardRepository.UserRank> allRanks =
-          leaderboardRepo.getLeaderboard(Integer.MAX_VALUE);
-      RScoredSortedSet<String> leaderboard =
-          redisson.getScoredSortedSet("leaderboard", StringCodec.INSTANCE);
-      // 清空原有数据
-      leaderboard.clear();
-      for (ILeaderboardRepository.UserRank rank : allRanks) {
-        leaderboard.add(rank.score, rank.username);
-      }
-      logger.info("Loaded " + allRanks.size() + " records from MySQL to Redis");
-    } catch (Exception e) {
-      logger.error("Failed to load leaderboard to Redis: " + e.getMessage());
-    }
-  }
-
-  /** 增量更新单条记录（由 Kafka 事件触发） */
-  private void updateScoreInRedis(String username, int newScore) {
-    if (redisson == null || redisson.isShutdown()) return;
-    try {
-      RScoredSortedSet<String> leaderboard =
-          redisson.getScoredSortedSet("leaderboard", StringCodec.INSTANCE);
-      Double current = leaderboard.getScore(username);
-      if (current == null || current < newScore) {
-        leaderboard.add(newScore, username);
-        logger.debug("Redis updated for " + username + " with score " + newScore);
-      }
-    } catch (Exception e) {
-      logger.error("Failed to update Redis for " + username + ": " + e.getMessage());
-    }
-  }
-
   @Override
   public void run() {
-    // 启动时先全量加载一次
-    loadAllScoresToRedis();
-
-    // 定时同步（每小时一次），确保 Redis 不丢失
-    scheduler.scheduleAtFixedRate(this::loadAllScoresToRedis, 1, 1, TimeUnit.HOURS);
+    // 启动时全量同步一次
+    synchronizer.syncOnce();
+    // 每小时定时同步
+    synchronizer.startScheduledSync();
 
     logger.info("LeaderboardConsumer started, listening to game.player.died");
     while (running) {
       try {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
         for (ConsumerRecord<String, String> record : records) {
-          try {
-            JsonNode event = JsonUtils.MAPPER.readTree(record.value());
-            if ("PlayerDied".equals(event.get("eventType").asText())) {
-              JsonNode payload = event.get("payload");
-              String username = payload.get("username").asText();
-              int finalScore = payload.get("score").asInt();
-
-              // 1. 更新 MySQL（如果分数更高）
-              boolean mysqlUpdated = leaderboardRepo.updateHighScore(username, finalScore);
-              // 2. 更新 Redis（如果分数更高）
-              updateScoreInRedis(username, finalScore);
-
-              if (mysqlUpdated) {
-                logger.info("Leaderboard updated for " + username + " with score " + finalScore);
-              }
-            }
-          } catch (Exception e) {
-            logger.error("Failed to process event: " + e.getMessage());
-          }
+          JsonNode event = JsonUtils.MAPPER.readTree(record.value());
+          eventHandler.handle(event);
         }
       } catch (Exception e) {
         logger.error("Consumer loop error: " + e.getMessage());
       }
     }
-    scheduler.shutdown();
+    synchronizer.stop();
     consumer.close();
     logger.info("LeaderboardConsumer stopped");
   }
@@ -127,6 +72,7 @@ public class LeaderboardConsumer implements Runnable {
     consumer.wakeup();
   }
 
+  // main 方法保持不变，但内部改用新的构造函数
   public static void main(String[] args) {
     IConfigProvider configProvider = new PropertiesConfigProvider("config.properties");
     DatabaseManager dbManager = DatabaseManager.getInstance(configProvider);
