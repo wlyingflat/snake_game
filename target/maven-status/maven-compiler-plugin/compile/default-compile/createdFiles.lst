@@ -11,14 +11,17 @@ snake/actor/GameActor$1.class
 snake/gateway/reactor/ReactorGateway.class
 snake/distributed/DistributedCoordinator$UserRank.class
 snake/auth/MainServer.class
+snake/distributed/PlayerLocationRepository.class
 snake/event/ScoreChangedEvent$1.class
 snake/actor/ActorEventLoop.class
 snake/event/PlayerDiedEvent.class
 snake/network/IServer.class
+snake/distributed/LeaderboardService.class
 snake/base/Config.class
 snake/client/swing/RoomListFrame$1.class
 snake/game/event/Message.class
 snake/gateway/session/DefaultSessionManager.class
+snake/distributed/PlayerLocationRepository$PlayerLocation.class
 snake/game/event/MessageEvent.class
 snake/event/KafkaEventProducer.class
 snake/gateway/auth/GatewayAuthClient.class
@@ -36,6 +39,7 @@ snake/base/Logger.class
 snake/gateway/lobby/LobbyService.class
 snake/base/ILogger.class
 snake/base/JsonUtils.class
+snake/distributed/RoomRepository$RoomEntry.class
 snake/client/swing/GameFrame$2.class
 snake/distributed/RedisKeys.class
 snake/gateway/heartbeat/HeartbeatService.class
@@ -57,6 +61,8 @@ snake/distributed/DistributedCoordinator$PlayerLocation.class
 snake/gateway/server/GatewayServer$1.class
 snake/actor/GameTickProcessor.class
 snake/event/PlayerDiedEvent$1.class
+snake/distributed/RoomRepository.class
+snake/distributed/NodeRepository.class
 snake/actor/ActorNotifier.class
 snake/game/event/GameStateDiff.class
 snake/base/ILeaderboardRepository.class
@@ -66,10 +72,12 @@ snake/client/swing/GameFrame$1.class
 snake/persistence/leaderboard/RedissonLeaderboardRepository.class
 snake/gateway/server/GatewayServer.class
 snake/gateway/dispatcher/MessageDispatcher.class
+snake/distributed/OnlineStatusService.class
 snake/gateway/session/ClientSession.class
 snake/game/state/GameState.class
 snake/base/GameStateData.class
 snake/auth/IAuthenticationService.class
+snake/distributed/LeaderboardService$UserRank.class
 snake/actor/EnhancedMessage$1.class
 snake/game/event/TickMessage.class
 snake/client/GatewayClient$RoomListListener.class

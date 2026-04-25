@@ -1,18 +1,25 @@
 package snake.distributed;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import org.redisson.api.*;
+import org.redisson.api.RedissonClient;
 import snake.base.*;
 
+/** 分布式协调器门面，组合各个领域服务，提供与原有完全相同的 API。 所有方法直接委托给对应的领域服务。 */
 public class DistributedCoordinator {
-  private final RedissonClient redisson;
+  private final RoomRepository roomRepo;
+  private final NodeRepository nodeRepo;
+  private final PlayerLocationRepository playerLocRepo;
+  private final OnlineStatusService onlineStatusService;
+  private final LeaderboardService leaderboardService;
   private final String nodeId;
-  private final ILogger logger = Logger.getInstance();
 
   public DistributedCoordinator(RedissonClient redisson, String nodeId) {
-    this.redisson = redisson;
     this.nodeId = nodeId;
+    this.roomRepo = new RoomRepository(redisson);
+    this.nodeRepo = new NodeRepository(redisson);
+    this.playerLocRepo = new PlayerLocationRepository(redisson, nodeId);
+    this.onlineStatusService = new OnlineStatusService(redisson);
+    this.leaderboardService = new LeaderboardService(redisson);
   }
 
   public String getNodeId() {
@@ -20,206 +27,118 @@ public class DistributedCoordinator {
   }
 
   // ==================== 房间管理 ====================
-
   public boolean tryCreateRoom(int roomId, int maxPlayers) {
-    RMap<String, Object> roomMap = redisson.getMap(RedisKeys.ROOM_PREFIX + roomId);
-    boolean created = roomMap.fastPutIfAbsent("nodeId", nodeId);
-    if (created) {
-      roomMap.fastPut("status", "OPEN");
-      roomMap.fastPut("playerCount", 0);
-      roomMap.fastPut("maxPlayers", maxPlayers);
-      roomMap.expire(2, TimeUnit.HOURS);
-      logger.info("Room " + roomId + " registered in Redis by node " + nodeId);
-    }
-    return created;
+    return roomRepo.tryCreateRoom(roomId, maxPlayers, nodeId);
   }
 
   public void updateRoomInfo(int roomId, int playerCount, boolean isFull) {
-    RMap<String, Object> roomMap = redisson.getMap(RedisKeys.ROOM_PREFIX + roomId);
-    roomMap.fastPut("playerCount", playerCount);
-    roomMap.fastPut("status", isFull ? "FULL" : "OPEN");
-    roomMap.expire(2, TimeUnit.HOURS);
+    roomRepo.updateRoomInfo(roomId, playerCount, isFull);
   }
 
   public void deleteRoom(int roomId) {
-    redisson.getMap(RedisKeys.ROOM_PREFIX + roomId).delete();
-    logger.info("Room " + roomId + " removed from Redis");
+    roomRepo.deleteRoom(roomId);
   }
 
   public boolean roomExists(int roomId) {
-    return redisson.getMap(RedisKeys.ROOM_PREFIX + roomId).isExists();
+    return roomRepo.roomExists(roomId);
   }
 
   public List<RoomEntry> getAllRooms() {
-    List<RoomEntry> rooms = new ArrayList<>();
-    Iterable<String> keys = redisson.getKeys().getKeysByPattern(RedisKeys.ROOM_PREFIX + "*");
-    for (String key : keys) {
-      RMap<String, Object> map = redisson.getMap(key);
-      if (map.isEmpty()) continue;
-      int roomId = Integer.parseInt(key.substring(RedisKeys.ROOM_PREFIX.length()));
-      rooms.add(
-          new RoomEntry(
-              roomId,
-              (String) map.get("status"),
-              ((Number) map.getOrDefault("playerCount", 0)).intValue(),
-              ((Number) map.getOrDefault("maxPlayers", 0)).intValue(),
-              (String) map.get("nodeId")));
+    List<RoomRepository.RoomEntry> entries = roomRepo.getAllRooms();
+    List<RoomEntry> result = new ArrayList<>();
+    for (RoomRepository.RoomEntry e : entries) {
+      result.add(
+          new RoomEntry(e.roomId(), e.status(), e.playerCount(), e.maxPlayers(), e.nodeId()));
     }
-    return rooms;
+    return result;
   }
 
+  // 兼容原有的 RoomEntry record
   public record RoomEntry(
       int roomId, String status, int playerCount, int maxPlayers, String nodeId) {}
 
   // ==================== Worker 管理 ====================
-
   public void registerWorker(String workerId) {
-    RSet<String> workers = redisson.getSet(RedisKeys.WORKER_NODES);
-    workers.add(workerId);
-    logger.info("Worker registered: " + workerId);
+    nodeRepo.registerWorker(workerId);
   }
 
   public void unregisterWorker(String workerId) {
-    RSet<String> workers = redisson.getSet(RedisKeys.WORKER_NODES);
-    workers.remove(workerId);
-    logger.info("Worker unregistered: " + workerId);
+    nodeRepo.unregisterWorker(workerId);
   }
 
   public Set<String> getActiveWorkers() {
-    Set<String> workers = new HashSet<>();
-    for (Object obj : redisson.getSet(RedisKeys.WORKER_NODES).readAll()) {
-      workers.add(obj.toString());
-    }
-    return workers;
+    return nodeRepo.getActiveWorkers();
   }
 
   // ==================== Gateway 管理 ====================
-
   public void registerGateway(String gatewayId) {
-    redisson.getSet(RedisKeys.GATEWAY_NODES).add(gatewayId);
-    logger.info("Gateway registered: " + gatewayId);
+    nodeRepo.registerGateway(gatewayId);
   }
 
   public void unregisterGateway(String gatewayId) {
-    redisson.getSet(RedisKeys.GATEWAY_NODES).remove(gatewayId);
-    logger.info("Gateway unregistered: " + gatewayId);
+    nodeRepo.unregisterGateway(gatewayId);
   }
 
   // ==================== 房间到 Worker 的映射 ====================
-
   public boolean assignRoomToWorker(int roomId, String workerId) {
-    RMap<String, Object> roomMap = redisson.getMap(RedisKeys.ROOM_PREFIX + roomId);
-    roomMap.fastPut("workerId", workerId);
+    roomRepo.assignRoomToWorker(roomId, workerId);
     return true;
   }
 
   public String getRoomWorker(int roomId) {
-    RMap<String, Object> roomMap = redisson.getMap(RedisKeys.ROOM_PREFIX + roomId);
-    return (String) roomMap.get("workerId");
+    return roomRepo.getRoomWorker(roomId);
   }
 
   public int getRoomCount(String workerId) {
-    int count = 0;
-    Iterable<String> keys = redisson.getKeys().getKeysByPattern(RedisKeys.ROOM_PREFIX + "*");
-    for (String key : keys) {
-      RMap<String, Object> map = redisson.getMap(key);
-      if (workerId.equals(map.get("workerId"))) {
-        count++;
-      }
-    }
-    return count;
+    return roomRepo.getRoomCount(workerId);
   }
 
   // ==================== 玩家位置管理 ====================
-
   public void setPlayerLocation(String username, String gatewayId, int roomId) {
-    RMap<String, Object> playerMap = redisson.getMap(RedisKeys.PLAYER_PREFIX + username);
-    playerMap.fastPut("gatewayId", gatewayId);
-    playerMap.fastPut("roomId", roomId);
-    playerMap.fastPut("nodeId", nodeId);
-    playerMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
+    playerLocRepo.setPlayerLocation(username, gatewayId, roomId);
   }
 
   public PlayerLocation getPlayerLocation(String username) {
-    RMap<String, Object> map = redisson.getMap(RedisKeys.PLAYER_PREFIX + username);
-    if (map.isEmpty()) return null;
-    return new PlayerLocation(
-        (String) map.get("gatewayId"), ((Number) map.getOrDefault("roomId", -1)).intValue());
+    PlayerLocationRepository.PlayerLocation loc = playerLocRepo.getPlayerLocation(username);
+    if (loc == null) return null;
+    return new PlayerLocation(loc.gatewayId(), loc.roomId());
   }
 
   public void removePlayerLocation(String username) {
-    redisson.getMap(RedisKeys.PLAYER_PREFIX + username).delete();
+    playerLocRepo.removePlayerLocation(username);
   }
 
   public void refreshPlayerLocation(String username) {
-    if (username == null) return;
-    RMap<String, Object> playerMap = redisson.getMap(RedisKeys.PLAYER_PREFIX + username);
-    if (!playerMap.isEmpty()) {
-      playerMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
-    }
+    playerLocRepo.refreshPlayerLocation(username);
   }
 
   public record PlayerLocation(String gatewayId, int roomId) {}
 
   // ==================== 在线状态管理 ====================
-
   public void markOnline(String username) {
-    if (username == null) return;
-    RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
-    onlineMap.fastPut(username, System.currentTimeMillis());
-    onlineMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
+    onlineStatusService.markOnline(username);
   }
 
   public void refreshOnline(String username) {
-    if (username == null) return;
-    RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
-    Long lastSeen = onlineMap.get(username);
-    if (lastSeen != null) {
-      onlineMap.fastPut(username, System.currentTimeMillis());
-      onlineMap.expire(Config.HEARTBEAT_TIMEOUT * 2, TimeUnit.SECONDS);
-    }
+    onlineStatusService.refreshOnline(username);
   }
 
   public void markOffline(String username) {
-    if (username == null) return;
-    RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
-    onlineMap.remove(username);
+    onlineStatusService.markOffline(username);
   }
 
   public boolean isOnline(String username) {
-    if (username == null) return false;
-    RMap<String, Long> onlineMap = redisson.getMap(RedisKeys.ONLINE_USERS_MAP);
-    Long lastSeen = onlineMap.get(username);
-    if (lastSeen == null) {
-      return false;
-    }
-    long elapsed = System.currentTimeMillis() - lastSeen;
-    if (elapsed > Config.HEARTBEAT_TIMEOUT * 2 * 1000L) {
-      logger.warn("User " + username + " online status expired");
-      markOffline(username);
-      return false;
-    }
-    return true;
+    return onlineStatusService.isOnline(username);
   }
 
   // ==================== 排行榜 ====================
-
   public List<UserRank> getLeaderboard(int limit) {
-    RScoredSortedSet<String> leaderboard =
-        redisson.getScoredSortedSet(
-            RedisKeys.LEADERBOARD_KEY, org.redisson.client.codec.StringCodec.INSTANCE);
-    List<UserRank> ranks = new ArrayList<>();
-    Collection<String> usernames = leaderboard.valueRangeReversed(0, limit - 1);
-    if (usernames != null) {
-      int rank = 1;
-      for (String username : usernames) {
-        Double score = leaderboard.getScore(username);
-        if (score != null) {
-          ranks.add(new UserRank(rank++, username, score.intValue()));
-        }
-      }
+    List<LeaderboardService.UserRank> ranks = leaderboardService.getLeaderboard(limit);
+    List<UserRank> result = new ArrayList<>();
+    for (LeaderboardService.UserRank r : ranks) {
+      result.add(new UserRank(r.rank, r.username, r.score));
     }
-    return ranks;
+    return result;
   }
 
   public static class UserRank {
