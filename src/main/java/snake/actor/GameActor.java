@@ -1,39 +1,31 @@
 package snake.actor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.lmax.disruptor.*;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
-import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import snake.base.*;
 import snake.distributed.DistributedCoordinator;
 import snake.event.KafkaEventProducer;
-import snake.game.event.*;
+import snake.game.event.TickMessage;
 import snake.game.state.GameState;
 import snake.mq.MessageBus;
-import snake.network.Serializer;
 
+/**
+ * 重构后的 GameActor 仅负责： - 组合各个组件（ActorEventLoop, ActorScheduler, GameMessageHandler,
+ * GameTickProcessor） - 提供外部 API（postMessage, getSnapshot, stop, isRunning） - 协调组件间的交互
+ */
 public class GameActor {
   private final int roomId;
   private final String workerId;
-  private final Disruptor<MessageEvent> disruptor;
-  private final RingBuffer<MessageEvent> ringBuffer;
-  private final GameState state;
+  private final ActorEventLoop eventLoop;
+  private final ActorScheduler scheduler;
+  private final GameTickProcessor tickProcessor;
+  private final GameMessageHandler messageHandler;
   private final ActorNotifier notifier;
   private final DistributedCoordinator coordinator;
+  private final GameState state; // 暴露给外部获取玩家列表等
   private final Runnable onStatusChange;
   private final AtomicBoolean running = new AtomicBoolean(true);
-  private final ScheduledExecutorService tickScheduler;
-  private final ScheduledExecutorService idleCheckScheduler;
-  private volatile GameStateData cachedSnapshot;
-  private long lastActiveTime;
+  private volatile long lastActiveTime = System.currentTimeMillis();
   private final ILogger logger = Logger.getInstance();
-
-  private int tickSinceLastFullState = 0;
-  private static final int FULL_STATE_INTERVAL_TICKS = 100;
 
   public GameActor(
       int roomId,
@@ -46,79 +38,50 @@ public class GameActor {
     this.coordinator = coordinator;
     this.workerId = workerId;
     this.onStatusChange = onStatusChange;
+
     this.state = new GameState(roomId);
     this.notifier = new ActorNotifier(coordinator, eventProducer, messageBus);
-    this.lastActiveTime = System.currentTimeMillis();
 
-    this.disruptor =
-        new Disruptor<>(
-            MessageEvent.FACTORY,
-            Config.RING_BUFFER_SIZE,
-            r -> {
-              Thread t = new Thread(r);
-              t.setName("actor-" + roomId);
-              t.setDaemon(true);
-              return t;
-            },
-            ProducerType.MULTI,
-            new YieldingWaitStrategy());
+    // 创建消息处理器和 tick 处理器
+    this.tickProcessor = new GameTickProcessor(roomId, state, notifier, onStatusChange);
+    this.messageHandler =
+        new GameMessageHandler(roomId, state, notifier, coordinator, tickProcessor, onStatusChange);
 
-    this.disruptor.handleEventsWith(
-        (event, sequence, endOfBatch) -> {
-          Message msg = event.getMessage();
-          if (msg instanceof TickMessage) {
-            doGameTick();
-          } else if (msg instanceof EnhancedMessage) {
-            EnhancedMessage enhanced = (EnhancedMessage) msg;
-            try {
-              handleEnhancedMessage(enhanced);
-            } finally {
-              enhanced.recycle(); // 处理完毕后回收池化对象
-            }
-          }
-          event.clear();
-        });
+    // 创建事件循环，将自己实现的 MessageHandler 注入
+    this.eventLoop =
+        new ActorEventLoop(
+            roomId,
+            new ActorEventLoop.MessageHandler() {
+              @Override
+              public void onTick() {
+                // 每次 tick 更新时间戳
+                if (!state.isEmpty()) {
+                  lastActiveTime = System.currentTimeMillis();
+                }
+                tickProcessor.processTick();
+              }
 
-    this.ringBuffer = disruptor.getRingBuffer();
-    disruptor.start();
-
-    this.tickScheduler =
-        Executors.newSingleThreadScheduledExecutor(
-            r -> {
-              Thread t = new Thread(r);
-              t.setName("actor-" + roomId + "-tick");
-              t.setDaemon(true);
-              return t;
+              @Override
+              public void onMessage(EnhancedMessage msg) {
+                messageHandler.handle(msg);
+              }
             });
-    tickScheduler.scheduleAtFixedRate(
-        () -> {
-          if (running.get()) publishEvent(new TickMessage());
-        },
-        0,
-        Config.TICK_INTERVAL_MS,
-        TimeUnit.MILLISECONDS);
 
-    this.idleCheckScheduler =
-        Executors.newSingleThreadScheduledExecutor(
-            r -> {
-              Thread t = new Thread(r);
-              t.setName("actor-" + roomId + "-idle");
-              t.setDaemon(true);
-              return t;
-            });
-    idleCheckScheduler.scheduleAtFixedRate(
-        this::checkIdleAndStop,
-        Config.ROOM_IDLE_TIMEOUT,
-        Config.ROOM_IDLE_TIMEOUT,
-        TimeUnit.SECONDS);
+    // 创建调度器，将任务进行绑定
+    this.scheduler =
+        new ActorScheduler(
+            roomId, () -> eventLoop.publishEvent(new TickMessage()), this::checkIdleAndStop);
 
-    updateCachedSnapshot();
+    // 启动 Disruptor 和调度器
+    eventLoop.start();
+    scheduler.start();
+
     logger.info("Actor " + roomId + " started on worker " + this.workerId);
   }
 
   public void postMessage(EnhancedMessage msg) {
     if (!running.get()) return;
-    publishEvent(msg);
+    eventLoop.publishEvent(msg);
   }
 
   public int getRoomId() {
@@ -130,160 +93,29 @@ public class GameActor {
   }
 
   public GameStateData getSnapshot(String username) {
-    return cachedSnapshot;
+    return tickProcessor.getCachedSnapshot();
   }
 
-  private void handleEnhancedMessage(EnhancedMessage msg) {
-    switch (msg.getCommand()) {
-      case "CREATE":
-      case "JOIN":
-        handleJoin(msg.getUsername(), msg.getGatewayId());
-        break;
-      case "INPUT":
-        handleInput(msg);
-        break;
-      case "LEAVE":
-        handleLeave(msg.getUsername(), msg.getGatewayId());
-        break;
-      default:
-        logger.warn("Actor " + roomId + " unknown command: " + msg.getCommand());
-    }
-  }
+  public void stop() {
+    if (!running.compareAndSet(true, false)) return;
+    logger.info("Actor " + roomId + " is stopping...");
 
-  private void handleJoin(String username, String gatewayId) {
-    boolean joined = state.addPlayer(username);
-    if (joined) {
-      String joinOk = buildJoinOkMessage();
-      notifier.sendToPlayer(username, gatewayId, joinOk);
-      if (gatewayId != null) {
-        coordinator.setPlayerLocation(username, gatewayId, roomId);
-      }
-      sendFullStateTo(username, gatewayId);
-      logger.info("Player " + username + " joined actor " + roomId);
-      if (onStatusChange != null) onStatusChange.run();
-    } else {
-      String joinFail = buildJoinFailMessage();
-      notifier.sendToPlayer(username, gatewayId, joinFail);
-      logger.warn("Player " + username + " failed to join actor " + roomId);
-    }
-  }
-
-  private void handleInput(EnhancedMessage msg) {
-    try {
-      JsonNode params = JsonUtils.MAPPER.readTree(msg.getRawMessage());
-      Direction dir = Direction.valueOf(params.get("direction").asText());
-      state.updateDirection(msg.getUsername(), dir);
-    } catch (Exception e) {
-      logger.error("Failed to parse input: " + e.getMessage());
-    }
-  }
-
-  private void handleLeave(String username, String gatewayId) {
-    state.removePlayer(username);
-    String leaveMsg = "{\"cmd\":\"YOU_LEFT\"}";
-    notifier.sendToPlayer(username, gatewayId, leaveMsg);
-    coordinator.removePlayerLocation(username);
-    logger.info("Player " + username + " left actor " + roomId);
-    if (onStatusChange != null) onStatusChange.run();
-    updateCachedSnapshotAndBroadcast();
-  }
-
-  private void doGameTick() {
-    if (!state.isEmpty()) {
-      lastActiveTime = System.currentTimeMillis();
-    }
-
-    Map<String, Integer> oldScores = new HashMap<>();
+    // 通知所有玩家
     for (GameState.Player p : state.getPlayers()) {
-      oldScores.put(p.username, p.score);
+      notifier.sendToPlayer(p.username, null, "{\"cmd\":\"ROOM_CLOSED\"}");
+      coordinator.removePlayerLocation(p.username);
     }
 
-    Map<String, Boolean> wasAlive = new HashMap<>();
-    for (GameState.Player p : state.getPlayers()) {
-      wasAlive.put(p.username, !p.isDead);
-    }
-
-    state.update();
-
-    for (GameState.Player p : state.getPlayers()) {
-      int oldScore = oldScores.getOrDefault(p.username, 0);
-      if (p.score > oldScore) {
-        notifier.publishScoreChanged(p.username, roomId, p.score, p.score - oldScore);
+    if (onStatusChange != null) {
+      try {
+        onStatusChange.run();
+      } catch (Exception ignored) {
       }
     }
 
-    List<String> diedPlayers = new ArrayList<>();
-    for (GameState.Player p : state.getPlayers()) {
-      Boolean aliveBefore = wasAlive.get(p.username);
-      if (aliveBefore != null && aliveBefore && p.isDead) {
-        diedPlayers.add(p.username);
-      }
-    }
-
-    for (String username : diedPlayers) {
-      GameState.Player player =
-          state.getPlayers().stream()
-              .filter(p -> p.username.equals(username))
-              .findFirst()
-              .orElse(null);
-      if (player != null) {
-        notifier.publishPlayerDied(username, roomId, player.score, player.length, "COLLISION");
-      }
-      state.removePlayer(username);
-      notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");
-    }
-
-    tickSinceLastFullState++;
-    boolean forceFull =
-        (tickSinceLastFullState >= FULL_STATE_INTERVAL_TICKS) || state.hasNewPlayer();
-    if (forceFull) {
-      updateCachedSnapshotAndBroadcast();
-      tickSinceLastFullState = 0;
-    } else {
-      broadcastDiff();
-    }
-
-    if (!diedPlayers.isEmpty() && onStatusChange != null) {
-      onStatusChange.run();
-    }
-  }
-
-  private void updateCachedSnapshotAndBroadcast() {
-    cachedSnapshot = state.snapshot(null);
-    if (cachedSnapshot == null) return;
-    String json = new Serializer().serialize(cachedSnapshot);
-    if (json == null) return;
-    for (GameState.Player p : state.getPlayers()) {
-      if (!p.isDead) {
-        notifier.sendToPlayer(p.username, null, json);
-      }
-    }
-  }
-
-  private void updateCachedSnapshot() {
-    cachedSnapshot = state.snapshot(null);
-  }
-
-  private void broadcastDiff() {
-    GameStateDiff diff = state.computeDiff();
-    if (diff == null) return;
-    String json = new Serializer().serializeDiff(diff);
-    if (json == null) return;
-    for (GameState.Player p : state.getPlayers()) {
-      if (!p.isDead) {
-        notifier.sendToPlayer(p.username, null, json);
-      }
-    }
-  }
-
-  private void sendFullStateTo(String username, String gatewayId) {
-    if (cachedSnapshot == null) {
-      cachedSnapshot = state.snapshot(username);
-    }
-    String json = new Serializer().serialize(cachedSnapshot);
-    if (json != null) {
-      notifier.sendToPlayer(username, gatewayId, json);
-    }
+    scheduler.stop();
+    eventLoop.shutdown();
+    logger.info("Actor " + roomId + " destroyed.");
   }
 
   private void checkIdleAndStop() {
@@ -294,68 +126,6 @@ public class GameActor {
         logger.info("Actor " + roomId + " idle timeout, stopping.");
         stop();
       }
-    }
-  }
-
-  public void stop() {
-    if (!running.compareAndSet(true, false)) return;
-    logger.info("Actor " + roomId + " is stopping...");
-    for (GameState.Player p : state.getPlayers()) {
-      notifier.sendToPlayer(p.username, null, "{\"cmd\":\"ROOM_CLOSED\"}");
-      coordinator.removePlayerLocation(p.username);
-    }
-    if (onStatusChange != null) {
-      try {
-        onStatusChange.run();
-      } catch (Exception e) {
-      }
-    }
-    tickScheduler.shutdown();
-    idleCheckScheduler.shutdown();
-    try {
-      tickScheduler.awaitTermination(5, TimeUnit.SECONDS);
-      idleCheckScheduler.awaitTermination(5, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-    disruptor.shutdown();
-    logger.info("Actor " + roomId + " destroyed.");
-  }
-
-  private void publishEvent(Message msg) {
-    try {
-      long sequence = ringBuffer.tryNext();
-      MessageEvent event = ringBuffer.get(sequence);
-      event.setMessage(msg);
-      ringBuffer.publish(sequence);
-    } catch (InsufficientCapacityException e) {
-      logger.warn("Actor " + roomId + " ring buffer full");
-      // 如果提交失败，需要回收 EnhancedMessage
-      if (msg instanceof EnhancedMessage) {
-        ((EnhancedMessage) msg).recycle();
-      }
-    }
-  }
-
-  private String buildJoinOkMessage() {
-    ObjectNode resp = JsonUtils.MAPPER.createObjectNode();
-    resp.put("cmd", "JOIN_OK");
-    resp.put("roomId", roomId);
-    try {
-      return JsonUtils.MAPPER.writeValueAsString(resp);
-    } catch (Exception e) {
-      return "{}";
-    }
-  }
-
-  private String buildJoinFailMessage() {
-    try {
-      ObjectNode resp = JsonUtils.MAPPER.createObjectNode();
-      resp.put("cmd", "JOIN_FAIL");
-      resp.put("message", "Room is full or join failed");
-      return JsonUtils.MAPPER.writeValueAsString(resp);
-    } catch (Exception e) {
-      return "{}";
     }
   }
 }

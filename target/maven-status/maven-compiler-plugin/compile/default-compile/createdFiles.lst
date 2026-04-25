@@ -13,11 +13,14 @@ snake/auth/AuthHttpServer.class
 snake/persistence/user/MySQLUserRepository.class
 snake/distributed/DistributedCoordinator$PlayerLocation.class
 snake/client/swing/RoomListFrame$RoomEntry.class
+snake/actor/ActorScheduler.class
+snake/actor/GameTickProcessor.class
 snake/event/PlayerDiedEvent$1.class
 snake/mq/MessageBus$1.class
 snake/client/swing/GameCanvas.class
 snake/distributed/DistributedCoordinator.class
 snake/actor/ActorNotifier.class
+snake/actor/GameActor$1.class
 snake/game/event/GameStateDiff.class
 snake/gateway/reactor/ReactorGateway.class
 snake/gateway/reactor/ReactorGateway$PingPongHandler.class
@@ -28,6 +31,7 @@ snake/distributed/DistributedCoordinator$UserRank.class
 snake/auth/MainServer.class
 snake/client/swing/GameFrame$1.class
 snake/event/ScoreChangedEvent$1.class
+snake/actor/ActorEventLoop.class
 snake/event/PlayerDiedEvent.class
 snake/persistence/leaderboard/RedissonLeaderboardRepository.class
 snake/gateway/dispatcher/MessageDispatcher.class
@@ -70,12 +74,14 @@ snake/auth/AuthHttpServer$AuthServlet.class
 snake/distributed/DistributedCoordinator$RoomEntry.class
 snake/client/swing/GameApp.class
 snake/persistence/redis/RedissonManager.class
+snake/actor/ActorEventLoop$MessageHandler.class
 snake/base/Logger.class
 snake/worker/ActorManager.class
 snake/persistence/BaseMySQLRepository.class
 snake/base/ILogger.class
 snake/base/JsonUtils.class
 snake/base/ILeaderboardRepository$UserRank.class
+snake/actor/GameMessageHandler.class
 snake/client/swing/GameFrame$2.class
 snake/client/swing/LeaderboardDialog$1.class
 snake/client/swing/GameFrame.class

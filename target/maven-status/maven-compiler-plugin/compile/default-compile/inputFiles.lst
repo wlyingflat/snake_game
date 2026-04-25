@@ -1,6 +1,10 @@
+/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/ActorEventLoop.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/ActorNotifier.java
+/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/ActorScheduler.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/EnhancedMessage.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/GameActor.java
+/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/GameMessageHandler.java
+/home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/actor/GameTickProcessor.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/auth/AuthHttpServer.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/auth/IAuthenticationService.java
 /home/lying/下载/作业/大作业/20236946/snake_game/src/main/java/snake/auth/MainServer.java
