@@ -3,7 +3,6 @@ package snake.application.actor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import snake.common.*;
-import snake.common.Serializer;
 import snake.distributed.DistributedCoordinator;
 import snake.domain.game.GameState;
 
@@ -71,10 +70,8 @@ public class GameMessageHandler {
 
   private void sendFullStateToPlayer(String username, String gatewayId) {
     GameStateData snapshot = state.snapshot(username);
-    String json = new Serializer().serialize(snapshot);
-    if (json != null) {
-      notifier.sendToPlayer(username, gatewayId, json);
-    }
+    byte[] data = new FlatBuffersSerializer().serializeGameState(snapshot);
+    notifier.sendBinaryToPlayer(username, gatewayId, data, ActorNotifier.SUBTYPE_FULL_STATE);
   }
 
   private void handleInput(EnhancedMessage msg) {
@@ -103,11 +100,10 @@ public class GameMessageHandler {
   private void broadcastCurrentState() {
     GameStateData snapshot = state.snapshot(null);
     if (snapshot == null) return;
-    String json = new Serializer().serialize(snapshot);
-    if (json == null) return;
+    byte[] data = new FlatBuffersSerializer().serializeGameState(snapshot);
     for (GameState.Player p : state.getPlayers()) {
       if (!p.isDead) {
-        notifier.sendToPlayer(p.username, null, json);
+        notifier.sendBinaryToPlayer(p.username, null, data, ActorNotifier.SUBTYPE_FULL_STATE);
       }
     }
   }

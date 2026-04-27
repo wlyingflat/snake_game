@@ -80,17 +80,30 @@ public class GatewayMain {
     // 定向消息订阅（RabbitMQ）
     if (messageBus != null) {
       try {
+        // 文本消息订阅（JOIN_OK, ERROR 等）
         messageBus.subscribeGateway(
             gatewayId,
             (routingKey, message) -> {
               String[] parts = routingKey.split("\\.");
-              String username = (parts.length >= 4) ? parts[3] : null;
+              String username = (parts.length >= 5) ? parts[4] : null; // 改为 parts[4]
               if (username == null) return;
               ClientSession session = sessionManager.getSessionByUsername(username);
               if (session != null && session.isActive()) {
-                session.sendMessage(message);
-              } else {
-                logger.warn("Player " + username + " not online, discarding message");
+                session.sendMessage(message); // 文本处理，自动加 0x01 前缀
+              }
+            });
+
+        // 二进制消息订阅（游戏状态）
+        messageBus.subscribeGatewayBinary(
+            gatewayId,
+            (routingKey, data) -> {
+              String[] parts = routingKey.split("\\.");
+              String username = (parts.length >= 5) ? parts[4] : null; // 改为 parts[4]
+              if (username == null) return;
+              ClientSession session = sessionManager.getSessionByUsername(username);
+              if (session != null && session.isActive()) {
+                // data 已包含 0x00 前缀，直接发送（绕过 sendBinary 避免二次编码）
+                session.getChannel().writeAndFlush(data);
               }
             });
       } catch (Exception e) {

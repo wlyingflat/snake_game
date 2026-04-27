@@ -52,6 +52,15 @@ public class MessageBus implements AutoCloseable {
     workerChannel.startConsumer(workerId, messageHandler);
   }
 
+  public void publishBinaryToPlayer(String gatewayId, String username, byte[] data, byte subType) {
+    playerChannel.publishBinaryToPlayer(gatewayId, username, data, subType);
+  }
+
+  public void subscribeGatewayBinary(String gatewayId, BiConsumer<String, byte[]> consumer)
+      throws IOException {
+    playerChannel.subscribeGatewayBinary(gatewayId, consumer);
+  }
+
   public void sendToWorker(String workerId, String message) {
     workerChannel.sendToWorker(workerId, message);
   }

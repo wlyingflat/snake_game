@@ -2,11 +2,8 @@ package snake.application.actor;
 
 import java.util.*;
 import snake.common.*;
-import snake.domain.game.GameState;
-import snake.domain.game.GameStateDiff;
-import snake.domain.game.GameStateDiffer;
+import snake.domain.game.*;
 
-/** 负责游戏状态的一次更新（tick），包括： - 状态推进 - 分数事件和死亡事件发布 - 差分或全量广播策略 不处理客户端消息，不管理线程。 */
 public class GameTickProcessor {
   private final int roomId;
   private final GameState state;
@@ -14,6 +11,7 @@ public class GameTickProcessor {
   private final ActorNotifier notifier;
   private final Runnable onStatusChange;
   private final ILogger logger = Logger.getInstance();
+  private final FlatBuffersSerializer serializer = new FlatBuffersSerializer(); // 替代原 Serializer
 
   private GameStateData cachedSnapshot;
   private int tickSinceLastFullState = 0;
@@ -25,17 +23,14 @@ public class GameTickProcessor {
     this.state = state;
     this.notifier = notifier;
     this.onStatusChange = onStatusChange;
-    this.differ = new GameStateDiffer(state); // 创建差分器
-    // 在游戏开始时立即捕获一次基线
+    this.differ = new GameStateDiffer(state);
     differ.captureBeforeTick();
     updateCachedSnapshot();
   }
 
   public void processTick() {
-    // 如果房间为空，不推进逻辑（但由外部检查空闲）
     if (state.isEmpty()) return;
 
-    // 记录旧分数和存活状态
     Map<String, Integer> oldScores = new HashMap<>();
     for (GameState.Player p : state.getPlayers()) {
       oldScores.put(p.username, p.score);
@@ -46,10 +41,9 @@ public class GameTickProcessor {
     }
 
     differ.captureBeforeTick();
-    // 执行状态更新
     state.update();
 
-    // 分数变化事件
+    // 分数事件
     for (GameState.Player p : state.getPlayers()) {
       int oldScore = oldScores.getOrDefault(p.username, 0);
       if (p.score > oldScore) {
@@ -74,26 +68,24 @@ public class GameTickProcessor {
       if (player != null) {
         notifier.publishPlayerDied(username, roomId, player.score, player.length, "COLLISION");
         state.removePlayer(username);
-        notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");
+        notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}"); // 文本提示
       }
     }
 
-    // 广播策略
     tickSinceLastFullState++;
     boolean forceFull =
         (tickSinceLastFullState >= FULL_STATE_INTERVAL_TICKS) || state.hasNewPlayer();
+
     if (forceFull) {
-      updateCachedSnapshotAndBroadcast();
+      cachedSnapshot = state.snapshot(null);
+      byte[] data = serializer.serializeGameState(cachedSnapshot);
+      notifier.broadcastBinaryToRoom(state.getPlayers(), data, ActorNotifier.SUBTYPE_FULL_STATE);
       tickSinceLastFullState = 0;
     } else {
       GameStateDiff diff = differ.computeDiff();
-      String json = new Serializer().serializeDiff(diff);
-      if (json != null) {
-        for (GameState.Player p : state.getPlayers()) {
-          if (!p.isDead) {
-            notifier.sendToPlayer(p.username, null, json);
-          }
-        }
+      if (!diff.players.isEmpty() || !diff.died.isEmpty() || diff.food != null) {
+        byte[] data = serializer.serializeDiff(diff);
+        notifier.broadcastBinaryToRoom(state.getPlayers(), data, ActorNotifier.SUBTYPE_DIFF_STATE);
       }
     }
 
@@ -104,18 +96,6 @@ public class GameTickProcessor {
 
   public void refreshCache() {
     this.cachedSnapshot = state.snapshot(null);
-  }
-
-  private void updateCachedSnapshotAndBroadcast() {
-    cachedSnapshot = state.snapshot(null);
-    if (cachedSnapshot == null) return;
-    String json = new Serializer().serialize(cachedSnapshot);
-    if (json == null) return;
-    for (GameState.Player p : state.getPlayers()) {
-      if (!p.isDead) {
-        notifier.sendToPlayer(p.username, null, json);
-      }
-    }
   }
 
   private void updateCachedSnapshot() {

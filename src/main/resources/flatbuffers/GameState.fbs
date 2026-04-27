@@ -1,0 +1,29 @@
+namespace snake.fbs;
+
+table Position {
+  x:int;
+  y:int;
+}
+
+enum Direction:byte { UP, DOWN, LEFT, RIGHT }
+
+table Player {
+  name:string;
+  head:Position;
+  body:[Position];
+  length:int;
+  direction:Direction;
+  score:int;
+  is_dead:bool;
+}
+
+table GameState {
+  room_id:int;
+  food:Position;
+  obstacles:[Position];
+  players:[Player];
+  active_players:int;
+  total_players:int;
+}
+
+root_type GameState;

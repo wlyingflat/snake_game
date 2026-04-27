@@ -138,6 +138,7 @@ public class RoomListFrame extends JFrame {
     while (System.currentTimeMillis() - start < 5000) {
       String msg = gateway.pollMessage();
       if (msg != null) {
+        System.out.println("[ROOMLIST] poll: " + msg); // 添加这一行
         if (msg.contains("\"cmd\":\"CREATE_OK\"") || msg.contains("\"cmd\":\"JOIN_OK\"")) {
           return true;
         }

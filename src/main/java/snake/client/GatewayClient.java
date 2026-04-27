@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import snake.common.GameStateData;
 import snake.common.Serializer;
+import snake.fbs.*;
 
 public class GatewayClient {
   private Socket socket;
@@ -28,7 +29,13 @@ public class GatewayClient {
   private RoomListListener roomListListener;
   private DeathListener deathListener;
   private final ObjectMapper mapper = new ObjectMapper();
-  private final LocalGameState localGameState = new LocalGameState(); // 本地状态管理器
+  private final LocalGameState localGameState = new LocalGameState();
+
+  // 协议常量
+  private static final byte TYPE_BINARY = 0x00;
+  private static final byte TYPE_TEXT = 0x01;
+  private static final byte SUBTYPE_FULL_STATE = 0x00;
+  private static final byte SUBTYPE_DIFF_STATE = 0x01;
 
   public interface GameStateListener {
     void onGameState(String json, GameStateData data);
@@ -62,8 +69,10 @@ public class GatewayClient {
     try {
       String jsonStr = mapper.writeValueAsString(json);
       byte[] body = jsonStr.getBytes(StandardCharsets.UTF_8);
-      ByteBuffer buf = ByteBuffer.allocate(4 + body.length);
-      buf.putInt(body.length);
+      // 协议：4字节长度（不包含自身） + 1字节类型(0x01) + JSON
+      ByteBuffer buf = ByteBuffer.allocate(4 + 1 + body.length);
+      buf.putInt(1 + body.length); // 长度 = 类型(1) + JSON长度
+      buf.put(TYPE_TEXT);
       buf.put(body);
       out.write(buf.array());
       out.flush();
@@ -111,10 +120,9 @@ public class GatewayClient {
                     messageBuf.position(messageBuf.position() + read);
                     if (!messageBuf.hasRemaining()) {
                       messageBuf.flip();
-                      byte[] body = new byte[messageBuf.remaining()];
-                      messageBuf.get(body);
-                      String json = new String(body, StandardCharsets.UTF_8);
-                      handleMessage(json);
+                      byte[] frame = new byte[messageBuf.remaining()];
+                      messageBuf.get(frame);
+                      processFrame(frame);
                       expectedLength = -1;
                       messageBuf = null;
                     }
@@ -132,24 +140,71 @@ public class GatewayClient {
     receiverThread.start();
   }
 
-  public void stopMessageReceiver() {
-    running = false;
-    receiverStarted = false;
-    if (receiverThread != null) {
-      receiverThread.interrupt();
+  private void processFrame(byte[] frame) {
+    if (frame.length < 1) return;
+    byte type = frame[0];
+    if (type == TYPE_TEXT) {
+      // 文本消息
+      String json = new String(frame, 1, frame.length - 1, StandardCharsets.UTF_8);
+      handleJsonMessage(json);
+    } else if (type == TYPE_BINARY) {
+      // 二进制消息
+      if (frame.length < 2) return;
+      byte subType = frame[1];
+      int dataLen = frame.length - 2;
+      System.out.println(
+          "[DEBUG] Binary frame: total="
+              + frame.length
+              + ", subType="
+              + subType
+              + ", dataLen="
+              + dataLen);
+      if (dataLen < 4) {
+        System.err.println("[WARN] FlatBuffers data too short, ignoring frame.");
+        return;
+      }
+      try {
+        ByteBuffer dataBuf = ByteBuffer.wrap(frame, 2, dataLen);
+        dataBuf.order(ByteOrder.LITTLE_ENDIAN);
+        if (subType == SUBTYPE_FULL_STATE) {
+          GameState fbState = GameState.getRootAsGameState(dataBuf);
+          applyFbsFullState(fbState);
+        } else if (subType == SUBTYPE_DIFF_STATE) {
+          GameStateDiff fbDiff = GameStateDiff.getRootAsGameStateDiff(dataBuf);
+          applyFbsDiffState(fbDiff);
+        }
+      } catch (Exception e) {
+        System.err.println("[ERROR] Failed to parse FlatBuffers frame: " + e.getMessage());
+        e.printStackTrace();
+      }
     }
   }
 
-  private void handleMessage(String json) {
+  private void applyFbsFullState(GameState fbState) {
+    localGameState.applyFbsFullState(fbState);
+    GameStateData data = localGameState.toGameStateData();
+    if (gameStateListener != null) {
+      gameStateListener.onGameState(null, data);
+    }
+  }
+
+  private void applyFbsDiffState(GameStateDiff fbDiff) {
+    localGameState.applyFbsDiffState(fbDiff);
+    GameStateData data = localGameState.toGameStateData();
+    if (gameStateListener != null) {
+      gameStateListener.onGameState(null, data);
+    }
+  }
+
+  private void handleJsonMessage(String json) {
+    System.out.println("[GATEWAY] text received: " + json);
     try {
       JsonNode root = mapper.readTree(json);
       String cmd = root.get("cmd").asText();
 
       switch (cmd) {
         case "ROOM_LIST":
-          if (roomListListener != null) {
-            roomListListener.onRoomListUpdate(root);
-          }
+          if (roomListListener != null) roomListListener.onRoomListUpdate(root);
           break;
         case "JOIN_OK":
         case "JOIN_FAIL":
@@ -159,26 +214,21 @@ public class GatewayClient {
           messageQueue.offer(json);
           break;
         case "STATE":
-          // 全量状态
+          // 兼容旧版 JSON 状态（如果未来需要回退）
           GameStateData data = Serializer.deserializeGameState(json);
           if (data != null) {
             localGameState.applyFullState(data);
-            if (gameStateListener != null) {
+            if (gameStateListener != null)
               gameStateListener.onGameState(json, localGameState.toGameStateData());
-            }
           }
           break;
         case "STATE_DIFF":
-          // 增量差分
           localGameState.applyDiff(root);
-          if (gameStateListener != null) {
+          if (gameStateListener != null)
             gameStateListener.onGameState(json, localGameState.toGameStateData());
-          }
           break;
         case "YOU_DIED":
-          if (deathListener != null) {
-            deathListener.onDeath();
-          }
+          if (deathListener != null) deathListener.onDeath();
           messageQueue.offer(json);
           break;
         case "LEADERBOARD":
@@ -186,9 +236,6 @@ public class GatewayClient {
           break;
         case "PING":
           sendCommand("PONG");
-          break;
-        case "PONG":
-          // ignore
           break;
         default:
           messageQueue.offer(json);
@@ -204,6 +251,12 @@ public class GatewayClient {
     } catch (InterruptedException e) {
       return null;
     }
+  }
+
+  public void stopMessageReceiver() {
+    running = false;
+    receiverStarted = false;
+    if (receiverThread != null) receiverThread.interrupt();
   }
 
   public void setGameStateListener(GameStateListener listener) {
@@ -223,7 +276,13 @@ public class GatewayClient {
     receiverStarted = false;
     try {
       if (in != null) in.close();
+    } catch (IOException e) {
+    }
+    try {
       if (out != null) out.close();
+    } catch (IOException e) {
+    }
+    try {
       if (socket != null) socket.close();
     } catch (IOException e) {
     }

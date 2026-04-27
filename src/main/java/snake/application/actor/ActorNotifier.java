@@ -1,9 +1,11 @@
 package snake.application.actor;
 
 import snake.common.Config;
+import snake.common.FlatBuffersSerializer;
 import snake.common.ILogger;
 import snake.common.Logger;
 import snake.distributed.DistributedCoordinator;
+import snake.domain.game.GameState;
 import snake.infrastructure.event.KafkaEventProducer;
 import snake.infrastructure.event.PlayerDiedEvent;
 import snake.infrastructure.event.ScoreChangedEvent;
@@ -14,6 +16,29 @@ public class ActorNotifier {
   private final KafkaEventProducer eventProducer;
   private final MessageBus messageBus;
   private final ILogger logger = Logger.getInstance();
+  private final FlatBuffersSerializer serializer = new FlatBuffersSerializer();
+  public static final byte SUBTYPE_FULL_STATE = 0x00;
+  public static final byte SUBTYPE_DIFF_STATE = 0x01;
+
+  public void sendBinaryToPlayer(String username, String gatewayId, byte[] data, byte subType) {
+    if (username == null) return;
+    if (gatewayId == null) {
+      DistributedCoordinator.PlayerLocation loc = coordinator.getPlayerLocation(username);
+      if (loc == null) return;
+      gatewayId = loc.gatewayId();
+    }
+    if (messageBus != null) {
+      messageBus.publishBinaryToPlayer(gatewayId, username, data, subType);
+    }
+  }
+
+  public void broadcastBinaryToRoom(Iterable<GameState.Player> players, byte[] data, byte subType) {
+    for (GameState.Player p : players) {
+      if (!p.isDead) {
+        sendBinaryToPlayer(p.username, null, data, subType);
+      }
+    }
+  }
 
   public ActorNotifier(
       DistributedCoordinator coordinator, KafkaEventProducer eventProducer, MessageBus messageBus) {

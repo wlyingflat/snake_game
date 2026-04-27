@@ -1,0 +1,26 @@
+include "GameState.fbs";
+
+namespace snake.fbs;
+
+table PlayerDiff {
+  new_head:Position;
+  remove_tail:bool;
+  length:int;
+}
+
+table KeyValue {
+  key:string;
+  value:PlayerDiff;
+}
+
+table GameStateDiff {
+  room_id:int;
+  seq:long;
+  food:Position;
+  players_diff:[KeyValue];
+  died:[string];
+  new_players:[Player];
+  removed_players:[string];
+}
+
+root_type GameStateDiff;

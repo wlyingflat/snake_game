@@ -2,6 +2,7 @@ package snake.application.gateway.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -12,10 +13,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.AttributeKey;
-import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import java.util.concurrent.TimeUnit;
@@ -84,11 +82,17 @@ public class GatewayServer {
               @Override
               protected void initChannel(SocketChannel ch) {
                 ChannelPipeline pipeline = ch.pipeline();
+                // 先解析长度: 4 字节大端，不含长度头自身
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(65536, 0, 4, 0, 4));
-                pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
+                // 根据首字节区分文本/二进制
+                pipeline.addLast(new ProtocolFrameDecoder());
+                // 发送时添加 4 字节长度头
                 pipeline.addLast(new LengthFieldPrepender(4));
-                pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
+                // 根据类型自动编码
+                pipeline.addLast(new ProtocolFrameEncoder());
+                // 心跳在业务处理之前，直接消费
                 pipeline.addLast(new PingPongHandler(heartbeatService));
+                // 业务处理
                 pipeline.addLast(bizGroup, new GatewayHandler());
               }
             })
@@ -129,12 +133,18 @@ public class GatewayServer {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-      String jsonMsg = (String) msg;
       try {
-        JsonNode root = JsonUtils.MAPPER.readTree(jsonMsg);
-        String cmd = root.get("cmd").asText();
-        dispatcher.dispatch(session, cmd, root);
-        heartbeatService.refresh(session);
+        if (msg instanceof String text) {
+          // 文本消息（命令、心跳已被 PingPongHandler 拦截）
+          JsonNode root = JsonUtils.MAPPER.readTree(text);
+          String cmd = root.get("cmd").asText();
+          dispatcher.dispatch(session, cmd, root);
+          heartbeatService.refresh(session);
+        } else if (msg instanceof ByteBuf buf) {
+          // 二进制消息（客户端上行的输入等，如果需要可扩展）
+          // 目前客户端到服务器的游戏命令仍用文本，保留 ByteBuf 释放
+          buf.release();
+        }
       } catch (Exception e) {
         logger.error("Error processing message: " + e.getMessage());
       }

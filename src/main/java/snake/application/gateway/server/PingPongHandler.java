@@ -18,16 +18,18 @@ public class PingPongHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    String jsonMsg = (String) msg;
+    // 只处理文本消息，二进制消息直接放行给后续 Handler
+    if (!(msg instanceof String jsonMsg)) {
+      ctx.fireChannelRead(msg);
+      return;
+    }
     JsonNode root;
     try {
       root = JsonUtils.MAPPER.readTree(jsonMsg);
     } catch (Exception e) {
-      // ctx.fireChannelRead(msg);
       return;
     }
     String cmd = root.get("cmd").asText();
-
     if ("PING".equals(cmd)) {
       ClientSession session = ctx.channel().attr(SESSION_KEY).get();
       ctx.writeAndFlush("{\"cmd\":\"PONG\"}");

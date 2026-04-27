@@ -24,8 +24,13 @@ public class ClientSession implements ISession {
   @Override
   public void sendMessage(String message) {
     if (!isActive()) return;
-    // 直接发送字符串，由 Netty 的 LengthFieldPrepender + StringEncoder 自动添加长度头
-    channel.writeAndFlush(message);
+    channel.writeAndFlush(message); // 会被 ProtocolFrameEncoder 处理
+  }
+
+  @Override
+  public void sendBinary(byte[] data) {
+    if (!isActive()) return;
+    channel.writeAndFlush(data); // 会被 ProtocolFrameEncoder 处理
   }
 
   @Override
