@@ -19,6 +19,7 @@ snake/application/gateway/handler/LeaderboardHandler.class
 snake/application/gateway/session/DefaultSessionManager.class
 snake/domain/game/Message.class
 snake/application/gateway/handler/CommandDispatcher.class
+snake/client/swing/RoomListFrame$2.class
 snake/distributed/DistributedCoordinator$UserRank.class
 snake/infrastructure/auth/AuthHttpServer$AuthServlet.class
 snake/application/actor/GameMessageHandler.class
@@ -75,10 +76,12 @@ snake/client/swing/LeaderboardDialog.class
 snake/application/gateway/heartbeat/DefaultHeartbeatService.class
 snake/infrastructure/auth/MainServer.class
 snake/application/actor/GameTickProcessor.class
+snake/client/swing/RoomListFrame$3.class
 snake/client/LocalGameState.class
 snake/infrastructure/persistence/BaseMySQLRepository.class
 snake/common/Config.class
 snake/client/GatewayClient.class
+snake/client/swing/RoomListFrame$RoomListRenderer.class
 snake/common/FlatBuffersSerializer.class
 snake/distributed/DistributedCoordinator$PlayerLocation.class
 snake/common/Position.class
@@ -118,6 +121,7 @@ snake/application/actor/ActorEventLoop$MessageHandler.class
 snake/infrastructure/persistence/DatabaseManager.class
 snake/ecs/Component.class
 snake/domain/game/GameStateDiff.class
+snake/client/swing/LoginFrame$1.class
 snake/infrastructure/messaging/RoomListChannel.class
 snake/fbs/KeyValue.class
 snake/distributed/LeaderboardService$UserRank.class
@@ -142,6 +146,7 @@ snake/fbs/Position.class
 snake/distributed/DistributedCoordinator$RoomEntry.class
 snake/common/IServer.class
 snake/application/gateway/lobby/LobbyService.class
+snake/client/swing/LoginFrame$2.class
 snake/infrastructure/auth/AuthHttpServer.class
 snake/consumer/LeaderboardSynchronizer.class
 snake/common/IConfigProvider.class

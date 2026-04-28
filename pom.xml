@@ -1,5 +1,4 @@
 <project>
-
     <modelVersion>4.0.0</modelVersion>
     <groupId>snake</groupId>
     <artifactId>snake-game</artifactId>
@@ -8,10 +7,70 @@
         <maven.compiler.release>17</maven.compiler.release>
     </properties>
     <dependencies>
+        <!-- ================= 测试框架 ================= -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito 核心 + JUnit 5 集成 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.16.0</version>          <!-- 支持较新的 Java -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.16.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- 显式升级 Byte Buddy 以兼容 Java 26 -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.15.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.15.10</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- 其他测试工具 -->
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hdrhistogram</groupId>
+            <artifactId>HdrHistogram</artifactId>
+            <version>2.1.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.37</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.37</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ================= 生产依赖 ================= -->
         <dependency>
             <groupId>com.google.flatbuffers</groupId>
             <artifactId>flatbuffers-java</artifactId>
-            <version>23.5.26</version> <!-- 或最新稳定版 -->
+            <version>23.5.26</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -51,29 +110,9 @@
             <version>3.4.4</version>
         </dependency>
         <dependency>
-            <groupId>org.hdrhistogram</groupId>
-            <artifactId>HdrHistogram</artifactId>
-            <version>2.1.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
             <version>3.27.2</version>
-        </dependency>
-        <!-- JMH 核心 -->
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>1.37</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- JMH 注解处理器（生成基准代码） -->
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.37</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -95,13 +134,11 @@
             <artifactId>jetty-servlet</artifactId>
             <version>11.0.20</version>
         </dependency>
-        <!-- Jetty HTTP/2 核心模块 -->
         <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>http2-server</artifactId>
             <version>11.0.20</version>
         </dependency>
-        <!-- ALPN 支持（JDK 9+ 可选，Jetty 11 会自动处理） -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-alpn-java-server</artifactId>
@@ -112,11 +149,10 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.3</version>
         </dependency>
-        <!-- Jakarta Servlet API (适配 Jetty 10/11) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>   <!-- Jetty 10/11 用 5.0；Jetty 12 用 6.0 -->
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -184,10 +220,10 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <!-- 不固定 MainClass，运行时通过 -cp 指定 -->
+                                    <!-- 不固定 MainClass -->
                                 </transformer>
                             </transformers>
-                          <filters>
+                            <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
@@ -200,6 +236,17 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- 测试插件：传递 JVM 参数以支持 Java 26 上的 Mockito -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <argLine>
+                        -XX:+EnableDynamicAgentLoading -Dnet.bytebuddy.experimental=true
+                    </argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -90,5 +90,9 @@ public class GatewayAuthClient {
     public static AuthResult failure(String message) {
       return new AuthResult(false, message, null, 0);
     }
+
+    public static AuthResult success(String gatewayHost, int gatewayPort) {
+      return new AuthResult(true, null, gatewayHost, gatewayPort);
+    }
   }
 }

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: snake.distributed.DistributedCoordinatorTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.022 s -- in snake.distributed.DistributedCoordinatorTest

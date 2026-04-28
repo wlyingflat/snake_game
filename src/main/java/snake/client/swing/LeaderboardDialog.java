@@ -1,3 +1,4 @@
+// LeaderboardDialog.java - 美化版
 package snake.client.swing;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,7 +7,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.border.*;
+import javax.swing.table.*;
 import snake.client.GatewayClient;
 
 public class LeaderboardDialog extends JDialog {
@@ -18,53 +20,87 @@ public class LeaderboardDialog extends JDialog {
   public LeaderboardDialog(Frame owner, GatewayClient gateway) {
     super(owner, "Leaderboard", true);
     this.gateway = gateway;
-    setSize(400, 300);
-    setLocationRelativeTo(owner);
-    setLayout(new BorderLayout());
+    initUI();
+    fetchLeaderboard();
+  }
 
-    // 表格模型
+  private void initUI() {
+    setSize(500, 400);
+    setLocationRelativeTo(getOwner());
+    JPanel mainPanel = new JPanel(new BorderLayout());
+    mainPanel.setBackground(new Color(35, 35, 55));
+    setContentPane(mainPanel);
+
+    // 标题
+    JLabel title = new JLabel("TOP PLAYERS", SwingConstants.CENTER);
+    title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+    title.setForeground(new Color(220, 220, 120));
+    title.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
+    mainPanel.add(title, BorderLayout.NORTH);
+
     String[] columns = {"Rank", "Username", "Score"};
     tableModel =
         new DefaultTableModel(columns, 0) {
           @Override
-          public boolean isCellEditable(int row, int column) {
+          public boolean isCellEditable(int row, int col) {
             return false;
           }
         };
     table = new JTable(tableModel);
-    table.setFillsViewportHeight(true);
-    table.setRowHeight(25);
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    table.setRowHeight(30);
+    table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    table.setBackground(new Color(45, 45, 65));
+    table.setForeground(Color.WHITE);
+    table.setGridColor(new Color(80, 80, 100));
+    table.setSelectionBackground(new Color(80, 130, 180));
+    table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+    table.getTableHeader().setBackground(new Color(55, 55, 75));
+    table.getTableHeader().setForeground(new Color(220, 220, 200));
+    table.getTableHeader().setReorderingAllowed(false);
+    // 居中显示
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+    table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+    table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
-    // 底部按钮
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    JButton refreshBtn = new JButton("Refresh");
-    JButton closeBtn = new JButton("Close");
-    buttonPanel.add(refreshBtn);
-    buttonPanel.add(closeBtn);
-    add(buttonPanel, BorderLayout.SOUTH);
+    JScrollPane scroll = new JScrollPane(table);
+    scroll.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+    scroll.getViewport().setBackground(new Color(45, 45, 65));
+    mainPanel.add(scroll, BorderLayout.CENTER);
 
-    // 事件
+    JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    btnPanel.setOpaque(false);
+    btnPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 15));
+    JButton refreshBtn = createStyledButton("Refresh", new Color(70, 130, 200));
+    JButton closeBtn = createStyledButton("Close", new Color(180, 80, 80));
     refreshBtn.addActionListener(e -> fetchLeaderboard());
     closeBtn.addActionListener(e -> dispose());
+    btnPanel.add(refreshBtn);
+    btnPanel.add(closeBtn);
+    mainPanel.add(btnPanel, BorderLayout.SOUTH);
+  }
 
-    // 初始加载
-    fetchLeaderboard();
+  private JButton createStyledButton(String text, Color bgColor) {
+    JButton btn = new JButton(text);
+    btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    btn.setForeground(Color.WHITE);
+    btn.setBackground(bgColor);
+    btn.setFocusPainted(false);
+    btn.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
+    btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    btn.setOpaque(true);
+    return btn;
   }
 
   private void fetchLeaderboard() {
-    // 显示加载中
     tableModel.setRowCount(0);
     tableModel.addRow(new Object[] {"Loading...", "", ""});
-
     new Thread(
             () -> {
-              // 发送命令，默认获取前10名
               Map<String, Object> cmd = new HashMap<>();
               cmd.put("cmd", "LEADERBOARD");
               cmd.put("limit", 10);
               gateway.sendJson(cmd);
-
               long start = System.currentTimeMillis();
               while (System.currentTimeMillis() - start < 5000) {
                 String resp = gateway.pollMessage();
@@ -85,7 +121,6 @@ public class LeaderboardDialog extends JDialog {
                   break;
                 }
               }
-              // 超时或错误
               SwingUtilities.invokeLater(
                   () -> {
                     tableModel.setRowCount(0);

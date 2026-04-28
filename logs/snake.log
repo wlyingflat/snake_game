@@ -16969,3 +16969,150 @@ java.util.concurrent.RejectedExecutionException: event executor terminated
 2026-04-28 16:24:34.044 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
 2026-04-28 16:24:34.238 [Thread-3] INFO  snake.common.Logger - Loaded config from config.properties
 2026-04-28 16:25:09.686 [qtp1711185459-55] INFO  snake.common.Logger - User logged out: wmh
+2026-04-28 16:26:04.291 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 idle timeout, stopping.
+2026-04-28 16:26:04.291 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 is stopping...
+2026-04-28 16:26:04.291 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 stopped, cleaning up...
+2026-04-28 16:26:04.291 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 removed from worker worker-2
+2026-04-28 16:26:04.292 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 removed from Redis
+2026-04-28 16:26:04.294 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 deleted from Redis
+2026-04-28 16:26:04.296 [pool-4-thread-1] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 16:26:04.297 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 destroyed.
+2026-04-28 16:29:17.211 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Resetting the last seen epoch of partition game.player.score-0 to 8 since the associated topicId changed from null to q_FdLKBnTMOMWIHXUKKsSg
+2026-04-28 16:33:10.895 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-28 16:33:15.010 [leaderboard-consumer] INFO  org.apache.kafka.clients.NetworkClient - [Consumer clientId=consumer-leaderboard-updater-1, groupId=leaderboard-updater] Node -1 disconnected.
+2026-04-28 16:33:17.426 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.NetworkClient - [Producer clientId=producer-1] Node -1 disconnected.
+2026-04-28 16:35:57.732 [qtp1711185459-94] INFO  snake.common.Logger - User logged in: wmh
+2026-04-28 16:35:57.739 [defaultEventExecutorGroup-5-2] INFO  snake.common.Logger - User logged in: wmh
+2026-04-28 16:36:04.397 [worker-worker-2-dispatch] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-2
+2026-04-28 16:36:04.398 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 constructed on worker worker-2
+2026-04-28 16:36:04.398 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 started on worker worker-2
+2026-04-28 16:36:04.400 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 created on worker worker-2
+2026-04-28 16:36:04.400 [worker-worker-2-dispatch] INFO  snake.common.Logger - Room 1 created by wmh
+2026-04-28 16:36:04.410 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:36:04.636 [Thread-3] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 16:36:45.896 [qtp1711185459-57] INFO  snake.common.Logger - User logged out: wmh
+2026-04-28 16:37:04.591 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 idle timeout, stopping.
+2026-04-28 16:37:04.591 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 is stopping...
+2026-04-28 16:37:04.591 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 stopped, cleaning up...
+2026-04-28 16:37:04.591 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 removed from worker worker-2
+2026-04-28 16:37:04.592 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 removed from Redis
+2026-04-28 16:37:04.594 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 deleted from Redis
+2026-04-28 16:37:04.596 [pool-4-thread-1] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 16:37:04.596 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 destroyed.
+2026-04-28 16:38:17.457 [kafka-producer-network-thread | producer-1] INFO  org.apache.kafka.clients.Metadata - [Producer clientId=producer-1] Resetting the last seen epoch of partition game.player.score-0 to 8 since the associated topicId changed from null to q_FdLKBnTMOMWIHXUKKsSg
+2026-04-28 16:42:10.447 [qtp1711185459-97] INFO  snake.common.Logger - User logged in: wmh
+2026-04-28 16:42:10.454 [defaultEventExecutorGroup-5-3] INFO  snake.common.Logger - User logged in: wmh
+2026-04-28 16:42:14.148 [worker-worker-2-dispatch] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-2
+2026-04-28 16:42:14.149 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 constructed on worker worker-2
+2026-04-28 16:42:14.150 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 started on worker worker-2
+2026-04-28 16:42:14.152 [worker-worker-2-dispatch] INFO  snake.common.Logger - Actor 1 created on worker worker-2
+2026-04-28 16:42:14.153 [worker-worker-2-dispatch] INFO  snake.common.Logger - Room 1 created by wmh
+2026-04-28 16:42:14.163 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:42:14.398 [Thread-3] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 16:42:20.711 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:42:50.384 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:42:52.486 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:42:53.808 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:42:59.637 [actor-1] INFO  snake.common.Logger - Player wmh joined actor 1
+2026-04-28 16:43:35.016 [qtp1711185459-59] INFO  snake.common.Logger - User logged out: wmh
+2026-04-28 16:44:14.491 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 idle timeout, stopping.
+2026-04-28 16:44:14.491 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 is stopping...
+2026-04-28 16:44:14.491 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 stopped, cleaning up...
+2026-04-28 16:44:14.491 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 removed from worker worker-2
+2026-04-28 16:44:14.492 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 removed from Redis
+2026-04-28 16:44:14.494 [pool-4-thread-1] INFO  snake.common.Logger - Room 1 deleted from Redis
+2026-04-28 16:44:14.496 [pool-4-thread-1] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 16:44:14.496 [pool-4-thread-1] INFO  snake.common.Logger - Actor 1 destroyed.
+2026-04-28 16:49:02.380 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 16:51:28.200 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 16:51:46.154 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:02:31.461 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:02:31.671 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:02:31.874 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:02:31.878 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.878 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:31.879 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:02:32.379 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:09:48.961 [main] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-1
+2026-04-28 17:09:49.026 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:09:49.236 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:09:49.439 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.443 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:09:49.943 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:09:50.240 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:09:50.244 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:15:03.243 [main] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-1
+2026-04-28 17:15:03.311 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:15:03.520 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:15:03.723 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:15:03.727 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.727 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:03.728 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:15:04.229 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:15:04.386 [main] INFO  snake.common.Logger - User logged in: test
+2026-04-28 17:15:04.498 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:15:04.500 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:15:04.503 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:15:04.503 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:15:04.552 [main] INFO  snake.common.Logger - Actor 1 constructed on worker worker-1
+2026-04-28 17:15:04.555 [main] INFO  snake.common.Logger - Actor 1 started on worker worker-1
+2026-04-28 17:15:04.556 [main] INFO  snake.common.Logger - Actor 1 created on worker worker-1
+2026-04-28 17:15:04.556 [main] INFO  snake.common.Logger - Room 1 created by user
+2026-04-28 17:15:04.562 [actor-1] INFO  snake.common.Logger - Player user joined actor 1
+2026-04-28 17:21:15.043 [main] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-1
+2026-04-28 17:21:15.116 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:21:15.324 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:15.527 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:15.530 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.530 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.530 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:15.531 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:16.031 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:16.202 [main] INFO  snake.common.Logger - User logged in: test
+2026-04-28 17:21:16.343 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:21:16.346 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:21:16.351 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:21:16.352 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:21:16.395 [main] INFO  snake.common.Logger - Actor 1 constructed on worker worker-1
+2026-04-28 17:21:16.397 [main] INFO  snake.common.Logger - Actor 1 started on worker worker-1
+2026-04-28 17:21:16.398 [main] INFO  snake.common.Logger - Actor 1 created on worker worker-1
+2026-04-28 17:21:16.399 [main] INFO  snake.common.Logger - Room 1 created by user
+2026-04-28 17:21:16.407 [actor-1] INFO  snake.common.Logger - Player user joined actor 1
+2026-04-28 17:21:28.851 [main] INFO  snake.common.Logger - Room 1 registered in Redis by node worker-1
+2026-04-28 17:21:28.920 [main] INFO  snake.common.Logger - Loaded config from config.properties
+2026-04-28 17:21:29.129 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:29.332 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:29.336 [main] WARN  snake.common.Logger - Actor 1 ring buffer full, dropping message
+2026-04-28 17:21:29.837 [main] INFO  snake.common.Logger - Disruptor for room 1 shut down
+2026-04-28 17:21:29.982 [main] INFO  snake.common.Logger - User logged in: test
+2026-04-28 17:21:30.068 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:21:30.071 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:21:30.073 [main] INFO  snake.common.Logger - HeartbeatService started
+2026-04-28 17:21:30.074 [main] INFO  snake.common.Logger - HeartbeatService stopped
+2026-04-28 17:21:30.117 [main] INFO  snake.common.Logger - Actor 1 constructed on worker worker-1
+2026-04-28 17:21:30.118 [main] INFO  snake.common.Logger - Actor 1 started on worker worker-1
+2026-04-28 17:21:30.119 [main] INFO  snake.common.Logger - Actor 1 created on worker worker-1
+2026-04-28 17:21:30.119 [main] INFO  snake.common.Logger - Room 1 created by user
+2026-04-28 17:21:30.156 [actor-1] INFO  snake.common.Logger - Player user joined actor 1
