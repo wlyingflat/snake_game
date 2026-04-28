@@ -8,56 +8,49 @@
 
 ## ✨ 技术亮点
 
-- **事件驱动 + 分布式微服务**
-  游戏逻辑被拆分到 **Gateway**、**Worker**、**Actor** 等独立角色中，通过 **Apache Kafka** 作为分布式消息中枢，实现解耦和横向扩展。
+- **多协议事件驱动架构**
+  游戏内指令通过 **RabbitMQ** 在 Gateway 与 Worker 之间路由；游戏事件（死亡、得分）通过 **Apache Kafka** 发布给排行榜等消费者。两者职责分离，架构更清晰。
 
 - **ECS 架构实验**
-  代码中引入了游戏引擎常用的 **Entity-Component-System (ECS)** 模式（位于 `snake.ecs` 包），在典型 Java 业务应用里非常少见。
+  核心逻辑完全基于 **Entity-Component-System** 模式实现（参见 `snake.ecs` 包），包含 `World`、`Entity`、`Component`、`System`，这在 Java 项目中非常罕见。
 
-- **高性能排行榜设计**
-  采用 **Redis（Redisson）+ MySQL** 的读写分离策略：排行榜分数先写 Redis，再异步刷入数据库，保证高并发下的性能与最终一致性。
+- **高性能 Disruptor 事件循环**
+  每个房间使用 **LMAX Disruptor** 构建单线程事件循环，避免锁竞争，并提供背压处理（满则丢弃并回收消息）。
 
-- **双重序列化方案**
-  项目中同时实践了 **FlatBuffers** 与 **Protocol Buffers**，适合对比两者在性能、内存占用和易用性上的差异。
+- **平坦二进制序列化**
+  游戏状态同步采用 **FlatBuffers**（零拷贝、无需解析），网关到 Worker 的命令传输使用 **Protocol Buffers**，两者都有实际运用。
 
-- **Spring Boot + 主流中间件**
-  Spring Boot 整合 Kafka、Redis、MySQL 等，展示企业级基础设施的典型组合。
+- **高可用排行榜设计**
+  排行榜分数先写 **Redis（Redisson）**，再异步刷入 MySQL，并配有定时同步机制防止数据不一致。
+
+- **纯异步 Netty 网关**
+  基于 **Netty** 的自研二进制/文本混合协议，支持心跳、长连接管理，无 Spring Boot 依赖，启动极快。
 
 ---
 
-## 🏗️ 架构概览
+## 🏗️ 实际架构
 
 ```
-         玩家浏览器 / 客户端
-               │
-               ▼
-          ┌─────────┐
-          │ Gateway │  ← 接收玩家输入，发布到 Kafka
-          └────┬────┘
-               │
-          ┌────▼────────────────────────┐
-          │   Apache Kafka (消息总线)     │
-          │  Topics:                     │
-          │  - game.player.input         │
-          │  - game.player.score         │
-          │  - game.player.died          │
-          └────┬──────────┬──────────────┘
-               │          │
-          ┌────▼───┐ ┌───▼─────────┐
-          │ Worker │ │ Leaderboard │
-          └────┬───┘ │ (Redis+DB)  │
-               │      └──────────────┘
-          ┌────▼────┐
-          │  Actor   │  ← 持有游戏状态，运行 ECS 逻辑
-          └─────────┘
+ 客户端 (Swing / 自定义)
+       │ TCP (自定义帧协议)
+       ▼
+    Gateway (Netty)
+       │ 命令路由 (RabbitMQ)
+       ▼
+    Worker (消费队列)
+       │ Disruptor RingBuffer
+       ▼
+    Actor (房间实例, ECS 世界)
+       │ 游戏事件 (Kafka)
+       ▼
+  Leaderboard Consumer (Kafka → Redis + MySQL)
 ```
 
-**数据流说明：**
-1. **玩家输入** → Gateway 发布 `game.player.input` 消息。
-2. **Worker** 消费输入事件，分发给对应的 **Actor**。
-3. **Actor** 更新 ECS 组件状态，计算碰撞、得分等。
-4. 得分事件写入 `game.player.score`，死亡事件写入 `game.player.died`。
-5. **排行榜服务** 消费这些事件，更新 Redis 排行榜，并异步持久化到 MySQL。
+**数据流细节**：
+1. 客户端发送 `CREATE/JOIN/INPUT` 等 JSON 命令，Gateway 根据玩家位置通过 **RabbitMQ** 转发给对应 Worker。
+2. Worker 反序列化 **Protobuf** 格式的命令，投递到房间对应的 **Disruptor RingBuffer**。
+3. Actor 每 200ms 一次 tick，执行 ECS 系统（移动、碰撞、食物等），产生 **FlatBuffers** 格式的全量/增量状态，通过 RabbitMQ 推回 Gateway 再发给客户端。
+4. 死亡、得分事件通过 **Kafka** 异步发送，独立的 `LeaderboardConsumer` 消费后更新 Redis 排行榜并异步写 MySQL。
 
 ---
 
@@ -66,127 +59,137 @@
 ### 前置依赖
 - **JDK 17+**
 - **Maven 3.8+**
-- **Apache Kafka** (建议本地开发使用 Docker)
-- **Redis** (6.x+，推荐使用 Redisson 客户端)
-- **MySQL** (5.7+ 或 8.0)
+- **RabbitMQ** （Gateway ↔ Worker 通信）
+- **Apache Kafka** （游戏事件流）
+- **Redis** （排行榜、分布式协调）
+- **MySQL** （用户数据、排行榜持久化）
 
-### 1. 启动中间件
-如果你使用 Docker，可以快速准备环境：
+### 1. 启动中间件（使用 Docker 示例）
 
 ```bash
-# 启动 Kafka (Confluent 快速启动镜像)
-docker run -d --name snake-kafka -p 9092:9092 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 apache/kafka:latest
+# RabbitMQ（管理界面端口 15672）
+docker run -d --name snake-mq -p 5672:5672 -p 15672:15672 rabbitmq:management
 
-# 启动 Redis
+# Kafka（需要 KRaft 模式，无 ZK）
+docker run -d --name snake-kafka -p 9092:9092 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  apache/kafka:latest
+
+# Redis
 docker run -d --name snake-redis -p 6379:6379 redis:7
 
-# 启动 MySQL
-docker run -d --name snake-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=snake mysql:8
+# MySQL（自动创建数据库 snake_game）
+docker run -d --name snake-mysql -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=snake_game \
+  mysql:8
 ```
 
 ### 2. 创建 Kafka Topics（必须）
-项目默认不会自动创建主题，你需要手动执行以下命令：
 
 ```bash
-# 如果 Kafka 安装在 /usr/share/kafka 下
-/usr/share/kafka/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 \
-  --topic game.player.input --partitions 3 --replication-factor 1
-
 /usr/share/kafka/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 \
   --topic game.player.score --partitions 3 --replication-factor 1
 
 /usr/share/kafka/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 \
   --topic game.player.died --partitions 3 --replication-factor 1
 ```
-
-> 💡 **进阶技巧**：你可以在代码里通过 `KafkaAdmin` + `NewTopic` Bean 实现自动创建，避免手动执行脚本。见后文“待办事项”。
+> 注意：输入命令路由不经过 Kafka，因此不包含 `game.player.input`。
 
 ### 3. 数据库初始化
-在 MySQL 中创建对应的库表（示例）：
+
+项目启动时 `BaseMySQLRepository` 会自动建表，无需手动执行 SQL。如需手动检查：
 
 ```sql
-CREATE DATABASE IF NOT EXISTS snake;
-USE snake;
-CREATE TABLE leaderboard (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  player_id VARCHAR(64) NOT NULL,
-  score INT NOT NULL,
-  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+SHOW TABLES; -- 应看到 users 表
+DESC users;  -- 包含 high_score 字段
 ```
 
 ### 4. 配置文件
-修改各模块的 `application.yml`（或 `application.properties`），指向你本地的 Kafka、Redis 和 MySQL 地址。例如：
 
-```yaml
-spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-  redis:
-    host: localhost
-    port: 6379
-  datasource:
-    url: jdbc:mysql://localhost:3306/snake
-    username: root
-    password: root
+在项目根目录放置 `config.properties`，内容参考：
+
+```properties
+# 数据库
+db.host=localhost
+db.port=3306
+db.name=snake_game
+db.user=root
+db.password=root
+
+# Redis
+redis.host=localhost
+redis.port=6379
+
+# RabbitMQ
+mq.host=localhost
+mq.port=5672
+mq.username=guest
+mq.password=guest
+
+# Kafka
+kafka.bootstrap.servers=localhost:9092
+kafka.enabled=true
 ```
 
-### 5. 编译与启动
-项目拆分为多个模块，你可以逐个启动：
+### 5. 启动服务（顺序建议）
 
 ```bash
-mvn clean package -DskipTests
-# 按需启动各个服务，例如：
-java -jar gateway/target/gateway-0.0.1-SNAPSHOT.jar
-java -jar worker/target/worker-0.0.1-SNAPSHOT.jar
-# ... 以此类推
+# 1. 认证服务（HTTP，默认 19001 端口）
+java -cp target/classes:target/dependency/* snake.infrastructure.auth.MainServer
+
+# 2. 排行榜消费者（Kafka → Redis + MySQL）
+java -cp ... snake.consumer.LeaderboardConsumer
+
+# 3. Worker（处理游戏逻辑，会自动注册到 Redis）
+java -cp ... snake.application.worker.WorkerMain
+
+# 4. Gateway（Netty 端口，默认 8080）
+java -cp ... snake.application.gateway.GatewayMain
 ```
 
-### 6. 验证
-启动后观察控制台日志，如果 Kafka 连接正常、主题无报错，服务即可开始工作。目前没有前端界面，建议通过日志或 Kafka 消费工具（如 `kafka-console-consumer`）查看消息流转。
+### 6. 客户端
 
----
+项目提供了 Swing 客户端，启动命令：
 
-## 📁 项目结构（部分）
-
-```
-snake_game/
-├── snake-ecs/           # ECS 核心抽象与实现
-├── snake-proto/         # Protobuf / FlatBuffers 定义与生成代码
-├── gateway/             # 网关服务：接收玩家连接和输入
-├── worker/              # 工作节点：消费 Kafka 事件，调度Actor
-├── actor/               # 游戏逻辑实体，持有 ECS 世界状态
-├── leaderboard/         # 排行榜服务：Redis + MySQL 榜单
-├── common/              # 公共配置与工具类
-├── pom.xml              # Maven 父 POM
-└── README.md
+```bash
+java -cp ... snake.client.swing.GameApp <gateway_ip> 8080
 ```
 
 ---
 
-## 🔧 工程化与待办事项
+## 📁 项目包结构（基于源码真实包名）
 
-- [ ] **README 完善** – 本文档已按最佳实践重写，可直接合并。
-- [ ] **自动化主题创建** – 使用 `KafkaAdmin` 配置 Bean，去除手动执行命令的步骤。
-- [ ] **清理 `.gitignore`** – 已排除 `target/`、`logs/`、`*.iml` 等，避免构建产物污染仓库。
-- [ ] **提交规范** – 建议采用 conventional commits (`feat`, `fix`, `chore`)，便于追踪变更。
-- [ ] **序列化方案统一** – 可考虑仅保留 Protobuf 或 FlatBuffers 一种，降低项目复杂度。
-- [ ] **添加单元测试** – 当前缺少测试，难以快速验证核心逻辑。
-- [ ] **补充前端或模拟客户端** – 至少提供一个命令行模拟器，方便演示。
+```
+snake.
+├── application
+│   ├── actor          # GameActor, EventLoop, Scheduler, ECS Tick/Message处理
+│   ├── gateway        # Netty 网关、命令分发、心跳、会话管理
+│   └── worker         # Worker 主逻辑、消息路由、房间服务
+├── consumer           # LeaderboardConsumer（Kafka 消费者）
+├── common             # 共享类：Config, Position, Direction, GameStateData, FlatBuffersSerializer
+├── distributed         # 基于 Redis 的分布式协调（房间、节点、玩家位置、在线状态、排行榜查询）
+├── domain.game        # GameState, GameStateDiff, GameStateDiffer
+├── ecs                # ECS 框架（Component, Entity, System, World）
+│   ├── components
+│   └── systems
+├── fbs                # FlatBuffers 生成的 table 类
+├── infrastructure
+│   ├── auth           # HTTP 认证服务 + 认证客户端 + 密码工具
+│   ├── event          # Kafka 事件生产及事件对象（PlayerDied, ScoreChanged）
+│   ├── messaging      # RabbitMQ 连接、Worker/Gateway 消息通道
+│   └── persistence    # 数据库连接池、用户仓储、排行榜仓储、配置加载
+└── client             # Swing 客户端（UI + 网络客户端 + 本地状态缓存）
+```
 
 ---
 
-## 🤔 为什么这个项目值得一看？
+## 🔧 工程化待办事项
 
-- 如果你是 **分布式系统初学者**，可以在这里看到 Kafka、Redis 在游戏场景下的实战组合。
-- 如果你好奇 **ECS 架构**，又不想啃 C++ 代码，这个 Java 实现是很好的阅读材料。
-- 如果你想挑战 **“把简单问题复杂化”** 的乐趣，这个项目就是极佳的范例。
-
----
-
-## 📜 许可证
-暂无明确的许可证，当前仅供学习与交流使用。
-
----
-
-> *snake_game 是一个初生牛犊的技术火花，欢迎 Fork、改进和拍砖。*
+- [x] **清理 `.gitignore`** – 需排除 `target/`、`logs/`、`*.iml` 等（上一轮已给出）
+- [x] **README 更正** – 本文档已根据实际代码重写
+- [ ] **自动化 Kafka 主题创建** – 可使用 `KafkaAdmin` 在启动时自动创建，避免手动命令
+- [ ] **配置文件外部化** – 当前硬编码了默认值，部分配置散落在 `Config` 类中
+- [ ] **序列化统一** – FlatBuffers 和 Protobuf 混用，可考虑统一以降低复杂度
+- [ ] **测试覆盖** – 已有部分单元测试，但核心 ECS 和网络层缺少集成测试
+- [ ] **构建完善** – 需提供 `pom.xml` 及正确的模块结构，目前只看到零散文件
