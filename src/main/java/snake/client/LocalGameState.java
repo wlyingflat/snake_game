@@ -1,6 +1,5 @@
 package snake.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.*;
 import snake.common.Direction;
 import snake.common.GameStateData;
@@ -23,99 +22,6 @@ public class LocalGameState {
     Direction direction;
     int score;
     boolean isDead;
-  }
-
-  // ---------- JSON 兼容方法 ----------
-  public void applyFullState(GameStateData data) {
-    players.clear();
-    this.roomId = data.roomId;
-    this.food = data.food;
-    this.obstacleCount = data.obstacleCount;
-    if (this.obstacles == null) {
-      this.obstacles = new Position[Config.OBSTACLE_COUNT];
-    }
-    for (int i = 0; i < data.obstacleCount; i++) {
-      this.obstacles[i] = data.obstacles[i];
-    }
-    for (int i = 0; i < data.playerCount; i++) {
-      GameStateData.PlayerInfo pi = data.players[i];
-      if (pi == null) continue;
-      PlayerData pd = new PlayerData();
-      pd.body.addAll(Arrays.asList(pi.body).subList(0, pi.length));
-      pd.length = pi.length;
-      pd.direction = pi.direction;
-      pd.score = pi.score;
-      pd.isDead = pi.isDead;
-      players.put(pi.name, pd);
-    }
-    this.activePlayers = data.activePlayers;
-    this.totalPlayers = data.totalPlayers;
-  }
-
-  public void applyDiff(JsonNode diffRoot) {
-    if (diffRoot == null) return;
-    JsonNode changes = diffRoot.get("changes");
-    if (changes == null) return;
-
-    if (changes.has("food")) {
-      JsonNode f = changes.get("food");
-      this.food = new Position(f.get("x").asInt(), f.get("y").asInt());
-    }
-    if (changes.has("removedPlayers")) {
-      JsonNode arr = changes.get("removedPlayers");
-      for (JsonNode nameNode : arr) {
-        players.remove(nameNode.asText());
-      }
-    }
-    if (changes.has("died")) {
-      JsonNode arr = changes.get("died");
-      for (JsonNode nameNode : arr) {
-        PlayerData pd = players.get(nameNode.asText());
-        if (pd != null) pd.isDead = true;
-      }
-    }
-    if (changes.has("newPlayers")) {
-      JsonNode arr = changes.get("newPlayers");
-      for (JsonNode node : arr) {
-        String name = node.get("name").asText();
-        PlayerData pd = new PlayerData();
-        JsonNode bodyArr = node.get("body");
-        if (bodyArr != null && bodyArr.isArray()) {
-          for (JsonNode seg : bodyArr) {
-            pd.body.add(new Position(seg.get("x").asInt(), seg.get("y").asInt()));
-          }
-        }
-        pd.length = node.get("length").asInt();
-        pd.direction = Direction.valueOf(node.get("direction").asText());
-        pd.score = node.has("score") ? node.get("score").asInt() : 0;
-        pd.isDead = node.has("isDead") ? node.get("isDead").asBoolean() : false;
-        players.put(name, pd);
-      }
-    }
-    if (changes.has("players")) {
-      JsonNode playersDiff = changes.get("players");
-      Iterator<Map.Entry<String, JsonNode>> fields = playersDiff.fields();
-      while (fields.hasNext()) {
-        Map.Entry<String, JsonNode> entry = fields.next();
-        String name = entry.getKey();
-        JsonNode pdNode = entry.getValue();
-        PlayerData pd = players.get(name);
-        if (pd == null || pd.isDead) continue;
-        JsonNode headNode = pdNode.get("newHead");
-        Position newHead = new Position(headNode.get("x").asInt(), headNode.get("y").asInt());
-        pd.body.add(0, newHead);
-        if (pdNode.get("removeTail").asBoolean() && pd.body.size() > 1) {
-          pd.body.remove(pd.body.size() - 1);
-        }
-        pd.length = pdNode.get("length").asInt();
-        pd.score = pd.length - 1;
-      }
-    }
-    activePlayers = 0;
-    for (PlayerData pd : players.values()) {
-      if (!pd.isDead) activePlayers++;
-    }
-    totalPlayers = players.size();
   }
 
   // ---------- FlatBuffers 版本 ----------

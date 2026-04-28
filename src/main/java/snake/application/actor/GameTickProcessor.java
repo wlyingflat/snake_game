@@ -1,3 +1,4 @@
+// snake/application/actor/GameTickProcessor.java
 package snake.application.actor;
 
 import java.util.*;
@@ -10,9 +11,7 @@ public class GameTickProcessor {
   private final GameStateDiffer differ;
   private final ActorNotifier notifier;
   private final Runnable onStatusChange;
-  private final ILogger logger = Logger.getInstance();
-  private final FlatBuffersSerializer serializer = new FlatBuffersSerializer(); // 替代原 Serializer
-
+  private final FlatBuffersSerializer serializer = new FlatBuffersSerializer();
   private GameStateData cachedSnapshot;
   private int tickSinceLastFullState = 0;
   private static final int FULL_STATE_INTERVAL_TICKS = 100;
@@ -31,19 +30,18 @@ public class GameTickProcessor {
   public void processTick() {
     if (state.isEmpty()) return;
 
+    // 记录旧状态
     Map<String, Integer> oldScores = new HashMap<>();
-    for (GameState.Player p : state.getPlayers()) {
-      oldScores.put(p.username, p.score);
-    }
     Map<String, Boolean> wasAlive = new HashMap<>();
     for (GameState.Player p : state.getPlayers()) {
+      oldScores.put(p.username, p.score);
       wasAlive.put(p.username, !p.isDead);
     }
 
     differ.captureBeforeTick();
-    state.update();
+    state.update(); // ECS 系统已调用
 
-    // 分数事件
+    // 分数变化事件
     for (GameState.Player p : state.getPlayers()) {
       int oldScore = oldScores.getOrDefault(p.username, 0);
       if (p.score > oldScore) {
@@ -51,11 +49,10 @@ public class GameTickProcessor {
       }
     }
 
-    // 死亡检测
+    // 死亡事件
     List<String> diedPlayers = new ArrayList<>();
     for (GameState.Player p : state.getPlayers()) {
-      Boolean aliveBefore = wasAlive.get(p.username);
-      if (aliveBefore != null && aliveBefore && p.isDead) {
+      if (wasAlive.getOrDefault(p.username, false) && p.isDead) {
         diedPlayers.add(p.username);
       }
     }
@@ -68,14 +65,13 @@ public class GameTickProcessor {
       if (player != null) {
         notifier.publishPlayerDied(username, roomId, player.score, player.length, "COLLISION");
         state.removePlayer(username);
-        notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}"); // 文本提示
+        notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");
       }
     }
 
     tickSinceLastFullState++;
     boolean forceFull =
         (tickSinceLastFullState >= FULL_STATE_INTERVAL_TICKS) || state.hasNewPlayer();
-
     if (forceFull) {
       cachedSnapshot = state.snapshot(null);
       byte[] data = serializer.serializeGameState(cachedSnapshot);

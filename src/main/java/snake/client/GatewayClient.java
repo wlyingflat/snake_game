@@ -12,7 +12,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import snake.common.GameStateData;
-import snake.common.Serializer;
 import snake.fbs.*;
 
 public class GatewayClient {
@@ -213,20 +212,6 @@ public class GatewayClient {
         case "LOGIN_OK":
           messageQueue.offer(json);
           break;
-        case "STATE":
-          // 兼容旧版 JSON 状态（如果未来需要回退）
-          GameStateData data = Serializer.deserializeGameState(json);
-          if (data != null) {
-            localGameState.applyFullState(data);
-            if (gameStateListener != null)
-              gameStateListener.onGameState(json, localGameState.toGameStateData());
-          }
-          break;
-        case "STATE_DIFF":
-          localGameState.applyDiff(root);
-          if (gameStateListener != null)
-            gameStateListener.onGameState(json, localGameState.toGameStateData());
-          break;
         case "YOU_DIED":
           if (deathListener != null) deathListener.onDeath();
           messageQueue.offer(json);
@@ -276,15 +261,15 @@ public class GatewayClient {
     receiverStarted = false;
     try {
       if (in != null) in.close();
-    } catch (IOException e) {
+    } catch (IOException ignored) {
     }
     try {
       if (out != null) out.close();
-    } catch (IOException e) {
+    } catch (IOException ignored) {
     }
     try {
       if (socket != null) socket.close();
-    } catch (IOException e) {
+    } catch (IOException ignored) {
     }
   }
 }

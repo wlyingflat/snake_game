@@ -18,7 +18,6 @@ public class PingPongHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    // 只处理文本消息，二进制消息直接放行给后续 Handler
     if (!(msg instanceof String jsonMsg)) {
       ctx.fireChannelRead(msg);
       return;
@@ -42,7 +41,7 @@ public class PingPongHandler extends ChannelInboundHandlerAdapter {
       ClientSession session = ctx.channel().attr(SESSION_KEY).get();
       if (session != null) {
         session.pendingPong = false;
-        session.lastHeartbeat = System.currentTimeMillis() / 1000;
+        session.refreshHeartbeat(); // 替换原来的直接赋值
         heartbeatService.refresh(session);
       }
       return;
