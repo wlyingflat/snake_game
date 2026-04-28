@@ -8,7 +8,6 @@ import snake.common.Logger;
 import snake.distributed.DistributedCoordinator;
 import snake.infrastructure.messaging.MessageBus;
 
-/** 负责创建房间，若房间已存在则转为加入。 */
 public class RoomService {
   private final ActorManager actorManager;
   private final DistributedCoordinator coordinator;
@@ -26,7 +25,6 @@ public class RoomService {
     int roomId = msg.getRoomId();
 
     if (coordinator.roomExists(roomId)) {
-      // 房间已存在，直接发布 JOIN 给对应 Actor
       EnhancedMessage joinMsg =
           EnhancedMessage.newInstance()
               .init("JOIN", msg.getUsername(), roomId, msg.getGatewayId(), msg.getRawMessage());

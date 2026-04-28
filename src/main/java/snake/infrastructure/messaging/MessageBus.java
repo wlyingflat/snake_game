@@ -34,7 +34,6 @@ public class MessageBus implements AutoCloseable {
     factory.setNetworkRecoveryInterval(5000);
     this.connection = factory.newConnection();
 
-    // 声明持久化交换机
     try (com.rabbitmq.client.Channel ch = connection.createChannel()) {
       ch.exchangeDeclare("gateway.topic", "topic", true);
       ch.exchangeDeclare("room.list.fanout", "fanout", true);
@@ -43,35 +42,38 @@ public class MessageBus implements AutoCloseable {
     this.workerChannel = new WorkerMessageChannel(connection);
     this.playerChannel = new GatewayPlayerChannel(connection);
     this.roomListChannel = new RoomListChannel(connection);
-    logger.info("MessageBus connected to RabbitMQ at " + host + ":" + port);
+    logger.info("MessageBus connected to RabbitMQ");
   }
 
-  // 委托方法，保持与原来完全相同的签名和行为
-  public void startWorkerConsumer(String workerId, Consumer<String> messageHandler)
+  // Worker 端：接收 binary 消息（Protobuf 格式）
+  public void startWorkerConsumer(String workerId, Consumer<byte[]> messageHandler)
       throws IOException {
     workerChannel.startConsumer(workerId, messageHandler);
   }
 
-  public void publishBinaryToPlayer(String gatewayId, String username, byte[] data, byte subType) {
-    playerChannel.publishBinaryToPlayer(gatewayId, username, data, subType);
+  // 向 Worker 发送 Protobuf 二进制消息
+  public void sendToWorker(String workerId, byte[] protobufMessage) {
+    workerChannel.sendToWorker(workerId, protobufMessage);
   }
 
-  public void subscribeGatewayBinary(String gatewayId, BiConsumer<String, byte[]> consumer)
-      throws IOException {
-    playerChannel.subscribeGatewayBinary(gatewayId, consumer);
-  }
-
-  public void sendToWorker(String workerId, String message) {
-    workerChannel.sendToWorker(workerId, message);
-  }
-
+  // 向某玩家发送文本消息（JOIN_OK 等）
   public void publishToPlayer(String gatewayId, String username, String message) {
     playerChannel.publishToPlayer(gatewayId, username, message);
+  }
+
+  // 向某玩家发送二进制消息（游戏状态 / Protobuf 业务消息）
+  public void publishBinaryToPlayer(String gatewayId, String username, byte[] data, byte subType) {
+    playerChannel.publishBinaryToPlayer(gatewayId, username, data, subType);
   }
 
   public void subscribeGateway(String gatewayId, BiConsumer<String, String> messageConsumer)
       throws IOException {
     playerChannel.subscribeGateway(gatewayId, messageConsumer);
+  }
+
+  public void subscribeGatewayBinary(String gatewayId, BiConsumer<String, byte[]> consumer)
+      throws IOException {
+    playerChannel.subscribeGatewayBinary(gatewayId, consumer);
   }
 
   public void publishRoomListUpdate() {

@@ -162,7 +162,7 @@ public class GatewayServer {
                 EnhancedMessage.newInstance()
                     .init("LEAVE", session.username, session.roomId, gatewayId, "{}");
             try {
-              messageBus.sendToWorker(workerId, leaveMsg.toJson());
+              messageBus.sendToWorker(workerId, leaveMsg.toProtobuf());
             } finally {
               leaveMsg.recycle();
             }

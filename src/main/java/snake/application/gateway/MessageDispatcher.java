@@ -58,11 +58,10 @@ public class MessageDispatcher {
         EnhancedMessage.newInstance()
             .init("CREATE", username, roomId, localGatewayId, msg.toString());
     try {
-      messageBus.sendToWorker(workerId, enhancedMsg.toJson());
+      messageBus.sendToWorker(workerId, enhancedMsg.toProtobuf());
     } finally {
       enhancedMsg.recycle();
     }
-    logger.info("CREATE routed to worker " + workerId + " for room " + roomId);
   }
 
   private void routeJoin(String username, JsonNode msg) {
@@ -77,7 +76,7 @@ public class MessageDispatcher {
         EnhancedMessage.newInstance()
             .init("JOIN", username, roomId, localGatewayId, msg.toString());
     try {
-      messageBus.sendToWorker(workerId, enhancedMsg.toJson());
+      messageBus.sendToWorker(workerId, enhancedMsg.toProtobuf());
     } finally {
       enhancedMsg.recycle();
     }
@@ -85,10 +84,7 @@ public class MessageDispatcher {
 
   private void routeInput(String username, JsonNode msg) {
     DistributedCoordinator.PlayerLocation location = coordinator.getPlayerLocation(username);
-    if (location == null) {
-      logger.warn("Player location not found for " + username);
-      return;
-    }
+    if (location == null) return;
     int roomId = location.roomId();
     if (roomId == -1) return;
     String workerId = coordinator.getRoomWorker(roomId);
@@ -97,7 +93,7 @@ public class MessageDispatcher {
         EnhancedMessage.newInstance()
             .init("INPUT", username, roomId, localGatewayId, msg.toString());
     try {
-      messageBus.sendToWorker(workerId, enhancedMsg.toJson());
+      messageBus.sendToWorker(workerId, enhancedMsg.toProtobuf());
     } finally {
       enhancedMsg.recycle();
     }
@@ -114,7 +110,7 @@ public class MessageDispatcher {
         EnhancedMessage.newInstance()
             .init("LEAVE", username, roomId, localGatewayId, msg.toString());
     try {
-      messageBus.sendToWorker(workerId, enhancedMsg.toJson());
+      messageBus.sendToWorker(workerId, enhancedMsg.toProtobuf());
     } finally {
       enhancedMsg.recycle();
     }

@@ -51,8 +51,8 @@ public class GameWorker {
     coordinator.registerWorker(workerId);
     messageBus.startWorkerConsumer(
         workerId,
-        rawMsg -> {
-          dispatchPool.submit(() -> router.route(rawMsg));
+        rawBytes -> {
+          dispatchPool.submit(() -> router.route(rawBytes));
         });
     logger.info("Worker " + workerId + " started, listening for messages via RabbitMQ");
   }

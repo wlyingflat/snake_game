@@ -1,15 +1,13 @@
 package snake.application.actor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.util.Recycler;
-import snake.common.JsonUtils;
 import snake.domain.game.Message;
+import snake.messaging.CommandMsg; // 由 protobuf 生成
 
 public class EnhancedMessage implements Message {
 
   private static final Recycler<EnhancedMessage> RECYCLER =
-      new Recycler<EnhancedMessage>() {
+      new Recycler<>() {
         @Override
         protected EnhancedMessage newObject(Handle<EnhancedMessage> handle) {
           return new EnhancedMessage(handle);
@@ -75,30 +73,29 @@ public class EnhancedMessage implements Message {
     handle.recycle(this);
   }
 
-  public String toJson() {
-    ObjectNode node = JsonUtils.MAPPER.createObjectNode();
-    node.put("command", command);
-    node.put("username", username);
-    node.put("roomId", roomId);
-    node.put("gatewayId", gatewayId);
-    node.put("rawMessage", rawMessage);
-    try {
-      return JsonUtils.MAPPER.writeValueAsString(node);
-    } catch (Exception e) {
-      return "{}";
-    }
+  // ---------- Protobuf 序列化 ----------
+  public byte[] toProtobuf() {
+    CommandMsg proto =
+        CommandMsg.newBuilder()
+            .setCommand(command)
+            .setUsername(username)
+            .setRoomId(roomId)
+            .setGatewayId(gatewayId)
+            .setRawMessage(rawMessage)
+            .build();
+    return proto.toByteArray();
   }
 
-  public static EnhancedMessage fromJson(String json) {
+  // ---------- Protobuf 反序列化 ----------
+  public static EnhancedMessage fromProtobuf(byte[] data) {
     try {
-      JsonNode node = JsonUtils.MAPPER.readTree(json);
+      CommandMsg proto = CommandMsg.parseFrom(data);
       EnhancedMessage msg = newInstance();
-      msg.init(
-          node.get("command").asText(),
-          node.get("username").asText(),
-          node.get("roomId").asInt(),
-          node.get("gatewayId").asText(),
-          node.get("rawMessage").asText());
+      msg.command = proto.getCommand();
+      msg.username = proto.getUsername();
+      msg.roomId = proto.getRoomId();
+      msg.gatewayId = proto.getGatewayId();
+      msg.rawMessage = proto.getRawMessage();
       return msg;
     } catch (Exception e) {
       return null;

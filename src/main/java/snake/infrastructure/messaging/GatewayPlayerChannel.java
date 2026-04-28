@@ -7,7 +7,6 @@ import java.util.function.BiConsumer;
 import snake.common.ILogger;
 import snake.common.Logger;
 
-/** 负责 Worker → Gateway 玩家定向消息的发布与订阅，文本与二进制分离。 */
 public class GatewayPlayerChannel {
   private static final String GATEWAY_EXCHANGE = "gateway.topic";
   public static final String TEXT_QUEUE_PREFIX = "gateway.text.queue.";
@@ -19,9 +18,7 @@ public class GatewayPlayerChannel {
     this.connection = connection;
   }
 
-  // ================== 文本消息 ==================
-
-  /** 向某个玩家的 Gateway 发送文本消息（如 JOIN_OK、ERROR）。 */
+  // ---------- 文本消息（仍用于 JOIN_OK, ERROR 等） ----------
   public void publishToPlayer(String gatewayId, String username, String message) {
     try (Channel ch = connection.createChannel()) {
       String routingKey = String.format("gateway.%s.player.text.%s", gatewayId, username);
@@ -35,7 +32,6 @@ public class GatewayPlayerChannel {
     }
   }
 
-  /** Gateway 订阅属于自己的文本消息队列。 */
   public void subscribeGateway(String gatewayId, BiConsumer<String, String> messageConsumer)
       throws IOException {
     Channel channel = connection.createChannel();
@@ -66,13 +62,10 @@ public class GatewayPlayerChannel {
     logger.info("Gateway " + gatewayId + " subscribed to text queue " + queueName);
   }
 
-  // ================== 二进制消息 ==================
-
-  /** 向某个玩家的 Gateway 发送二进制消息，只添加子类型，不再添加 0x00 前缀 */
+  // ---------- 二进制消息（含 Protobuf 业务消息） ----------
   public void publishBinaryToPlayer(String gatewayId, String username, byte[] data, byte subType) {
-    // 总长度：1(subType) + data.length
     byte[] framed = new byte[data.length + 1];
-    framed[0] = subType; // 0x00=全量, 0x01=差分
+    framed[0] = subType;
     System.arraycopy(data, 0, framed, 1, data.length);
     try (Channel ch = connection.createChannel()) {
       String routingKey = String.format("gateway.%s.player.bin.%s", gatewayId, username);
@@ -83,7 +76,6 @@ public class GatewayPlayerChannel {
     }
   }
 
-  /** Gateway 订阅属于自己的二进制消息队列。 */
   public void subscribeGatewayBinary(String gatewayId, BiConsumer<String, byte[]> consumer)
       throws IOException {
     Channel channel = connection.createChannel();
