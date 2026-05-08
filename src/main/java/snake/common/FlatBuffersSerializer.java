@@ -39,7 +39,7 @@ public class FlatBuffersSerializer {
     int root = snake.fbs.GameState.endGameState(fbb);
     fbb.finish(root);
     byte[] result = fbb.sizedByteArray();
-    System.out.println("[DEBUG] Serialized GameState length: " + result.length);
+    // System.out.println("[DEBUG] Serialized GameState length: " + result.length);
     return result;
   }
 
