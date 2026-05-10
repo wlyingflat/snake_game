@@ -144,10 +144,8 @@ public class ActorManager {
 
   private void updateRoomInfo(int roomId, GameActor actor) {
     if (actor == null || !actor.isRunning()) return;
-    var snapshot = actor.getSnapshot(null);
-    if (snapshot != null) {
-      boolean isFull = snapshot.activePlayers >= Config.MAX_PLAYERS_PER_ROOM;
-      coordinator.updateRoomInfo(roomId, snapshot.activePlayers, isFull);
-    }
+    int active = actor.getActivePlayers();
+    boolean isFull = active >= Config.MAX_PLAYERS_PER_ROOM;
+    coordinator.updateRoomInfo(roomId, active, isFull);
   }
 }

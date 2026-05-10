@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import snake.common.GameStateData;
 import snake.fbs.*;
 
 public class GatewayClient {
@@ -24,20 +23,18 @@ public class GatewayClient {
   private Thread receiverThread;
   private volatile boolean running = false;
   private volatile boolean receiverStarted = false;
-  private GameStateListener gameStateListener;
+  private AgarFrameListener agarFrameListener;
   private RoomListListener roomListListener;
   private DeathListener deathListener;
   private final ObjectMapper mapper = new ObjectMapper();
-  private final LocalGameState localGameState = new LocalGameState();
 
   // 协议常量
   private static final byte TYPE_BINARY = 0x00;
   private static final byte TYPE_TEXT = 0x01;
   private static final byte SUBTYPE_FULL_STATE = 0x00;
-  private static final byte SUBTYPE_DIFF_STATE = 0x01;
 
-  public interface GameStateListener {
-    void onGameState(String json, GameStateData data);
+  public interface AgarFrameListener {
+    void onFrame(AgarFrameData data);
   }
 
   public interface RoomListListener {
@@ -68,9 +65,8 @@ public class GatewayClient {
     try {
       String jsonStr = mapper.writeValueAsString(json);
       byte[] body = jsonStr.getBytes(StandardCharsets.UTF_8);
-      // 协议：4字节长度（不包含自身） + 1字节类型(0x01) + JSON
       ByteBuffer buf = ByteBuffer.allocate(4 + 1 + body.length);
-      buf.putInt(1 + body.length); // 长度 = 类型(1) + JSON长度
+      buf.putInt(1 + body.length);
       buf.put(TYPE_TEXT);
       buf.put(body);
       out.write(buf.array());
@@ -143,64 +139,53 @@ public class GatewayClient {
     if (frame.length < 1) return;
     byte type = frame[0];
     if (type == TYPE_TEXT) {
-      // 文本消息
       String json = new String(frame, 1, frame.length - 1, StandardCharsets.UTF_8);
       handleJsonMessage(json);
     } else if (type == TYPE_BINARY) {
-      // 二进制消息
       if (frame.length < 2) return;
       byte subType = frame[1];
       int dataLen = frame.length - 2;
-      System.out.println(
-          "[DEBUG] Binary frame: total="
-              + frame.length
-              + ", subType="
-              + subType
-              + ", dataLen="
-              + dataLen);
-      if (dataLen < 4) {
-        System.err.println("[WARN] FlatBuffers data too short, ignoring frame.");
-        return;
-      }
+      if (dataLen < 4) return;
       try {
         ByteBuffer dataBuf = ByteBuffer.wrap(frame, 2, dataLen);
         dataBuf.order(ByteOrder.LITTLE_ENDIAN);
         if (subType == SUBTYPE_FULL_STATE) {
-          GameState fbState = GameState.getRootAsGameState(dataBuf);
-          applyFbsFullState(fbState);
-        } else if (subType == SUBTYPE_DIFF_STATE) {
-          GameStateDiff fbDiff = GameStateDiff.getRootAsGameStateDiff(dataBuf);
-          applyFbsDiffState(fbDiff);
-        }
+          AgarFrame agar = AgarFrame.getRootAsAgarFrame(dataBuf);
+          applyAgarFrame(agar);
+        } // 忽略其他子类型
       } catch (Exception e) {
         System.err.println("[ERROR] Failed to parse FlatBuffers frame: " + e.getMessage());
-        e.printStackTrace();
       }
     }
   }
 
-  private void applyFbsFullState(GameState fbState) {
-    localGameState.applyFbsFullState(fbState);
-    GameStateData data = localGameState.toGameStateData();
-    if (gameStateListener != null) {
-      gameStateListener.onGameState(null, data);
+  private void applyAgarFrame(AgarFrame agar) {
+    AgarFrameData data = new AgarFrameData();
+    data.balls = new ArrayList<>();
+    for (int i = 0; i < agar.ballsLength(); i++) {
+      BallState fbBall = agar.balls(i);
+      AgarBall ball = new AgarBall();
+      ball.username = fbBall.username();
+      ball.x = fbBall.x();
+      ball.y = fbBall.y();
+      ball.mass = fbBall.mass();
+      data.balls.add(ball);
     }
-  }
-
-  private void applyFbsDiffState(GameStateDiff fbDiff) {
-    localGameState.applyFbsDiffState(fbDiff);
-    GameStateData data = localGameState.toGameStateData();
-    if (gameStateListener != null) {
-      gameStateListener.onGameState(null, data);
+    data.foods = new ArrayList<>();
+    for (int i = 0; i < agar.foodLength(); i++) {
+      Vec2 f = agar.food(i);
+      data.foods.add(new float[] {f.x(), f.y()});
+    }
+    if (agarFrameListener != null) {
+      agarFrameListener.onFrame(data);
     }
   }
 
   private void handleJsonMessage(String json) {
-    System.out.println("[GATEWAY] text received: " + json);
+    System.out.println("[GATEWAY] text: " + json);
     try {
       JsonNode root = mapper.readTree(json);
       String cmd = root.get("cmd").asText();
-
       switch (cmd) {
         case "ROOM_LIST":
           if (roomListListener != null) roomListListener.onRoomListUpdate(root);
@@ -244,8 +229,8 @@ public class GatewayClient {
     if (receiverThread != null) receiverThread.interrupt();
   }
 
-  public void setGameStateListener(GameStateListener listener) {
-    this.gameStateListener = listener;
+  public void setAgarFrameListener(AgarFrameListener listener) {
+    this.agarFrameListener = listener;
   }
 
   public void setRoomListListener(RoomListListener listener) {
@@ -271,5 +256,30 @@ public class GatewayClient {
       if (socket != null) socket.close();
     } catch (IOException ignored) {
     }
+  }
+
+  // ---- 新的游戏命令发送 ----
+  public void sendMove(float x, float y) {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("cmd", "MOVE");
+    msg.put("x", x);
+    msg.put("y", y);
+    sendJson(msg);
+  }
+
+  public void sendSplit(float x, float y) {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("cmd", "SPLIT");
+    msg.put("x", x);
+    msg.put("y", y);
+    sendJson(msg);
+  }
+
+  public void sendEject(float x, float y) {
+    Map<String, Object> msg = new HashMap<>();
+    msg.put("cmd", "EJECT");
+    msg.put("x", x);
+    msg.put("y", y);
+    sendJson(msg);
   }
 }

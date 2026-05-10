@@ -4,16 +4,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import snake.common.*;
 import snake.distributed.DistributedCoordinator;
+import snake.domain.game.AgarGameState;
 import snake.domain.game.GameState;
 import snake.domain.game.TickMessage;
 import snake.infrastructure.event.KafkaEventProducer;
 import snake.infrastructure.messaging.MessageBus;
 
-/**
- * 重构后的 GameActor 仅负责： - 组合各个组件（ActorEventLoop, ActorScheduler, GameMessageHandler,
- * GameTickProcessor） - 提供外部 API（postMessage, getSnapshot, stop, isRunning） - 协调组件间的交互
- * 构造与启动分离：构造后需调用 start() 才能真正运行。
- */
 public class GameActor {
   private final int roomId;
   private final String workerId;
@@ -23,10 +19,10 @@ public class GameActor {
   private final GameMessageHandler messageHandler;
   private final ActorNotifier notifier;
   private final DistributedCoordinator coordinator;
-  private final GameState state;
+  private final AgarGameState state; // ← 吞噬游戏状态
   private final Runnable onStatusChange;
   private final AtomicBoolean running = new AtomicBoolean(true);
-  private final AtomicBoolean started = new AtomicBoolean(false); // 启动状态
+  private final AtomicBoolean started = new AtomicBoolean(false);
   private final AtomicLong lastActiveTime = new AtomicLong(System.currentTimeMillis());
   private final ILogger logger = Logger.getInstance();
 
@@ -42,22 +38,20 @@ public class GameActor {
     this.workerId = workerId;
     this.onStatusChange = onStatusChange;
 
-    this.state = new GameState(roomId);
+    // 吞噬游戏地图：3000x3000
+    this.state = new AgarGameState(roomId, 3000, 3000);
     this.notifier = new ActorNotifier(coordinator, eventProducer, messageBus);
 
-    // 创建消息处理器和 tick 处理器
-    this.tickProcessor = new GameTickProcessor(roomId, state, notifier, onStatusChange);
+    this.tickProcessor = new GameTickProcessor(roomId, state, notifier);
     this.messageHandler =
-        new GameMessageHandler(roomId, state, notifier, coordinator, tickProcessor, onStatusChange);
+        new GameMessageHandler(roomId, state, notifier, coordinator, onStatusChange);
 
-    // 创建事件循环，将自己实现的 MessageHandler 注入
     this.eventLoop =
         new ActorEventLoop(
             roomId,
             new ActorEventLoop.MessageHandler() {
               @Override
               public void onTick() {
-                // 每次 tick 更新时间戳
                 if (!state.isEmpty()) {
                   lastActiveTime.set(System.currentTimeMillis());
                 }
@@ -70,21 +64,18 @@ public class GameActor {
               }
             });
 
-    // 创建调度器，将任务进行绑定
     this.scheduler =
         new ActorScheduler(
             roomId, () -> eventLoop.publishEvent(new TickMessage()), this::checkIdleAndStop);
 
-    // 注意：不再在这里启动 Disruptor 和调度器，由 start() 统一管理
-    logger.info("Actor " + roomId + " constructed on worker " + this.workerId);
+    logger.info("Agar Actor " + roomId + " constructed on worker " + this.workerId);
   }
 
-  /** 启动事件循环和调度器（幂等） */
   public void start() {
     if (started.compareAndSet(false, true)) {
       eventLoop.start();
       scheduler.start();
-      logger.info("Actor " + roomId + " started on worker " + this.workerId);
+      logger.info("Agar Actor " + roomId + " started on worker " + this.workerId);
     }
   }
 
@@ -101,16 +92,17 @@ public class GameActor {
     return running.get();
   }
 
-  public GameStateData getSnapshot(String username) {
-    return tickProcessor.getCachedSnapshot();
+  // 获取快照（用于房间状态，吞噬游戏可返回玩家数）
+  public int getActivePlayers() {
+    return state.getActivePlayers();
   }
 
   public void stop() {
     if (!running.compareAndSet(true, false)) return;
     logger.info("Actor " + roomId + " is stopping...");
 
-    // 通知所有玩家
-    for (GameState.Player p : state.getPlayers()) {
+    // 通知所有玩家（通过 state.getActiveUsernames()）
+    for (GameState.Player p : state.getActiveUsernames()) {
       notifier.sendToPlayer(p.username, null, "{\"cmd\":\"ROOM_CLOSED\"}");
       coordinator.removePlayerLocation(p.username);
     }
@@ -122,7 +114,6 @@ public class GameActor {
       }
     }
 
-    // 停止调度器与事件循环（即使未 start 也可安全调用）
     scheduler.stop();
     eventLoop.shutdown();
     logger.info("Actor " + roomId + " destroyed.");

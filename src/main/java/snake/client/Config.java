@@ -1,9 +1,10 @@
 package snake.client;
 
 public class Config {
-  public static final int OBSTACLE_COUNT = 15;
-  public static final int MAX_PLAYERS_PER_ROOM = 8;
-  public static final int MAX_SNAKE_LENGTH = 63;
-  public static final int MAP_WIDTH = 40; // 与服务端 snake.base.Config 一致
-  public static final int MAP_HEIGHT = 20;
+  public static final int MAP_WIDTH = 3000; // 吞噬游戏世界宽度
+  public static final int MAP_HEIGHT = 3000; // 世界高度
+  public static final int VIEW_WIDTH = 800; // 视口宽度 (像素)
+  public static final int VIEW_HEIGHT = 600; // 视口高度
+  public static final float BASE_RADIUS = 8f; // 质量 100 时的半径像素
+  public static final float FOOD_RADIUS = 3f;
 }

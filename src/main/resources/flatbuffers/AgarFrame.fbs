@@ -1,0 +1,18 @@
+namespace snake.fbs;
+
+table Vec2 {
+    x:float;
+    y:float;
+}
+
+table BallState {
+    username:string;
+    x:float;
+    y:float;
+    mass:float;
+}
+
+table AgarFrame {
+    balls:[BallState];
+    food:[Vec2];
+}

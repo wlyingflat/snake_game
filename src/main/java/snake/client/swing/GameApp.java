@@ -1,8 +1,7 @@
 package snake.client.swing;
 
-import java.awt.*;
 import javax.swing.*;
-import snake.client.*;
+import snake.client.GatewayClient;
 
 public class GameApp {
   private final String serverHost;
@@ -27,12 +26,10 @@ public class GameApp {
     SwingUtilities.invokeLater(() -> new LoginFrame(this).setVisible(true));
   }
 
-  // 供 LoginFrame 设置已连接的 GatewayClient
   public void setGatewayClient(GatewayClient client) {
     this.gatewayClient = client;
   }
 
-  // 登录成功回调（Gateway 已连接并认证通过）
   public void onLoginSuccess(String username) {
     this.username = username;
     showRoomList();

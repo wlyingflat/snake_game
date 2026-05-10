@@ -1,104 +1,37 @@
-// snake/application/actor/GameTickProcessor.java
 package snake.application.actor;
 
-import java.util.*;
+import java.util.List;
 import snake.common.*;
-import snake.domain.game.*;
+import snake.domain.game.AgarGameState;
+import snake.domain.game.AgarGameState.AgarPlayerState;
 
 public class GameTickProcessor {
   private final int roomId;
-  private final GameState state;
-  private final GameStateDiffer differ;
+  private final AgarGameState state;
   private final ActorNotifier notifier;
-  private final Runnable onStatusChange;
   private final FlatBuffersSerializer serializer = new FlatBuffersSerializer();
-  private GameStateData cachedSnapshot;
-  private int tickSinceLastFullState = 0;
-  private static final int FULL_STATE_INTERVAL_TICKS = 100;
 
-  public GameTickProcessor(
-      int roomId, GameState state, ActorNotifier notifier, Runnable onStatusChange) {
+  public GameTickProcessor(int roomId, AgarGameState state, ActorNotifier notifier) {
     this.roomId = roomId;
     this.state = state;
     this.notifier = notifier;
-    this.onStatusChange = onStatusChange;
-    this.differ = new GameStateDiffer(state);
-    differ.captureBeforeTick();
-    updateCachedSnapshot();
   }
 
   public void processTick() {
     if (state.isEmpty()) return;
+    state.update();
 
-    // 记录旧状态
-    Map<String, Integer> oldScores = new HashMap<>();
-    Map<String, Boolean> wasAlive = new HashMap<>();
-    for (GameState.Player p : state.getPlayers()) {
-      oldScores.put(p.username, p.score);
-      wasAlive.put(p.username, !p.isDead);
-    }
+    List<AgarPlayerState> playerStates = state.getPlayerStates();
+    if (playerStates.isEmpty()) return;
 
-    differ.captureBeforeTick();
-    state.update(); // ECS 系统已调用
+    List<Position> foodPositions = state.getFoodPositions();
+    byte[] data = serializer.serializeAgarFrame(playerStates, foodPositions);
 
-    // 分数变化事件
-    for (GameState.Player p : state.getPlayers()) {
-      int oldScore = oldScores.getOrDefault(p.username, 0);
-      if (p.score > oldScore) {
-        notifier.publishScoreChanged(p.username, roomId, p.score, p.score - oldScore);
-      }
-    }
-
-    // 死亡事件
-    List<String> diedPlayers = new ArrayList<>();
-    for (GameState.Player p : state.getPlayers()) {
-      if (wasAlive.getOrDefault(p.username, false) && p.isDead) {
-        diedPlayers.add(p.username);
-      }
-    }
-    for (String username : diedPlayers) {
-      GameState.Player player =
-          state.getPlayers().stream()
-              .filter(p -> p.username.equals(username))
-              .findFirst()
-              .orElse(null);
-      if (player != null) {
-        notifier.publishPlayerDied(username, roomId, player.score, player.length, "COLLISION");
-        state.removePlayer(username);
-        notifier.sendToPlayer(username, null, "{\"cmd\":\"YOU_DIED\"}");
-      }
-    }
-
-    tickSinceLastFullState++;
-    boolean forceFull =
-        (tickSinceLastFullState >= FULL_STATE_INTERVAL_TICKS) || state.hasNewPlayer();
-    if (forceFull) {
-      cachedSnapshot = state.snapshot(null);
-      byte[] data = serializer.serializeGameState(cachedSnapshot);
-      notifier.broadcastBinaryToRoom(state.getPlayers(), data, ActorNotifier.SUBTYPE_FULL_STATE);
-      tickSinceLastFullState = 0;
-    } else {
-      GameStateDiff diff = differ.computeDiff();
-      if (!diff.players.isEmpty() || !diff.died.isEmpty() || diff.food != null) {
-        byte[] data = serializer.serializeDiff(diff);
-        notifier.broadcastBinaryToRoom(state.getPlayers(), data, ActorNotifier.SUBTYPE_DIFF_STATE);
-      }
-    }
-
-    if (!diedPlayers.isEmpty() && onStatusChange != null) {
-      onStatusChange.run();
-    }
+    notifier.broadcastBinaryToRoom(
+        state.getActiveUsernames(), data, ActorNotifier.SUBTYPE_FULL_STATE);
   }
 
-  public void refreshCache() {
-    this.cachedSnapshot = state.snapshot(null);
-  }
-
-  private void updateCachedSnapshot() {
-    cachedSnapshot = state.snapshot(null);
-  }
-
-  public GameStateData getCachedSnapshot() {
-    return cachedSnapshot;
+  public byte[] getLastFrame() {
+    return serializer.serializeAgarFrame(state.getPlayerStates(), state.getFoodPositions());
   }
 }

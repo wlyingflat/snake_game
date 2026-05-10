@@ -1,14 +1,12 @@
-// snake/ecs/components/FoodComponent.java
 package snake.ecs.components;
 
-import snake.common.Position;
 import snake.ecs.Component;
 
 public class FoodComponent implements Component {
-  public Position position;
+  public float mass; // 食物质量
   public boolean eaten = false;
 
-  public FoodComponent(Position position) {
-    this.position = position;
+  public FoodComponent(float mass) {
+    this.mass = mass;
   }
 }

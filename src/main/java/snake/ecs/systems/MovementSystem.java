@@ -1,50 +1,37 @@
 // snake/ecs/systems/MovementSystem.java
 package snake.ecs.systems;
 
-import snake.common.Position;
-import snake.ecs.Component;
 import snake.ecs.Entity;
 import snake.ecs.System;
 import snake.ecs.World;
-import snake.ecs.components.AliveComponent;
-import snake.ecs.components.BodyComponent;
-import snake.ecs.components.DirectionComponent;
+import snake.ecs.components.*;
 
 public class MovementSystem implements System {
+  // 修复：使用 tick 间隔（秒），默认200ms
+  private static final float DELTA = 0.2f; // 将 0.016f 改为 0.2f
+
   @Override
   public void update(World world) {
-    // 为每条活蛇计算新头并暂存
-    world.entities.parallelStream()
-        .filter(e -> e.has(AliveComponent.class) && e.get(AliveComponent.class).alive)
-        .forEach(
-            e -> {
-              BodyComponent body = e.get(BodyComponent.class);
-              DirectionComponent dir = e.get(DirectionComponent.class);
-              Position head = body.segments.get(0);
-              Position newHead =
-                  switch (dir.direction) {
-                    case UP -> new Position(head.x, head.y - 1);
-                    case DOWN -> new Position(head.x, head.y + 1);
-                    case LEFT -> new Position(head.x - 1, head.y);
-                    case RIGHT -> new Position(head.x + 1, head.y);
-                  };
-              e.add(new NewHeadComponent(newHead));
-            });
-
-    // 插入新头（单线程，安全）
     for (Entity e : world.entities) {
-      if (!e.has(NewHeadComponent.class)) continue;
-      Position newHead = e.get(NewHeadComponent.class).position;
-      e.get(BodyComponent.class).segments.add(0, newHead);
-      e.remove(NewHeadComponent.class);
-    }
-  }
+      if (!e.has(MassComponent.class) || !e.has(TargetComponent.class)) continue;
+      MassComponent mass = e.get(MassComponent.class);
+      TargetComponent target = e.get(TargetComponent.class);
+      PositionComponent pos = e.get(PositionComponent.class);
+      VelocityComponent vel = e.get(VelocityComponent.class);
 
-  private static class NewHeadComponent implements Component {
-    final Position position;
+      float dx = target.tx - pos.x;
+      float dy = target.ty - pos.y;
+      float dist = (float) Math.sqrt(dx * dx + dy * dy);
+      if (dist < 0.5f) continue;
 
-    NewHeadComponent(Position p) {
-      this.position = p;
+      float speed = 300f / (float) Math.pow(mass.mass, 0.45f);
+      float vx = dx / dist * speed;
+      float vy = dy / dist * speed;
+      vel.vx = vx;
+      vel.vy = vy;
+
+      pos.x += vel.vx * DELTA; // 现在每步移动较大
+      pos.y += vel.vy * DELTA;
     }
   }
 }

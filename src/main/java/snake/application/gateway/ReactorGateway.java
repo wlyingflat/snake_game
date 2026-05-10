@@ -72,6 +72,10 @@ public class ReactorGateway implements IServer {
     dispatcher.register("INPUT", gameHandler);
     dispatcher.register("LEAVE", gameHandler);
     dispatcher.register("QUIT", gameHandler);
+    // 新增吞噬游戏命令
+    dispatcher.register("MOVE", gameHandler);
+    dispatcher.register("SPLIT", gameHandler);
+    dispatcher.register("EJECT", gameHandler);
 
     // 2. 创建 LobbyService
     this.lobbyService = new LobbyService(sessionManager, coordinator);
@@ -98,10 +102,6 @@ public class ReactorGateway implements IServer {
 
   // 供 LoginHandler 回调使用
   public void sendRoomList(ClientSession session) {
-    // 委托给 LobbyService 的单人版本（或直接复用已有逻辑）
-    // 简单实现：直接调用 RoomListHandler 的相同逻辑，但为了集中管理，我们在 RoomListHandler 里暴露一个静态方法或通过 LobbyService
-    // 提供单用户发送。
-    // 这里直接在内部构建 JSON 并发送
     var rooms = JsonUtils.MAPPER.createArrayNode();
     if (coordinator != null) {
       for (var entry : coordinator.getAllRooms()) {
