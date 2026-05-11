@@ -22,8 +22,6 @@ public class GameLoadTestClient {
   private final AtomicLong totalTx = new AtomicLong(0);
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
   private final EventLoopGroup group;
-
-  // 保存所有已建立的连接，用于测试结束后关闭
   private final List<Channel> channels = new CopyOnWriteArrayList<>();
 
   public GameLoadTestClient(String host, int port, int concurrentClients, int durationSeconds) {
@@ -57,19 +55,16 @@ public class GameLoadTestClient {
               },
               "client-init-" + i)
           .start();
-      Thread.sleep(10); // 控制连接速率
+      Thread.sleep(10);
     }
 
     boolean allConnected = latch.await(30, TimeUnit.SECONDS);
     if (!allConnected) {
       System.err.println(
-          "Warning: Not all clients connected in time, proceeding with "
-              + channels.size()
-              + " clients");
+          "Warning: Not all clients connected, proceeding with " + channels.size() + " clients");
     }
     System.out.println("All clients connected (" + channels.size() + "), running test...");
 
-    // 定时输出 TPS
     ScheduledFuture<?> statsFuture =
         scheduler.scheduleAtFixedRate(
             () -> {
@@ -82,23 +77,17 @@ public class GameLoadTestClient {
             1,
             TimeUnit.SECONDS);
 
-    // 运行指定时间
     Thread.sleep(durationSeconds * 1000L);
-
-    // 停止统计
     statsFuture.cancel(false);
 
-    // 自动登出：通知所有客户端下线（关闭前发送 LOGOUT 命令）
     System.out.println("Sending LOGOUT to all clients...");
     for (Channel ch : channels) {
       if (ch.isActive()) {
         ch.writeAndFlush("{\"cmd\":\"LOGOUT\"}").awaitUninterruptibly(200);
       }
     }
-    // 给网络一点时间发送完消息
     Thread.sleep(500);
 
-    // 关闭所有连接
     System.out.println("Test duration reached, closing all connections...");
     for (Channel ch : channels) {
       if (ch.isOpen()) {
@@ -106,14 +95,12 @@ public class GameLoadTestClient {
       }
     }
 
-    // 关闭 Netty 事件循环组
     group.shutdownGracefully().sync();
     scheduler.shutdown();
     try {
       scheduler.awaitTermination(1, TimeUnit.SECONDS);
     } catch (InterruptedException ignored) {
     }
-
     System.out.println("Test completed.");
     System.exit(0);
   }

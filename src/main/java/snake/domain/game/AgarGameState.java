@@ -8,24 +8,39 @@ import snake.ecs.systems.*;
 
 public class AgarGameState {
   private final World world;
-  private final Map<String, List<Entity>> playerEntities = new HashMap<>();
   private final int mapWidth, mapHeight;
   private int totalPlayers = 0;
+
+  // 仍保留玩家列表用于快速删除，但维护方式改为基于组件扫描
+  private final Map<String, List<Entity>> playerEntities = new HashMap<>();
 
   public AgarGameState(int roomId, int mapWidth, int mapHeight) {
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
     this.world = new World();
-    world.addSystem(new MovementSystem());
+
+    // 注册所有系统（顺序重要）
+    world.addSystem(new MovementSystem(mapWidth, mapHeight));
+    world.addSystem(new SplitExecutionSystem());
+    world.addSystem(new EjectSystem());
     world.addSystem(new CollisionSystem());
-    world.addSystem(new SplitSystem());
+    world.addSystem(new MergeUnlockSystem()); // 原 SplitSystem，处理合并冷却
     world.addSystem(new FoodSpawnSystem(mapWidth, mapHeight, 300));
+    world.addSystem(new DeathOnSpikeSystem());
 
     Random rand = new Random();
+    // 生成食物
     for (int i = 0; i < 200; i++) {
       Entity food = world.createEntity();
       food.add(new PositionComponent(rand.nextFloat() * mapWidth, rand.nextFloat() * mapHeight));
       food.add(new FoodComponent(10));
+    }
+    // 生成刺球
+    for (int i = 0; i < 15; i++) {
+      Entity spike = world.createEntity();
+      spike.add(new PositionComponent(rand.nextFloat() * mapWidth, rand.nextFloat() * mapHeight));
+      spike.add(new MassComponent(200 + rand.nextFloat() * 100));
+      spike.add(new SpikeComponent());
     }
   }
 
@@ -37,7 +52,13 @@ public class AgarGameState {
     Random rand = new Random();
     float startX = rand.nextFloat() * mapWidth;
     float startY = rand.nextFloat() * mapHeight;
-    Entity mainBall = createBall(startX, startY, 100);
+    Entity mainBall = world.createEntity();
+    mainBall.add(new MassComponent(100));
+    mainBall.add(new PositionComponent(startX, startY));
+    mainBall.add(new VelocityComponent(0, 0));
+    mainBall.add(new TargetComponent(startX, startY));
+    mainBall.add(new SplitCooldownComponent());
+    mainBall.add(new PlayerOwnerComponent(username));
     entities.add(mainBall);
     playerEntities.put(username, entities);
     totalPlayers++;
@@ -52,149 +73,84 @@ public class AgarGameState {
     }
   }
 
-  private Entity createBall(float x, float y, float mass) {
-    Entity ball = world.createEntity();
-    ball.add(new MassComponent(mass));
-    ball.add(new PositionComponent(x, y));
-    ball.add(new VelocityComponent(0, 0));
-    ball.add(new TargetComponent(x, y));
-    ball.add(new SplitCooldownComponent());
-    return ball;
-  }
-
+  // 移动目标
   public void updateTarget(String username, float x, float y) {
     List<Entity> balls = playerEntities.get(username);
-    if (balls == null) return;
-    x = clamp(x, 0, mapWidth);
-    y = clamp(y, 0, mapHeight);
-    for (Entity ball : balls) {
-      if (ball.has(TargetComponent.class)) {
-        TargetComponent tc = ball.get(TargetComponent.class);
-        tc.tx = x;
-        tc.ty = y;
+    if (balls != null) {
+      for (Entity ball : balls) {
+        if (ball.has(TargetComponent.class)) {
+          TargetComponent tc = ball.get(TargetComponent.class);
+          tc.tx = x;
+          tc.ty = y;
+        }
       }
     }
   }
 
+  // 请求分裂（仅添加组件，由 SplitExecutionSystem 处理）
   public void splitPlayer(String username, float targetX, float targetY) {
     List<Entity> balls = playerEntities.get(username);
-    if (balls == null || balls.isEmpty()) return;
-    Entity mainBall = balls.get(0);
-    SplitCooldownComponent cooldown = mainBall.get(SplitCooldownComponent.class);
-    if (cooldown != null
-        && java.lang.System.currentTimeMillis() - cooldown.lastSplitTime
-            < SplitSystem.SPLIT_COOLDOWN) return;
-    MassComponent mass = mainBall.get(MassComponent.class);
-    if (mass.mass < 36) return;
-
-    float splitMass = mass.mass * 0.5f;
-    mass.mass -= splitMass;
-
-    PositionComponent pos = mainBall.get(PositionComponent.class);
-    float angle = (float) Math.atan2(targetY - pos.y, targetX - pos.x);
-    float initDist = (float) (Math.sqrt(mass.mass) * 2 + Math.sqrt(splitMass) * 2 + 10);
-
-    Entity child =
-        createBall(
-            pos.x + (float) Math.cos(angle) * initDist,
-            pos.y + (float) Math.sin(angle) * initDist,
-            splitMass);
-    child.get(TargetComponent.class).tx = targetX;
-    child.get(TargetComponent.class).ty = targetY;
-    child.add(
-        new MergeLockComponent(
-            java.lang.System.currentTimeMillis() + SplitSystem.MERGE_LOCK_TIME, mainBall));
-    balls.add(child);
-    if (cooldown != null) cooldown.lastSplitTime = java.lang.System.currentTimeMillis();
+    if (balls != null && !balls.isEmpty()) {
+      Entity main = balls.get(0);
+      main.add(new SplitRequestComponent(targetX, targetY));
+      // 同步更新目标，让分裂出的球也朝向该方向
+      if (main.has(TargetComponent.class)) {
+        TargetComponent tc = main.get(TargetComponent.class);
+        tc.tx = targetX;
+        tc.ty = targetY;
+      }
+    }
   }
 
+  // 请求弹射
   public void ejectMass(String username, float targetX, float targetY) {
     List<Entity> balls = playerEntities.get(username);
-    if (balls == null || balls.isEmpty()) return;
-    Entity main = balls.get(0);
-    MassComponent pm = main.get(MassComponent.class);
-    if (pm.mass < 30) return;
-
-    float ejectMass = 16f;
-    pm.mass -= ejectMass;
-
-    PositionComponent pp = main.get(PositionComponent.class);
-    float angle = (float) Math.atan2(targetY - pp.y, targetX - pp.x);
-    float initDist = (float) (Math.sqrt(pm.mass) * 2 + 10);
-
-    Entity ejected = world.createEntity();
-    ejected.add(new MassComponent(ejectMass));
-    ejected.add(
-        new PositionComponent(
-            pp.x + (float) Math.cos(angle) * initDist, pp.y + (float) Math.sin(angle) * initDist));
-    ejected.add(new VelocityComponent((float) Math.cos(angle) * 4, (float) Math.sin(angle) * 4));
+    if (balls != null && !balls.isEmpty()) {
+      balls.get(0).add(new EjectRequestComponent(targetX, targetY));
+    }
   }
 
   public void update() {
     world.update();
-    updateEjectedBalls();
     syncPlayerEntities();
   }
 
-  private void updateEjectedBalls() {
-    for (Entity e : world.entities) {
-      if (!e.has(VelocityComponent.class) || !e.has(PositionComponent.class)) continue;
-      if (e.has(TargetComponent.class)) continue; // 跳过玩家球
-      PositionComponent pos = e.get(PositionComponent.class);
-      VelocityComponent vel = e.get(VelocityComponent.class);
-      pos.x += vel.vx * 0.016f;
-      pos.y += vel.vy * 0.016f;
-      if (pos.x < 0 || pos.x > mapWidth) vel.vx = -vel.vx;
-      if (pos.y < 0 || pos.y > mapHeight) vel.vy = -vel.vy;
-      pos.x = clamp(pos.x, 0, mapWidth);
-      pos.y = clamp(pos.y, 0, mapHeight);
-    }
-  }
-
+  // 将 world 中的实体同步回玩家列表（自动补充分裂/弹射产生的新球，移除已删除的球）
   private void syncPlayerEntities() {
-    Iterator<Map.Entry<String, List<Entity>>> it = playerEntities.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry<String, List<Entity>> entry = it.next();
-      entry.getValue().removeIf(ball -> !world.entities.contains(ball));
-      if (entry.getValue().isEmpty()) {
-        it.remove();
-        totalPlayers--;
+    // 先收集 world 中所有带 PlayerOwnerComponent 的实体，按玩家分组
+    Map<String, List<Entity>> newMap = new HashMap<>();
+    for (Entity e : world.entities) {
+      if (e.has(PlayerOwnerComponent.class)) {
+        String owner = e.get(PlayerOwnerComponent.class).username;
+        newMap.computeIfAbsent(owner, k -> new ArrayList<>()).add(e);
       }
     }
+    // 更新 playerEntities
+    playerEntities.clear();
+    playerEntities.putAll(newMap);
+    totalPlayers = playerEntities.size();
   }
 
-  // 修正后的 getPlayerStates：返回玩家球 + 中立球（弹出质量）
   public List<AgarPlayerState> getPlayerStates() {
     List<AgarPlayerState> states = new ArrayList<>();
-    // 先收集所有特定玩家的实体，用于排除
-    Set<Entity> ownedEntities = new HashSet<>();
-    for (List<Entity> list : playerEntities.values()) {
-      ownedEntities.addAll(list);
-    }
+    // 遍历所有有质量的实体（除了刺球）生成状态
+    for (Entity e : world.entities) {
+      if (!e.has(MassComponent.class) || !e.has(PositionComponent.class)) continue;
+      if (e.has(SpikeComponent.class)) continue; // 刺球单独处理
 
-    // 1. 添加玩家控制的球
-    for (Map.Entry<String, List<Entity>> e : playerEntities.entrySet()) {
-      String username = e.getKey();
-      for (Entity ball : e.getValue()) {
-        if (ball.has(MassComponent.class) && ball.has(PositionComponent.class)) {
-          PositionComponent pos = ball.get(PositionComponent.class);
-          states.add(
-              new AgarPlayerState(username, pos.x, pos.y, ball.get(MassComponent.class).mass));
-        }
-      }
+      PositionComponent pos = e.get(PositionComponent.class);
+      float mass = e.get(MassComponent.class).mass;
+      String owner =
+          e.has(PlayerOwnerComponent.class) ? e.get(PlayerOwnerComponent.class).username : "";
+      states.add(new AgarPlayerState(owner, pos.x, pos.y, mass));
     }
-
-    // 2. 添加弹出的质量球（中立球，不属于任何玩家）
-    for (Entity entity : world.entities) {
-      if (!ownedEntities.contains(entity)
-          && entity.has(MassComponent.class)
-          && entity.has(PositionComponent.class)) {
-        // 排除食物（有FoodComponent的实体）
-        if (entity.has(FoodComponent.class)) continue;
-        PositionComponent pos = entity.get(PositionComponent.class);
-        float mass = entity.get(MassComponent.class).mass;
-        // 没有名字，客户端可以渲染为无色球或灰色
-        states.add(new AgarPlayerState("", pos.x, pos.y, mass));
+    // 刺球
+    for (Entity e : world.entities) {
+      if (e.has(SpikeComponent.class)
+          && e.has(PositionComponent.class)
+          && e.has(MassComponent.class)) {
+        PositionComponent pos = e.get(PositionComponent.class);
+        states.add(new AgarPlayerState("SPIKE", pos.x, pos.y, e.get(MassComponent.class).mass));
       }
     }
     return states;
@@ -211,7 +167,6 @@ public class AgarGameState {
     return list;
   }
 
-  // 为了兼容老代码，这个 getActiveUsernames 暂时保留，返回玩家用户名列表
   public Iterable<GameState.Player> getActiveUsernames() {
     List<GameState.Player> list = new ArrayList<>();
     for (String username : playerEntities.keySet()) {
@@ -241,9 +196,5 @@ public class AgarGameState {
       this.y = y;
       this.mass = mass;
     }
-  }
-
-  private float clamp(float val, float min, float max) {
-    return Math.max(min, Math.min(max, val));
   }
 }

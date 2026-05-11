@@ -1,29 +1,67 @@
-// snake/ecs/systems/CollisionSystem.java
 package snake.ecs.systems;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import snake.ecs.Entity;
-import snake.ecs.System;
 import snake.ecs.World;
 import snake.ecs.components.*;
 
-public class CollisionSystem implements System {
+public class CollisionSystem implements snake.ecs.System {
 
   @Override
   public void update(World world) {
+    // 0. 先处理“野生球”（弹出物等）被任何玩家球吸收，无需比较质量大小
+    List<Entity> playerBalls =
+        world.entities.stream()
+            .filter(
+                e ->
+                    e.has(TargetComponent.class) // 有目标=玩家球
+                        && e.has(MassComponent.class)
+                        && e.has(PositionComponent.class)
+                        && !e.has(SpikeComponent.class))
+            .collect(Collectors.toList());
+
+    List<Entity> wildBalls =
+        world.entities.stream()
+            .filter(
+                e ->
+                    e.has(MassComponent.class)
+                        && e.has(PositionComponent.class)
+                        && !e.has(TargetComponent.class) // 没有目标
+                        && !e.has(SpikeComponent.class) // 不是刺球
+                        && !e.has(FoodComponent.class) // 不是食物
+                        && !e.has(PlayerOwnerComponent.class)) // 不是玩家分身
+            .collect(Collectors.toList());
+
+    List<Entity> toRemove = new ArrayList<>();
+    for (Entity wild : wildBalls) {
+      MassComponent wm = wild.get(MassComponent.class);
+      PositionComponent wp = wild.get(PositionComponent.class);
+      for (Entity player : playerBalls) {
+        if (toRemove.contains(player)) continue;
+        PositionComponent pp = player.get(PositionComponent.class);
+        float dx = wp.x - pp.x;
+        float dy = wp.y - pp.y;
+        float radius = (float) Math.sqrt(player.get(MassComponent.class).mass) * 2;
+        if (dx * dx + dy * dy < radius * radius) {
+          player.get(MassComponent.class).mass += wm.mass;
+          toRemove.add(wild);
+          break;
+        }
+      }
+    }
+
+    // 1. 玩家球之间的吞噬（需要1.15倍质量差）
     List<Entity> balls =
         world.entities.stream()
             .filter(
                 e ->
                     e.has(MassComponent.class)
                         && !e.has(MergeLockComponent.class)
-                        && e.has(PositionComponent.class))
+                        && e.has(PositionComponent.class)
+                        && !e.has(SpikeComponent.class))
             .collect(Collectors.toList());
 
-    List<Entity> toRemove = new ArrayList<>();
-
-    // ---------- 球与球的吞噬 ----------
     for (int i = 0; i < balls.size(); i++) {
       Entity a = balls.get(i);
       if (toRemove.contains(a)) continue;
@@ -45,7 +83,6 @@ public class CollisionSystem implements System {
           if (distSq < bigR * bigR) {
             am.mass += bm.mass;
             toRemove.add(b);
-            continue;
           }
         } else if (bm.mass > am.mass * 1.15f) {
           float bigR = (float) Math.sqrt(bm.mass) * 2;
@@ -58,14 +95,13 @@ public class CollisionSystem implements System {
       }
     }
 
-    // ---------- 球吃食物 ----------
+    // 2. 球吃食物（保留原逻辑）
     for (Entity ball : balls) {
       if (toRemove.contains(ball)) continue;
       MassComponent mass = ball.get(MassComponent.class);
       PositionComponent pos = ball.get(PositionComponent.class);
-      float radius = (float) Math.sqrt(mass.mass) * 2; // 与吞噬半径一致
+      float radius = (float) Math.sqrt(mass.mass) * 2;
 
-      // 遍历所有食物
       List<Entity> foods =
           world.entities.stream()
               .filter(e -> e.has(FoodComponent.class) && !e.get(FoodComponent.class).eaten)
@@ -77,12 +113,13 @@ public class CollisionSystem implements System {
         float dx = pos.x - fp.x;
         float dy = pos.y - fp.y;
         if (dx * dx + dy * dy < radius * radius) {
-          mass.mass += fc.mass; // 增加质量
-          fc.eaten = true; // 标记食物被吃（FoodRefreshSystem 会刷新它）
+          mass.mass += fc.mass;
+          fc.eaten = true;
         }
       }
     }
 
+    // 3. 移除所有被吃掉的实体
     for (Entity e : toRemove) {
       world.removeEntity(e);
     }

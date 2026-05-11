@@ -1,3 +1,4 @@
+// snake/client/swing/AgarCanvas.java
 package snake.client.swing;
 
 import java.awt.*;
@@ -9,14 +10,14 @@ import snake.client.Config;
 
 public class AgarCanvas extends JPanel {
   private static final Color[] BALL_COLORS = {
-    new Color(0xE5, 0x39, 0x35), // 红
-    new Color(0x1E, 0x88, 0xE5), // 蓝
-    new Color(0x43, 0xA0, 0x47), // 绿
-    new Color(0xFB, 0x8C, 0x00), // 橙
-    new Color(0x8E, 0x24, 0xAA), // 紫
-    new Color(0x00, 0xAC, 0xC1), // 青
-    new Color(0xE5, 0x39, 0x9E), // 粉
-    new Color(0x7C, 0xB3, 0x42), // 黄绿
+    new Color(0xE5, 0x39, 0x35),
+    new Color(0x1E, 0x88, 0xE5),
+    new Color(0x43, 0xA0, 0x47),
+    new Color(0xFB, 0x8C, 0x00),
+    new Color(0x8E, 0x24, 0xAA),
+    new Color(0x00, 0xAC, 0xC1),
+    new Color(0xE5, 0x39, 0x9E),
+    new Color(0x7C, 0xB3, 0x42),
   };
 
   private List<AgarBall> balls;
@@ -52,7 +53,6 @@ public class AgarCanvas extends JPanel {
     if (totalMass > 0) {
       cameraX = sumX / totalMass;
       cameraY = sumY / totalMass;
-      // 根据总质量调整缩放
       float desiredScale = 500f / (float) Math.sqrt(totalMass);
       scale = Math.max(0.3f, Math.min(1.5f, desiredScale));
     }
@@ -74,7 +74,6 @@ public class AgarCanvas extends JPanel {
     Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // 背景网格 (仅作装饰，根据摄像机移动)
     drawGrid(g2d);
 
     // 食物
@@ -88,7 +87,7 @@ public class AgarCanvas extends JPanel {
       }
     }
 
-    // 玩家球
+    // 玩家球 / 刺球
     if (balls != null) {
       for (AgarBall ball : balls) {
         Point p = worldToScreen(ball.x, ball.y);
@@ -96,12 +95,15 @@ public class AgarCanvas extends JPanel {
         if (p.x < -r * 2 || p.x > getWidth() + r * 2 || p.y < -r * 2 || p.y > getHeight() + r * 2)
           continue;
 
-        // 根据用户名哈希选择颜色
+        // 刺球特殊绘制
+        if (ball.username.equals("SPIKE")) {
+          drawSpikeBall(g2d, p.x, p.y, r);
+          continue;
+        }
+
         Color color = BALL_COLORS[Math.abs(ball.username.hashCode()) % BALL_COLORS.length];
-        // 外部光晕
         g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 60));
         g2d.fillOval(p.x - r - 4, p.y - r - 4, 2 * (r + 4), 2 * (r + 4));
-        // 本体
         RadialGradientPaint rgp =
             new RadialGradientPaint(
                 p.x - r * 0.3f,
@@ -111,12 +113,9 @@ public class AgarCanvas extends JPanel {
                 new Color[] {color.brighter(), color, color.darker()});
         g2d.setPaint(rgp);
         g2d.fillOval(p.x - r, p.y - r, 2 * r, 2 * r);
-        // 边框
         g2d.setColor(color.darker());
         g2d.setStroke(new BasicStroke(1.5f));
         g2d.drawOval(p.x - r, p.y - r, 2 * r, 2 * r);
-
-        // 名字
         if (r > 10) {
           g2d.setColor(Color.WHITE);
           g2d.setFont(new Font("SansSerif", Font.BOLD, Math.max(10, r / 3)));
@@ -129,9 +128,26 @@ public class AgarCanvas extends JPanel {
     }
   }
 
+  private void drawSpikeBall(Graphics2D g2d, int x, int y, int radius) {
+    // 深红底色
+    g2d.setColor(new Color(180, 40, 40));
+    g2d.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+    // 尖刺
+    g2d.setColor(Color.RED);
+    g2d.setStroke(new BasicStroke(2f));
+    for (int i = 0; i < 8; i++) {
+      double angle = i * Math.PI / 4;
+      int sx = x + (int) (Math.cos(angle) * (radius + 4));
+      int sy = y + (int) (Math.sin(angle) * (radius + 4));
+      int ex = x + (int) (Math.cos(angle) * (radius * 1.5));
+      int ey = y + (int) (Math.sin(angle) * (radius * 1.5));
+      g2d.drawLine(sx, sy, ex, ey);
+    }
+  }
+
   private void drawGrid(Graphics2D g2d) {
     g2d.setColor(new Color(40, 40, 70, 80));
-    int step = 50; // 世界单位间隔
+    int step = 50;
     float worldStep = step * scale;
     float startX = (cameraX % step) * scale;
     float startY = (cameraY % step) * scale;
@@ -143,7 +159,6 @@ public class AgarCanvas extends JPanel {
     }
   }
 
-  // 添加到 AgarCanvas 类中
   public Point.Float screenToWorld(int sx, int sy) {
     float wx = (sx - getWidth() / 2f) / scale + cameraX;
     float wy = (sy - getHeight() / 2f) / scale + cameraY;

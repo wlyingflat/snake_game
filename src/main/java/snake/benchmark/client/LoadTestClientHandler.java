@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import snake.common.JsonUtils;
 
 public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true; // 打开调试，观察前几个客户端
+  private static final int MAP_WIDTH = 3000;
+  private static final int MAP_HEIGHT = 3000;
 
   private final int clientId;
   private final AtomicLong successCount;
@@ -45,13 +47,8 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) {
-    System.out.println("Client " + clientId + " connected");
-    ObjectNode register = JsonUtils.MAPPER.createObjectNode();
-    register.put("cmd", "REGISTER");
-    register.put("username", username);
-    register.put("password", "password");
-    ctx.writeAndFlush(register.toString());
-
+    if (clientId < 5) System.out.println("Client " + clientId + " connected");
+    // 直接发送 LOGIN，不做 REGISTER
     ObjectNode login = JsonUtils.MAPPER.createObjectNode();
     login.put("cmd", "LOGIN");
     login.put("username", username);
@@ -63,15 +60,13 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
     if (msg instanceof String text) {
       totalTx.incrementAndGet();
-      if (DEBUG && clientId < 5) {
+      if (DEBUG && clientId < 2) {
         System.out.println("[DEBUG client " + clientId + "] recv: " + text);
       }
       try {
         var root = JsonUtils.MAPPER.readTree(text);
         String cmd = root.get("cmd").asText();
         switch (cmd) {
-          case "REGISTER_OK":
-            break;
           case "LOGIN_OK":
             if (!loginCounted) {
               loginCounted = true;
@@ -85,26 +80,40 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
               joined = true;
               successCount.incrementAndGet();
             }
-            startSendingInputs(ctx);
+            startSendingActions(ctx);
             break;
           case "PONG":
             break;
           case "ERROR":
             String errMsg = root.has("message") ? root.get("message").asText() : "";
-            if (errMsg.contains("Room not available")
+            if (clientId < 2) {
+              System.err.println("Client " + clientId + " error: " + errMsg);
+            }
+            // 如果是因为在线冲突，重试登录
+            if (errMsg.contains("already online")) {
+              ctx.executor()
+                  .schedule(
+                      () -> {
+                        if (ctx.channel().isActive()) {
+                          ObjectNode relogin = JsonUtils.MAPPER.createObjectNode();
+                          relogin.put("cmd", "LOGIN");
+                          relogin.put("username", username);
+                          relogin.put("password", "password");
+                          ctx.writeAndFlush(relogin.toString());
+                        }
+                      },
+                      3,
+                      TimeUnit.SECONDS);
+            } else if (errMsg.contains("Room not available")
                 || errMsg.contains("Cannot create room")
                 || errMsg.contains("Room not found")) {
               ctx.executor()
                   .schedule(
                       () -> {
-                        if (ctx.channel().isActive()) {
-                          createOrJoinRoom(ctx);
-                        }
+                        if (ctx.channel().isActive()) createOrJoinRoom(ctx);
                       },
                       2,
                       TimeUnit.SECONDS);
-            } else {
-              System.err.println("Client " + clientId + " fatal error: " + text);
             }
             break;
           default:
@@ -117,9 +126,7 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
       totalTx.incrementAndGet();
       buf.release();
     } else {
-      if (msg instanceof ByteBuf unknownBuf) {
-        unknownBuf.release();
-      }
+      if (msg instanceof ByteBuf unknownBuf) unknownBuf.release();
     }
   }
 
@@ -130,16 +137,33 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
     ctx.writeAndFlush(create.toString());
   }
 
-  private void startSendingInputs(ChannelHandlerContext ctx) {
+  private void startSendingActions(ChannelHandlerContext ctx) {
     if (tickTask != null) return;
     tickTask =
         tickScheduler.scheduleAtFixedRate(
             () -> {
               if (!loggedIn) return;
-              ObjectNode input = JsonUtils.MAPPER.createObjectNode();
-              input.put("cmd", "INPUT");
-              input.put("direction", randomDirection());
-              ctx.writeAndFlush(input.toString());
+              float targetX = (float) (Math.random() * MAP_WIDTH);
+              float targetY = (float) (Math.random() * MAP_HEIGHT);
+              ObjectNode move = JsonUtils.MAPPER.createObjectNode();
+              move.put("cmd", "MOVE");
+              move.put("x", targetX);
+              move.put("y", targetY);
+              ctx.writeAndFlush(move.toString());
+              if (Math.random() < 0.1) {
+                ObjectNode split = JsonUtils.MAPPER.createObjectNode();
+                split.put("cmd", "SPLIT");
+                split.put("x", targetX);
+                split.put("y", targetY);
+                ctx.writeAndFlush(split.toString());
+              }
+              if (Math.random() < 0.05) {
+                ObjectNode eject = JsonUtils.MAPPER.createObjectNode();
+                eject.put("cmd", "EJECT");
+                eject.put("x", targetX);
+                eject.put("y", targetY);
+                ctx.writeAndFlush(eject.toString());
+              }
             },
             0,
             200,
@@ -154,11 +178,6 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
         TimeUnit.SECONDS);
   }
 
-  private String randomDirection() {
-    String[] dirs = {"UP", "DOWN", "LEFT", "RIGHT"};
-    return dirs[(int) (Math.random() * 4)];
-  }
-
   @Override
   public void channelInactive(ChannelHandlerContext ctx) {
     if (tickTask != null) tickTask.cancel(false);
@@ -167,7 +186,6 @@ public class LoadTestClientHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    cause.printStackTrace();
     ctx.close();
   }
 }
