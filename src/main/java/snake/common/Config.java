@@ -25,7 +25,7 @@ public class Config {
   // ==================== 游戏参数 ====================
   public static final int MAP_WIDTH = provider.getInt("map.width", 40);
   public static final int MAP_HEIGHT = provider.getInt("map.height", 20);
-  public static final int TICK_INTERVAL_MS = provider.getInt("tick.interval.ms", 200);
+  public static final int TICK_INTERVAL_MS = provider.getInt("tick.interval.ms", 20);
   public static final int MAX_SNAKE_LENGTH = provider.getInt("max.snake.length", 63);
   public static final int OBSTACLE_COUNT = provider.getInt("obstacle.count", 15);
   public static final int MAX_SPAWN_ATTEMPTS = provider.getInt("max.spawn.attempts", 100);
